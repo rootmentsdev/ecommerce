@@ -98,3 +98,34 @@ button {
   font-family: 'Playfair Display', serif !important;
   font-weight: 600 !important;
 }
+
+/* Mobile App Style - Sharp Edges */
+.card,
+.btn,
+.form-control,
+.form-select,
+.modal-content,
+.dropdown-menu,
+.navbar,
+.offcanvas,
+.list-group-item {
+  border-radius: 0px !important;
+}
+
+/* Ensure all Bootstrap components have sharp edges */
+.card-img,
+.card-img-top,
+.card-img-bottom {
+  border-radius: 0px !important;
+}
+
+/* Remove rounded corners from buttons */
+.btn {
+  border-radius: 0px !important;
+}
+
+/* Remove rounded corners from form elements */
+.form-control,
+.form-select {
+  border-radius: 0px !important;
+}

@@ -32,12 +32,16 @@ export const PRODUCT_TYPES = {
 
 export const CARD_SIZES = {
   PRODUCT: {
-    WIDTH: '220px',
+    WIDTH: '180px',
     HEIGHT: '320px',
-    IMAGE_HEIGHT: '220px',
-    TEXT_HEIGHT: '100px'
+    IMAGE_HEIGHT: '240px',
+    TEXT_HEIGHT: '80px'
   },
   CATEGORY: {
     ASPECT_RATIO: '1'
+  },
+  FEATURE: {
+    HEIGHT: '120px',
+    BORDER_RADIUS: '12px 12px 0px 0px'
   }
 };

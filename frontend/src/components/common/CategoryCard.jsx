@@ -1,7 +1,7 @@
 // Reusable CategoryCard component following clean code principles
 import React from 'react';
 import { Card } from 'react-bootstrap';
-import { APP_CONFIG, CARD_SIZES } from '../../constants';
+import { APP_CONFIG } from '../../constants';
 
 const CategoryCard = ({ 
   category, 
@@ -15,8 +15,9 @@ const CategoryCard = ({
   };
 
   const cardStyles = {
-    aspectRatio: CARD_SIZES.CATEGORY.ASPECT_RATIO,
-    cursor: onClick ? 'pointer' : 'default'
+    aspectRatio: '1',
+    cursor: onClick ? 'pointer' : 'default',
+    borderRadius: '12px'
   };
 
   const imageStyles = {
@@ -25,7 +26,8 @@ const CategoryCard = ({
     objectFit: 'cover',
     position: 'absolute',
     top: 0,
-    left: 0
+    left: 0,
+    borderRadius: '12px'
   };
 
   const overlayStyles = {
@@ -33,8 +35,9 @@ const CategoryCard = ({
   };
 
   const textStyles = {
-    fontFamily: APP_CONFIG.FONTS.PRIMARY,
-    fontWeight: '600'
+    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+    fontWeight: '600',
+    fontSize: '14px'
   };
 
   return (
