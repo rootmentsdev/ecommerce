@@ -1,26 +1,18 @@
 import React from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, Card, Image } from 'react-bootstrap';
 import { Search, Cart, Truck, ArrowClockwise } from 'react-bootstrap-icons';
 
-// Import reusable components
-import ProductCard from './common/ProductCard';
-import CategoryCard from './common/CategoryCard';
-import FeatureIcon from './common/FeatureIcon';
-import HorizontalScroll from './common/HorizontalScroll';
-
-// Import constants and utilities
-import { APP_CONFIG } from '../constants';
-
 const HomePageContent = () => {
-  // Data moved to constants for better maintainability
-  const FEATURES = [
+  // Feature data
+  const features = [
     { icon: Search, title: 'Browse & Select' },
     { icon: Cart, title: 'Choose Rentals' },
     { icon: Truck, title: 'Book With Deposit' },
     { icon: ArrowClockwise, title: 'Return & Refund' }
   ];
 
-  const NEW_ARRIVALS = [
+  // Product data
+  const newArrivals = [
     { id: 1, name: 'Formal Suit', price: '₹1400', image: '/src/assets/demo1.png' },
     { id: 2, name: 'Formal Suit', price: '₹1400', image: '/src/assets/demo2.png' },
     { id: 3, name: 'Premium S', price: '₹1400', image: '/src/assets/demo3.png' },
@@ -31,7 +23,8 @@ const HomePageContent = () => {
     { id: 8, name: 'Casual Blazer', price: '₹1200', image: '/src/assets/demo2.png' }
   ];
 
-  const CATEGORIES = [
+  // Category data
+  const categories = [
     { id: 1, name: 'Premium Suit', image: '/src/assets/demo1.png' },
     { id: 2, name: 'Formal Wear', image: '/src/assets/demo2.png' },
     { id: 3, name: 'Sherwani', image: '/src/assets/demo3.png' },
@@ -40,217 +33,302 @@ const HomePageContent = () => {
     { id: 6, name: 'Accessories', image: '/src/assets/demo3.png' }
   ];
 
-  const OCCASIONS = [
+  // Occasion data
+  const occasions = [
     { id: 1, name: 'Wedding', image: '/src/assets/demo1.png' },
     { id: 2, name: 'Party', image: '/src/assets/demo2.png' },
     { id: 3, name: 'Formal', image: '/src/assets/demo3.png' }
   ];
 
-  // Event handlers following clean code principles
-  const handleProductClick = (product) => {
-    console.log('Product clicked:', product);
-    // TODO: Navigate to product detail page
-  };
-
-  const handleCategoryClick = (category) => {
-    console.log('Category clicked:', category);
-    // TODO: Navigate to category page
-  };
-
-  const handleOccasionClick = (occasion) => {
-    console.log('Occasion clicked:', occasion);
-    // TODO: Navigate to occasion page
-  };
-
-  const handleViewMoreClick = () => {
-    console.log('View more clicked');
-    // TODO: Navigate to all products page
-  };
-
-  const handleRentNowClick = () => {
-    console.log('Rent now clicked');
-    // TODO: Navigate to rental page
-  };
-
-  // Reusable style objects following clean code principles
-  const heroStyles = {
-    height: '50vh',
-    backgroundImage: 'url(/src/assets/HomePage.png)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat'
-  };
-
-  const heroOverlayStyles = {
-    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))'
-  };
-
-  const titleStyles = {
-    fontFamily: APP_CONFIG.FONTS.PRIMARY,
-    letterSpacing: '-0.03em'
-  };
-
-  const subtitleStyles = {
-    fontFamily: APP_CONFIG.FONTS.SECONDARY
-  };
-
-  const sectionTitleStyles = {
-    fontFamily: APP_CONFIG.FONTS.PRIMARY,
-    letterSpacing: '-0.02em'
-  };
-
-  const buttonStyles = {
-    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-    fontWeight: '600'
-  };
-
-  // Render methods following single responsibility principle
-  const renderHeroSection = () => (
-    <div className="position-relative" style={heroStyles}>
-      <div 
-        className="position-absolute bottom-0 start-0 end-0 text-white p-4"
-        style={heroOverlayStyles}
-      >
-        <Container>
-          <Row>
-            <Col>
-              <h1 
-                className="display-4 fw-bold mb-2"
-                style={titleStyles}
-              >
-                Rent Your<br />Perfect Look
-              </h1>
-              <p 
-                className="fs-5 mb-3 opacity-90"
-                style={subtitleStyles}
-              >
-                Premium Suits, Ethnic<br />Wear & Accessories fo
-              </p>
-              <Button 
-                variant="light" 
-                size="lg"
-                className="px-4 py-2 rounded-2"
-                style={buttonStyles}
-                onClick={handleRentNowClick}
-              >
-                Rent Now
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-    </div>
-  );
-
-  const renderFeaturesSection = () => (
-    <Container className="py-5">
-      <Row className="justify-content-center">
-        {FEATURES.map((feature, index) => (
-          <Col key={index} xs={6} md={3} className="text-center mb-4">
-            <FeatureIcon 
-              icon={feature.icon} 
-              title={feature.title} 
-            />
-          </Col>
-        ))}
-      </Row>
-    </Container>
-  );
-
-  const renderNewArrivalsSection = () => (
-    <Container className="py-4">
-      <Row className="align-items-center mb-4">
-        <Col>
-          <h2 
-            className="h3 fw-bold mb-0"
-            style={sectionTitleStyles}
-          >
-            New Arrivals
-          </h2>
-        </Col>
-        <Col xs="auto">
-          <Button 
-            variant="link" 
-            className="p-0 text-decoration-none text-muted"
-            style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
-            onClick={handleViewMoreClick}
-          >
-            View More &gt;
-          </Button>
-        </Col>
-      </Row>
-      
-      <HorizontalScroll>
-        {NEW_ARRIVALS.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onClick={handleProductClick}
-          />
-        ))}
-      </HorizontalScroll>
-    </Container>
-  );
-
-  const renderCategorySection = () => (
-    <Container className="py-4">
-      <Row className="mb-4">
-        <Col>
-          <h2 
-            className="h3 fw-bold mb-0"
-            style={sectionTitleStyles}
-          >
-            Shop By Category
-          </h2>
-        </Col>
-      </Row>
-      
-      <Row className="g-3">
-        {CATEGORIES.map((category) => (
-          <Col key={category.id} xs={4} md={4}>
-            <CategoryCard
-              category={category}
-              onClick={handleCategoryClick}
-            />
-          </Col>
-        ))}
-      </Row>
-    </Container>
-  );
-
-  const renderOccasionSection = () => (
-    <Container className="py-4 pb-5">
-      <Row className="mb-4">
-        <Col>
-          <h2 
-            className="h3 fw-bold mb-0"
-            style={sectionTitleStyles}
-          >
-            Shop By Occassion
-          </h2>
-        </Col>
-      </Row>
-      
-      <Row className="g-3">
-        {OCCASIONS.map((occasion) => (
-          <Col key={occasion.id} xs={4} md={4}>
-            <CategoryCard
-              category={occasion}
-              onClick={handleOccasionClick}
-            />
-          </Col>
-        ))}
-      </Row>
-    </Container>
-  );
-
   return (
     <div className="bg-white">
-      {renderHeroSection()}
-      {renderFeaturesSection()}
-      {renderNewArrivalsSection()}
-      {renderCategorySection()}
-      {renderOccasionSection()}
+      <style>
+        {`
+          .horizontal-scroll::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
+      {/* Hero Section */}
+      <div 
+        className="position-relative"
+        style={{ 
+          height: '50vh',
+          backgroundImage: 'url(/src/assets/HomePage.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div 
+          className="position-absolute bottom-0 start-0 end-0 text-white p-4"
+          style={{
+            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))'
+          }}
+        >
+          <Container>
+            <Row>
+              <Col>
+                <h1 
+                  className="display-4 fw-bold mb-2"
+                  style={{ 
+                    fontFamily: "'Playfair Display', serif",
+                    letterSpacing: '-0.03em'
+                  }}
+                >
+                  Rent Your<br />Perfect Look
+                </h1>
+                <p 
+                  className="fs-5 mb-3 opacity-90"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
+                >
+                  Premium Suits, Ethnic<br />Wear & Accessories fo
+                </p>
+                <Button 
+                  variant="light" 
+                  size="lg"
+                  className="px-4 py-2 rounded-2"
+                  style={{ 
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: '600'
+                  }}
+                >
+                  Rent Now
+                </Button>
+              </Col>
+            </Row>
+          </Container>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <Container className="py-5">
+        <Row className="justify-content-center">
+          {features.map((feature, index) => {
+            const IconComponent = feature.icon;
+            return (
+              <Col key={index} xs={6} md={3} className="text-center mb-4">
+                <div 
+                  className="d-flex flex-column align-items-center"
+                  style={{ maxWidth: '120px', margin: '0 auto' }}
+                >
+                  <div 
+                    className="rounded-circle bg-light d-flex align-items-center justify-content-center mb-2"
+                    style={{ width: '48px', height: '48px' }}
+                  >
+                    <IconComponent size={20} className="text-dark" />
+                  </div>
+                  <small 
+                    className="text-center fw-medium"
+                    style={{ 
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: '12px',
+                      lineHeight: '1.3'
+                    }}
+                  >
+                    {feature.title}
+                  </small>
+                </div>
+              </Col>
+            );
+          })}
+        </Row>
+      </Container>
+
+      {/* New Arrivals Section */}
+      <Container className="py-4">
+        <Row className="align-items-center mb-4">
+          <Col>
+            <h2 
+              className="h3 fw-bold mb-0"
+              style={{ 
+                fontFamily: "'Playfair Display', serif",
+                letterSpacing: '-0.02em'
+              }}
+            >
+              New Arrivals
+            </h2>
+          </Col>
+          <Col xs="auto">
+            <Button 
+              variant="link" 
+              className="p-0 text-decoration-none text-muted"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              View More &gt;
+            </Button>
+          </Col>
+        </Row>
+        
+        <div 
+          className="d-flex overflow-auto pb-3 horizontal-scroll"
+          style={{ 
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            gap: '16px'
+          }}
+        >
+          {newArrivals.map((product) => (
+            <div key={product.id} style={{ width: '220px', flexShrink: 0 }}>
+              <Card className="border-0 shadow-sm h-100" style={{ height: '320px' }}>
+                <div className="position-relative" style={{ height: '220px' }}>
+                  <Card.Img 
+                    variant="top" 
+                    src={product.image}
+                    style={{ 
+                      height: '100%', 
+                      width: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '8px 8px 0 0'
+                    }}
+                  />
+                </div>
+                <Card.Body className="p-3 d-flex flex-column justify-content-between" style={{ height: '100px' }}>
+                  <Card.Title 
+                    className="h6 mb-2"
+                    style={{ 
+                      fontFamily: "'Playfair Display', serif",
+                      fontWeight: '600',
+                      fontSize: '14px',
+                      lineHeight: '1.3',
+                      height: '36px',
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}
+                  >
+                    {product.name}
+                  </Card.Title>
+                  <Card.Text 
+                    className="h5 mb-0 fw-bold"
+                    style={{ 
+                      fontFamily: "'Inter', sans-serif",
+                      fontWeight: '700',
+                      fontSize: '16px',
+                      color: '#000'
+                    }}
+                  >
+                    {product.price}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </div>
+          ))}
+        </div>
+      </Container>
+
+      {/* Shop By Category Section */}
+      <Container className="py-4">
+        <Row className="mb-4">
+          <Col>
+            <h2 
+              className="h3 fw-bold mb-0"
+              style={{ 
+                fontFamily: "'Playfair Display', serif",
+                letterSpacing: '-0.02em'
+              }}
+            >
+              Shop By Category
+            </h2>
+          </Col>
+        </Row>
+        
+        <Row className="g-3">
+          {categories.map((category) => (
+            <Col key={category.id} xs={4} md={4}>
+              <Card 
+                className="border-0 shadow-sm position-relative overflow-hidden"
+                style={{ aspectRatio: '1' }}
+              >
+                <Card.Img 
+                  src={category.image}
+                  style={{ 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%'
+                  }}
+                />
+                <div 
+                  className="position-absolute bottom-0 start-0 end-0 text-white p-3"
+                  style={{
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))'
+                  }}
+                >
+                  <Card.Text 
+                    className="mb-0 fw-semibold"
+                    style={{ 
+                      fontFamily: "'Playfair Display', serif",
+                      fontWeight: '600'
+                    }}
+                  >
+                    {category.name}
+                  </Card.Text>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Container>
+
+      {/* Shop By Occasion Section */}
+      <Container className="py-4 pb-5">
+        <Row className="mb-4">
+          <Col>
+            <h2 
+              className="h3 fw-bold mb-0"
+              style={{ 
+                fontFamily: "'Playfair Display', serif",
+                letterSpacing: '-0.02em'
+              }}
+            >
+              Shop By Occassion
+            </h2>
+          </Col>
+        </Row>
+        
+        <Row className="g-3">
+          {occasions.map((occasion) => (
+            <Col key={occasion.id} xs={4} md={4}>
+              <Card 
+                className="border-0 shadow-sm position-relative overflow-hidden"
+                style={{ aspectRatio: '1' }}
+              >
+                <Card.Img 
+                  src={occasion.image}
+                  style={{ 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%'
+                  }}
+                />
+                <div 
+                  className="position-absolute bottom-0 start-0 end-0 text-white p-3"
+                  style={{
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))'
+                  }}
+                >
+                  <Card.Text 
+                    className="mb-0 fw-semibold"
+                    style={{ 
+                      fontFamily: "'Playfair Display', serif",
+                      fontWeight: '600'
+                    }}
+                  >
+                    {occasion.name}
+                  </Card.Text>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Container>
     </div>
   );
 };
