@@ -7,6 +7,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import SideMenu from '../components/SideMenu';
+import FilterSidebar from '../components/common/FilterSidebar';
 
 // Import constants and utilities
 import { APP_CONFIG } from '../constants';
@@ -21,14 +23,26 @@ const ProductListing = () => {
 
   // Product data with categories
   const ALL_PRODUCTS = [
-    { id: 1, name: 'Premium Suit', price: 1400, image: '/src/assets/demo1.png', category: 'premium', type: 'newArrivals' },
-    { id: 2, name: 'Premium Suit', price: 1400, image: '/src/assets/demo2.png', category: 'premium', type: 'newArrivals' },
-    { id: 3, name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png', category: 'premium', type: 'newArrivals' },
-    { id: 4, name: 'Kurta Set - Black', price: 1400, image: '/src/assets/demo1.png', category: 'traditional', type: 'traditional' },
-    { id: 5, name: 'Indo-Western Men', price: 1400, image: '/src/assets/demo2.png', category: 'traditional', type: 'traditional' },
-    { id: 6, name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png', category: 'premium', type: 'newArrivals' },
-    { id: 7, name: 'Premium Suit', price: 1400, image: '/src/assets/demo1.png', category: 'premium', type: 'newArrivals' },
-    { id: 8, name: 'Premium Suit', price: 1400, image: '/src/assets/demo2.png', category: 'premium', type: 'newArrivals' }
+    { id: 1, name: 'Premium Suit', price: 1400, image: '/src/assets/demo1.png', category: 'Premium Suits', occasion: 'Formal', size: 'M', type: 'newArrivals' },
+    { id: 2, name: 'Premium Suit', price: 1400, image: '/src/assets/demo2.png', category: 'Premium Suits', occasion: 'Wedding', size: 'L', type: 'newArrivals' },
+    { id: 3, name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png', category: 'Premium Suits', occasion: 'Formal', size: 'XL', type: 'newArrivals' },
+    { id: 4, name: 'Kurta Set - Black', price: 1400, image: '/src/assets/demo1.png', category: 'Kurta', occasion: 'Wedding', size: 'M', type: 'traditional' },
+    { id: 5, name: 'Indo-Western Men', price: 1400, image: '/src/assets/demo2.png', category: 'Indo-Western', occasion: 'Party', size: 'L', type: 'traditional' },
+    { id: 6, name: 'Formal Wear', price: 1800, image: '/src/assets/demo3.png', category: 'Formal Wear', occasion: 'Formal', size: 'S', type: 'newArrivals' },
+    { id: 7, name: 'Sherwani', price: 2200, image: '/src/assets/demo1.png', category: 'Sherwani', occasion: 'Wedding', size: 'M', type: 'traditional' },
+    { id: 8, name: 'Designer Tie', price: 500, image: '/src/assets/demo2.png', category: 'Tie', occasion: 'Formal', size: 'M', type: 'accessories' },
+    { id: 9, name: 'Cufflinks', price: 300, image: '/src/assets/demo3.png', category: 'Cufflinks', occasion: 'Formal', size: 'M', type: 'accessories' },
+    { id: 10, name: 'Business Suit', price: 1600, image: '/src/assets/demo1.png', category: 'Premium Suits', occasion: 'Formal', size: 'L', type: 'newArrivals' },
+    { id: 11, name: 'Designer Blazer', price: 1800, image: '/src/assets/demo2.png', category: 'Premium Suits', occasion: 'Formal', size: 'M', type: 'newArrivals' },
+    { id: 12, name: 'Evening Wear', price: 2200, image: '/src/assets/demo3.png', category: 'Premium Suits', occasion: 'Party', size: 'L', type: 'newArrivals' },
+    { id: 13, name: 'Wedding Sherwani', price: 2500, image: '/src/assets/demo1.png', category: 'Sherwani', occasion: 'Wedding', size: 'XL', type: 'traditional' },
+    { id: 14, name: 'Formal Kurta', price: 1200, image: '/src/assets/demo2.png', category: 'Kurta', occasion: 'Formal', size: 'S', type: 'traditional' },
+    { id: 15, name: 'Party Wear', price: 1500, image: '/src/assets/demo3.png', category: 'Indo-Western', occasion: 'Party', size: 'M', type: 'traditional' },
+    { id: 16, name: 'Silk Tie', price: 400, image: '/src/assets/demo1.png', category: 'Tie', occasion: 'Formal', size: 'M', type: 'accessories' },
+    { id: 17, name: 'Gold Cufflinks', price: 600, image: '/src/assets/demo2.png', category: 'Cufflinks', occasion: 'Formal', size: 'M', type: 'accessories' },
+    { id: 18, name: 'Executive Suit', price: 2000, image: '/src/assets/demo3.png', category: 'Premium Suits', occasion: 'Formal', size: 'L', type: 'newArrivals' },
+    { id: 19, name: 'Traditional Kurta', price: 1000, image: '/src/assets/demo1.png', category: 'Kurta', occasion: 'Wedding', size: 'XL', type: 'traditional' },
+    { id: 20, name: 'Modern Blazer', price: 1900, image: '/src/assets/demo2.png', category: 'Formal Wear', occasion: 'Formal', size: 'M', type: 'newArrivals' }
   ];
 
   // Filter products based on filter type
@@ -57,6 +71,14 @@ const ProductListing = () => {
 
   const [products] = useState(getFilteredProducts());
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilterSidebar, setShowFilterSidebar] = useState(false);
+  const [showSideMenu, setShowSideMenu] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({
+    priceRange: [2100, 8400],
+    categories: [],
+    occasions: [],
+    sizes: []
+  });
 
   // Event handlers following clean code principles
   const handleBackClick = () => {
@@ -78,14 +100,49 @@ const ProductListing = () => {
   };
 
   const handleFilterClick = () => {
-    console.log('Filter clicked');
-    // TODO: Open filter modal
+    setShowFilterSidebar(true);
   };
 
-  // Filter products based on search term
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleCloseFilterSidebar = () => {
+    setShowFilterSidebar(false);
+  };
+
+  const handleApplyFilters = (filters) => {
+    console.log('Applied Filters:', filters);
+    setAppliedFilters(filters);
+  };
+
+  const handleShowSideMenu = () => {
+    setShowSideMenu(true);
+  };
+
+  const handleCloseSideMenu = () => {
+    setShowSideMenu(false);
+  };
+
+  // Filter products based on search term and applied filters
+  const filteredProducts = products.filter(product => {
+    // Search filter
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Price filter
+    const matchesPrice = product.price >= appliedFilters.priceRange[0] && 
+                        product.price <= appliedFilters.priceRange[1];
+    
+    // Category filter
+    const matchesCategory = appliedFilters.categories.length === 0 || 
+                           appliedFilters.categories.includes(product.category);
+    
+    // Occasion filter
+    const matchesOccasion = appliedFilters.occasions.length === 0 || 
+                           appliedFilters.occasions.includes(product.occasion);
+    
+    // Size filter
+    const matchesSize = appliedFilters.sizes.length === 0 || 
+                       appliedFilters.sizes.includes(product.size);
+    
+    return matchesSearch && matchesPrice && matchesCategory && matchesOccasion && matchesSize;
+  });
 
   // Render methods following single responsibility principle
   const renderPageHeader = () => (
@@ -165,12 +222,21 @@ const ProductListing = () => {
 
   return (
     <div className="bg-white min-vh-100 d-flex flex-column">
-      <Header />
+      <Header onMenuClick={handleShowSideMenu} />
       <div className="flex-grow-1">
         {renderPageHeader()}
         {renderProductGrid()}
       </div>
       <Footer />
+      <SideMenu 
+        show={showSideMenu} 
+        handleClose={handleCloseSideMenu} 
+      />
+      <FilterSidebar 
+        show={showFilterSidebar}
+        handleClose={handleCloseFilterSidebar}
+        onApplyFilters={handleApplyFilters}
+      />
     </div>
   );
 };
