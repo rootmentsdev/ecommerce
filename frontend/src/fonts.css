@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap');
+
+/* Premium Font Settings */
+* {
+  font-family: 'Inter', sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Premium Headings use Playfair Display */
+h1, h2, h3, h4, h5, h6,
+.heading,
+.title,
+.section-title,
+.hero-title,
+.navbar-brand,
+.menu-item,
+.sidebar-text,
+.premium-heading {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Elegant serif for special headings */
+h1, .hero-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* Premium body text uses Inter */
+body,
+p,
+span,
+div,
+button,
+input,
+textarea,
+select,
+label,
+.small-text,
+.body-text,
+.description,
+.premium-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Premium button text */
+button {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* Specific component overrides */
+.navbar-brand {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.side-menu .menu-item span {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 500 !important;
+}
+
+.side-menu h5 {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 600 !important;
+}
+
+.side-menu p {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 400 !important;
+}
+
+/* Premium product names */
+.product-name {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 600 !important;
+}
+
+/* Premium pricing */
+.product-price {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Premium category names */
+.category-name {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 600 !important;
+}

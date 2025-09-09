@@ -1,0 +1,43 @@
+// Constants file for better maintainability
+export const APP_CONFIG = {
+  FONTS: {
+    PRIMARY: "'Playfair Display', serif",
+    SECONDARY: "'Inter', sans-serif"
+  },
+  COLORS: {
+    PRIMARY: '#000000',
+    SECONDARY: '#333333',
+    MUTED: '#666666',
+    LIGHT: '#f8f9fa',
+    WHITE: '#ffffff'
+  },
+  SPACING: {
+    SMALL: '8px',
+    MEDIUM: '16px',
+    LARGE: '24px',
+    XLARGE: '32px'
+  },
+  BREAKPOINTS: {
+    MOBILE: '576px',
+    TABLET: '768px',
+    DESKTOP: '992px'
+  }
+};
+
+export const PRODUCT_TYPES = {
+  NEW_ARRIVALS: 'newArrivals',
+  CATEGORIES: 'categories',
+  OCCASIONS: 'occasions'
+};
+
+export const CARD_SIZES = {
+  PRODUCT: {
+    WIDTH: '220px',
+    HEIGHT: '320px',
+    IMAGE_HEIGHT: '220px',
+    TEXT_HEIGHT: '100px'
+  },
+  CATEGORY: {
+    ASPECT_RATIO: '1'
+  }
+};

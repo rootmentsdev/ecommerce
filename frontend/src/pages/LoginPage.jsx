@@ -29,6 +29,9 @@ const LoginPage = () => {
   // Loading state for form submissions
   const [isLoading, setIsLoading] = useState(false);
   
+  // Success state for login
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+  
   // Message state for displaying alerts (success/error messages)
   const [message, setMessage] = useState({ type: '', text: '' });
   
@@ -72,8 +75,9 @@ const LoginPage = () => {
   const handleFormSwitch = (newIsLogin) => {
     setIsLogin(newIsLogin);
     setMessage({ type: '', text: '' }); // Clear any existing messages
+    setIsLoginSuccess(false); // Reset login success state
     // Reset forgot password state when switching forms
-    setForgotPasswordStep('email');
+    setForgotPasswordStep('');
     setResetToken('');
     setForgotPasswordData({
       emailOrPhone: '',
@@ -225,7 +229,8 @@ const LoginPage = () => {
       const result = await AuthService.login(loginData);
       
       if (result.success) {
-        setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
+        // Set success state to show in button
+        setIsLoginSuccess(true);
         // Redirect to home page after successful login
         setTimeout(() => {
           window.location.href = '/';
@@ -313,9 +318,9 @@ const LoginPage = () => {
           <div className="form-transition-container">
             <div className={`mobile-form-card ${isLogin ? 'login-form' : 'signup-form'}`}>
             {isLogin ? renderMobileLoginForm() : 
-             forgotPasswordStep === 'email' ? renderMobileForgotPasswordForm() :
-             forgotPasswordStep === 'reset' ? renderMobileResetPasswordForm() :
-             renderMobileRegisterForm()}
+             !isLogin && forgotPasswordStep === 'email' ? renderMobileForgotPasswordForm() :
+             !isLogin && forgotPasswordStep === 'reset' ? renderMobileResetPasswordForm() :
+             !isLogin && forgotPasswordStep === '' ? renderMobileRegisterForm() : renderMobileLoginForm()}
           </div>
         </div>
       </div>
@@ -336,8 +341,8 @@ const LoginPage = () => {
                   </div>
 
                   <Form className="mobile-form" onSubmit={handleLogin}>
-        {/* Alert Messages */}
-                    {message.text && (
+        {/* Alert Messages - Only show error messages, not success */}
+                    {message.text && message.type === 'danger' && (
                       <Alert variant={message.type} className="mb-3">
                         {message.text}
                       </Alert>
@@ -397,9 +402,11 @@ const LoginPage = () => {
                     <Button 
                       type="submit" 
                       className="login-btn"
-                      disabled={isLoading}
+                      disabled={isLoading || isLoginSuccess}
+                      style={isLoginSuccess ? { backgroundColor: '#28a745', borderColor: '#28a745' } : {}}
                     >
-                      {isLoading ? 'Logging in...' : 'Login'}
+                      {isLoginSuccess ? 'Login Successful! Redirecting...' : 
+                       isLoading ? 'Logging in...' : 'Login'}
                     </Button>
 
         {/* Social Login Divider */}
@@ -837,12 +844,12 @@ const LoginPage = () => {
                     {/* Desktop Form Content */}
                     <Form onSubmit={
                       isLogin ? handleLogin : 
-                      forgotPasswordStep === 'email' ? handleForgotPasswordRequest :
-                      forgotPasswordStep === 'reset' ? handlePasswordReset :
-                      handleRegister
+                      !isLogin && forgotPasswordStep === 'email' ? handleForgotPasswordRequest :
+                      !isLogin && forgotPasswordStep === 'reset' ? handlePasswordReset :
+                      !isLogin && forgotPasswordStep === '' ? handleRegister : handleLogin
                     }>
-                      {/* Alert Messages */}
-                         {message.text && (
+                      {/* Alert Messages - Only show error messages, not success */}
+                         {message.text && message.type === 'danger' && (
                            <Alert variant={message.type} className="mb-3">
                              {message.text}
                            </Alert>
@@ -850,9 +857,9 @@ const LoginPage = () => {
                          
                       {/* Render appropriate form based on mode */}
                       {isLogin ? renderDesktopLoginForm() : 
-                       forgotPasswordStep === 'email' ? renderDesktopForgotPasswordForm() :
-                       forgotPasswordStep === 'reset' ? renderDesktopResetPasswordForm() :
-                       renderDesktopRegisterForm()}
+                       !isLogin && forgotPasswordStep === 'email' ? renderDesktopForgotPasswordForm() :
+                       !isLogin && forgotPasswordStep === 'reset' ? renderDesktopResetPasswordForm() :
+                       !isLogin && forgotPasswordStep === '' ? renderDesktopRegisterForm() : renderDesktopLoginForm()}
                     </Form>
                   </Card.Body>
                 </Card>
@@ -929,16 +936,18 @@ const LoginPage = () => {
                                type="submit"
                                variant="dark" 
                                className="w-100 mb-3 py-3"
-                               disabled={isLoading}
+                               disabled={isLoading || isLoginSuccess}
                                style={{ 
                                  borderRadius: '12px', 
-                                 backgroundColor: '#333',
+                                 backgroundColor: isLoginSuccess ? '#28a745' : '#333',
+                                 borderColor: isLoginSuccess ? '#28a745' : '#333',
                                  fontSize: '16px',
                                  fontWeight: '600',
                                  height: '50px'
                                }}
                              >
-                               {isLoading ? 'Logging in...' : 'Login'}
+                               {isLoginSuccess ? 'Login Successful' : 
+                                isLoading ? 'Logging in...' : 'Login'}
                              </Button>
 
       {/* Social Login Divider */}

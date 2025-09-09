@@ -37,3 +37,4 @@ DB_NAME=ecommerce
 Make sure your MongoDB Atlas cluster allows connections from:
 - Your current IP address
 - Or use 0.0.0.0/0 for development (not recommended for production)
+
