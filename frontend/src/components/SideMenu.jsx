@@ -48,7 +48,7 @@ const SideMenu = ({ show, handleClose }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     handleClose();
-    navigate('/');
+    navigate('/login');
   };
 
   const handleMenuItemClick = (item) => {

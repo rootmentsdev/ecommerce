@@ -233,7 +233,7 @@ const LoginPage = () => {
         setIsLoginSuccess(true);
         // Redirect to home page after successful login
         setTimeout(() => {
-          window.location.reload(); // Reload to trigger authentication check
+          window.location.href = '/home';
         }, 1500);
       } else {
         setMessage({ type: 'danger', text: result.message });
@@ -277,7 +277,7 @@ const LoginPage = () => {
         setMessage({ type: 'success', text: 'Registration successful! Redirecting...' });
         // Redirect to home page after successful registration
         setTimeout(() => {
-          window.location.reload(); // Reload to trigger authentication check
+          window.location.href = '/home';
         }, 1500);
       } else {
         setMessage({ type: 'danger', text: result.message });
