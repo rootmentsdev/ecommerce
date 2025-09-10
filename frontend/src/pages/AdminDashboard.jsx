@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Table, Badge, Dropdown, Pagination } from 'react-bootstrap';
 import { Search, Bell, QuestionCircle, Calendar, Download, ChevronDown, ThreeDotsVertical } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
+import API_CONFIG, { getApiUrl } from '../config/api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -36,11 +37,9 @@ const AdminDashboard = () => {
       console.log('Fetching dashboard data...');
       
       // Use the public API endpoint for now (we'll add admin auth later)
-      const response = await fetch('http://localhost:5000/api/enquiries', {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.GET_ALL), {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: API_CONFIG.DEFAULT_HEADERS
       });
       
       console.log('Response status:', response.status);
@@ -115,11 +114,9 @@ const AdminDashboard = () => {
         updateData = { specialNotes: editValue };
       }
 
-      const response = await fetch(`http://localhost:5000/api/enquiries/${editingEnquiry}`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.UPDATE(editingEnquiry)), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: API_CONFIG.DEFAULT_HEADERS,
         body: JSON.stringify(updateData)
       });
 

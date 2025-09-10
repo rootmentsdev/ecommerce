@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+import API_CONFIG, { getApiUrl, getAuthHeaders } from '../config/api';
 
 /**
  * Enquiry Service
@@ -13,11 +13,9 @@ class EnquiryService {
    */
   static async submitEnquiry(enquiryData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/enquiries`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.CREATE), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: API_CONFIG.DEFAULT_HEADERS,
         body: JSON.stringify(enquiryData),
       });
 
@@ -60,14 +58,11 @@ class EnquiryService {
       });
 
       const queryString = queryParams.toString();
-      const url = `${API_BASE_URL}/enquiries${queryString ? `?${queryString}` : ''}`;
+      const url = getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.GET_ALL) + (queryString ? `?${queryString}` : '');
 
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(token),
       });
 
       const data = await response.json();

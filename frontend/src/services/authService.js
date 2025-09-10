@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+import API_CONFIG, { getApiUrl, getAuthHeaders } from '../config/api';
 
 class AuthService {
   // Register new user
@@ -6,11 +6,9 @@ class AuthService {
     try {
       console.log('Register attempt with userData:', userData);
       
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.REGISTER), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: API_CONFIG.DEFAULT_HEADERS,
         body: JSON.stringify(userData),
       });
 
@@ -39,11 +37,9 @@ class AuthService {
     try {
       console.log('Login attempt with credentials:', credentials);
       
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGIN), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: API_CONFIG.DEFAULT_HEADERS,
         body: JSON.stringify(credentials),
       });
 
@@ -78,12 +74,9 @@ class AuthService {
         };
       }
 
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.ME), {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(token),
       });
 
       const data = await response.json();
@@ -117,11 +110,9 @@ class AuthService {
   // Forgot password - Request reset code
   static async forgotPassword(emailOrPhone) {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: API_CONFIG.DEFAULT_HEADERS,
         body: JSON.stringify({ emailOrPhone }),
       });
 
@@ -139,11 +130,9 @@ class AuthService {
   // Reset password with verification code
   static async resetPassword(resetToken, verificationCode, newPassword) {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: API_CONFIG.DEFAULT_HEADERS,
         body: JSON.stringify({
           resetToken,
           verificationCode,
