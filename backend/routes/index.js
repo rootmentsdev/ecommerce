@@ -3,11 +3,15 @@ const express = require('express');
 const router = express.Router();
 
 // Import route modules
+const authRoutes = require('./authRoutes');
+const enquiryRoutes = require('./enquiryRoutes');
 // const productRoutes = require('./products');
 // const userRoutes = require('./users');
 // const orderRoutes = require('./orders');
 
 // Mount routes
+router.use('/auth', authRoutes);
+router.use('/enquiries', enquiryRoutes);
 // router.use('/products', productRoutes);
 // router.use('/users', userRoutes);
 // router.use('/orders', orderRoutes);
@@ -20,6 +24,8 @@ router.get('/', (req, res) => {
     status: 'active',
     endpoints: {
       health: '/health',
+      auth: '/api/auth',
+      enquiries: '/api/enquiries',
       products: '/api/products',
       users: '/api/users',
       orders: '/api/orders'

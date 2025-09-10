@@ -23,15 +23,15 @@ const HomePageContent = () => {
   ];
 
   const NEW_ARRIVALS = [
-    { id: 1, name: 'Formal Suit', price: 1400, image: '/src/assets/demo1.png' },
-    { id: 2, name: 'Formal Suit', price: 1400, image: '/src/assets/demo2.png' },
-    { id: 3, name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
-    { id: 4, name: 'Designer Blazer', price: 1800, image: '/src/assets/demo1.png' },
-    { id: 5, name: 'Evening Wear', price: 2200, image: '/src/assets/demo2.png' },
-    { id: 6, name: 'Business Suit', price: 1600, image: '/src/assets/demo3.png' },
-    { id: 7, name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
-    { id: 8, name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
-    { id: 9, name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' }
+    { id: '507f1f77bcf86cd799439011', name: 'Formal Suit', price: 1400, image: '/src/assets/demo1.png' },
+    { id: '507f1f77bcf86cd799439012', name: 'Formal Suit', price: 1400, image: '/src/assets/demo2.png' },
+    { id: '507f1f77bcf86cd799439013', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
+    { id: '507f1f77bcf86cd799439014', name: 'Designer Blazer', price: 1800, image: '/src/assets/demo1.png' },
+    { id: '507f1f77bcf86cd799439015', name: 'Evening Wear', price: 2200, image: '/src/assets/demo2.png' },
+    { id: '507f1f77bcf86cd799439016', name: 'Business Suit', price: 1600, image: '/src/assets/demo3.png' },
+    { id: '507f1f77bcf86cd799439017', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
+    { id: '507f1f77bcf86cd799439018', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
+    { id: '507f1f77bcf86cd799439019', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' }
   ];
 
   const CATEGORIES = [
@@ -52,7 +52,9 @@ const HomePageContent = () => {
   // Event handlers following clean code principles
   const handleProductClick = (product) => {
     console.log('Product clicked:', product);
-    // TODO: Navigate to product detail page
+    navigate('/product-details', { 
+      state: { product } 
+    });
   };
 
   const handleCategoryClick = (category) => {

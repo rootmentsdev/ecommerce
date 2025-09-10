@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 import { Heart, Cart } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
 import { APP_CONFIG } from '../../constants';
 
 const ProductCard = ({ 
@@ -12,7 +13,15 @@ const ProductCard = ({
   showPrice = true,
   showAddToCart = false
 }) => {
+  const navigate = useNavigate();
+
   const handleCardClick = () => {
+    // Navigate to product details page with product data
+    navigate('/product-details', { 
+      state: { product } 
+    });
+    
+    // Also call onClick if provided for backward compatibility
     if (onClick) {
       onClick(product);
     }

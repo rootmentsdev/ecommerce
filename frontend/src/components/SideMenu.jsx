@@ -273,20 +273,20 @@ const SideMenu = ({ show, handleClose }) => {
         className="side-menu"
         style={offcanvasStyles}
       >
-        <Offcanvas.Header className="border-0 pb-0">
-          <Offcanvas.Title className="w-100 d-flex justify-content-end">
+      <Offcanvas.Header className="border-0 pb-0">
+        <Offcanvas.Title className="w-100 d-flex justify-content-end">
             {renderCloseButton()}
-          </Offcanvas.Title>
-        </Offcanvas.Header>
-        
-        <Offcanvas.Body className="pt-0">
+        </Offcanvas.Title>
+      </Offcanvas.Header>
+      
+      <Offcanvas.Body className="pt-0">
           {renderUserProfile()}
-          <hr className="my-3" />
+        <hr className="my-3" />
           {renderMenuItems()}
-          <hr className="my-3" />
+        <hr className="my-3" />
           {renderUtilityItems()}
-        </Offcanvas.Body>
-      </Offcanvas>
+      </Offcanvas.Body>
+    </Offcanvas>
     </>
   );
 };

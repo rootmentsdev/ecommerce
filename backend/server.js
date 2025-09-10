@@ -6,6 +6,7 @@ const config = require('./config/config');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
+const enquiryRoutes = require('./routes/enquiryRoutes');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/enquiries', enquiryRoutes);
 
 // API Info endpoint
 app.get('/api', (req, res) => {
