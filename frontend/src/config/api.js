@@ -10,8 +10,8 @@ const isProduction = import.meta.env.PROD;
 // Backend API URLs
 const API_URLS = {
   development: 'http://localhost:5000/api',
-  production: 'https://ecommerce-q0bg.onrender.com/api', // Replace with your actual production URL
-  staging: 'https://your-staging-api.com/api' // Optional: Replace with your staging URL
+  production: 'https://ecommerce-q0bg.onrender.com/api', // Your actual production URL
+  staging: 'https://ecommerce-q0bg.onrender.com/api' // Same as production for now
 };
 
 // Current environment API URL
