@@ -30,7 +30,7 @@
   ],
   "redirects": [
     {
-      "source": "/home",
+      "source": "/login",
       "destination": "/",
       "permanent": true
     }

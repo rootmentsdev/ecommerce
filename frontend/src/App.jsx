@@ -15,11 +15,18 @@ function App() {
   return (
     <div className="app">
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
+        {/* Login page at root path */}
+        <Route path="/" element={<LoginPage />} />
+        
+        {/* Home page at /home */}
+        <Route path="/home" element={<HomePage />} />
+        
+        {/* Other protected routes */}
         <Route path="/products" element={<ProductListing />} />
         <Route path="/product-details" element={<ProductDetails />} />
         <Route path="/enquire" element={<EnquireNow />} />
+        
+        {/* Admin routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>

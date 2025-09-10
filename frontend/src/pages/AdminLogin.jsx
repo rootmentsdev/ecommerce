@@ -182,7 +182,7 @@ const AdminLogin = () => {
                 <div className="text-center mt-4">
                   <Button
                     variant="link"
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/home')}
                     style={{
                       fontFamily: 'Inter, sans-serif',
                       fontSize: '14px',
