@@ -30,6 +30,8 @@ const EnquireNow = () => {
     mobileNumber: '',
     email: '',
     preferredBookingDate: '',
+    pickupDate: '',
+    returnDate: '',
     city: '',
     specialNotes: '',
     selectedSize: ''
@@ -82,6 +84,27 @@ const EnquireNow = () => {
     }));
   };
 
+  // Calculate return date (5 days after pickup date)
+  const calculateReturnDate = (pickupDate) => {
+    if (!pickupDate) return '';
+    const pickup = new Date(pickupDate);
+    const returnDate = new Date(pickup);
+    returnDate.setDate(pickup.getDate() + 5);
+    return returnDate.toISOString().split('T')[0];
+  };
+
+  // Handle pickup date change and auto-calculate return date
+  const handlePickupDateChange = (e) => {
+    const pickupDate = e.target.value;
+    const returnDate = calculateReturnDate(pickupDate);
+    
+    setFormData(prev => ({
+      ...prev,
+      pickupDate,
+      returnDate
+    }));
+  };
+
   const handleDateSelect = (date) => {
     setFormData(prev => ({
       ...prev,
@@ -119,7 +142,9 @@ const EnquireNow = () => {
       // Prepare enquiry data
       const enquiryData = {
         ...formData,
-        preferredBookingDate: new Date(formData.preferredBookingDate).toISOString()
+        preferredBookingDate: new Date(formData.preferredBookingDate).toISOString(),
+        pickupDate: formData.pickupDate ? new Date(formData.pickupDate).toISOString() : null,
+        returnDate: formData.returnDate ? new Date(formData.returnDate).toISOString() : null
       };
       
       // Only add productId if it's a valid MongoDB ObjectId format
@@ -420,6 +445,71 @@ const EnquireNow = () => {
                     {errors.city}
                   </div>
                 )}
+              </Col>
+            </Row>
+
+            {/* Pickup and Return Dates */}
+            <Row className="mb-4 g-3">
+              <Col xs={6}>
+                <Form.Label 
+                  className="fw-medium mb-2"
+                  style={{
+                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                    fontSize: '14px',
+                    color: '#000'
+                  }}
+                >
+                  Pickup Date
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  name="pickupDate"
+                  value={formData.pickupDate}
+                  onChange={handlePickupDateChange}
+                  min={new Date().toISOString().split('T')[0]}
+                  style={{
+                    borderRadius: '8px',
+                    border: errors.pickupDate ? '1px solid #dc3545' : '1px solid #e9ecef',
+                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                    fontSize: '14px',
+                    padding: '12px'
+                  }}
+                />
+                {errors.pickupDate && (
+                  <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                    {errors.pickupDate}
+                  </div>
+                )}
+              </Col>
+              <Col xs={6}>
+                <Form.Label 
+                  className="fw-medium mb-2"
+                  style={{
+                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                    fontSize: '14px',
+                    color: '#000'
+                  }}
+                >
+                  Return Date
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  name="returnDate"
+                  value={formData.returnDate}
+                  readOnly
+                  style={{
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                    fontSize: '14px',
+                    padding: '12px',
+                    backgroundColor: '#f8f9fa',
+                    color: '#6c757d'
+                  }}
+                />
+                <small className="text-muted" style={{ fontSize: '11px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                  Automatically set to 5 days after pickup
+                </small>
               </Col>
             </Row>
 

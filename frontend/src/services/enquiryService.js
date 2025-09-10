@@ -259,6 +259,26 @@ class EnquiryService {
       errors.selectedSize = 'Please select a valid size';
     }
 
+    // Pickup Date validation (optional)
+    if (formData.pickupDate) {
+      const pickupDate = new Date(formData.pickupDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (pickupDate < today) {
+        errors.pickupDate = 'Pickup date must be in the future';
+      }
+    }
+
+    // Return Date validation (optional)
+    if (formData.returnDate) {
+      const returnDate = new Date(formData.returnDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (returnDate < today) {
+        errors.returnDate = 'Return date must be in the future';
+      }
+    }
+
     // City validation
     if (!formData.city || formData.city.trim().length === 0) {
       errors.city = 'City is required';

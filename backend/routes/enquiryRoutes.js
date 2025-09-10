@@ -57,6 +57,38 @@ const createEnquiryValidation = [
     .isIn(['XS', 'S', 'M', 'L', 'XL', 'XXL'])
     .withMessage('Please select a valid size'),
   
+  body('pickupDate')
+    .optional({ nullable: true })
+    .custom((value) => {
+      if (!value) return true; // Optional field
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        throw new Error('Please enter a valid pickup date');
+      }
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (date < today) {
+        throw new Error('Pickup date must be in the future');
+      }
+      return true;
+    }),
+  
+  body('returnDate')
+    .optional({ nullable: true })
+    .custom((value) => {
+      if (!value) return true; // Optional field
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        throw new Error('Please enter a valid return date');
+      }
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (date < today) {
+        throw new Error('Return date must be in the future');
+      }
+      return true;
+    }),
+  
   body('city')
     .trim()
     .notEmpty()

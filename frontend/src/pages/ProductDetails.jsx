@@ -538,25 +538,6 @@ const ProductDetails = () => {
   const renderActionButtons = () => (
     <div className="bg-white border-top">
       <Container className="py-4">
-        <Row className="g-3">
-          <Col xs={12} className="text-center">
-            <Button
-              variant="outline-secondary"
-              size="lg"
-              className="w-100 mb-3"
-              onClick={handleBookTrial}
-              style={{
-                borderRadius: '8px',
-                fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                fontSize: '16px',
-                fontWeight: '500',
-                padding: '12px'
-              }}
-            >
-              Book a Trial
-            </Button>
-          </Col>
-        </Row>
       </Container>
       
       {/* Sticky Footer */}
