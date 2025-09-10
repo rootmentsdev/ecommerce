@@ -3,6 +3,12 @@ import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { Search, Cart, Truck, ArrowClockwise } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 
+// Import images
+import demo1 from '../assets/demo1.png';
+import demo2 from '../assets/demo2.png';
+import demo3 from '../assets/demo3.png';
+import HomePageImage from '../assets/HomePage.png';
+
 // Import reusable components
 import ProductCard from './common/ProductCard';
 import CategoryCard from './common/CategoryCard';
@@ -23,30 +29,30 @@ const HomePageContent = () => {
   ];
 
   const NEW_ARRIVALS = [
-    { id: '507f1f77bcf86cd799439011', name: 'Formal Suit', price: 1400, image: '/src/assets/demo1.png' },
-    { id: '507f1f77bcf86cd799439012', name: 'Formal Suit', price: 1400, image: '/src/assets/demo2.png' },
-    { id: '507f1f77bcf86cd799439013', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
-    { id: '507f1f77bcf86cd799439014', name: 'Designer Blazer', price: 1800, image: '/src/assets/demo1.png' },
-    { id: '507f1f77bcf86cd799439015', name: 'Evening Wear', price: 2200, image: '/src/assets/demo2.png' },
-    { id: '507f1f77bcf86cd799439016', name: 'Business Suit', price: 1600, image: '/src/assets/demo3.png' },
-    { id: '507f1f77bcf86cd799439017', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
-    { id: '507f1f77bcf86cd799439018', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' },
-    { id: '507f1f77bcf86cd799439019', name: 'Premium Suit', price: 1400, image: '/src/assets/demo3.png' }
+    { id: '507f1f77bcf86cd799439011', name: 'Formal Suit', price: 1400, image: demo1 },
+    { id: '507f1f77bcf86cd799439012', name: 'Formal Suit', price: 1400, image: demo2 },
+    { id: '507f1f77bcf86cd799439013', name: 'Premium Suit', price: 1400, image: demo3 },
+    { id: '507f1f77bcf86cd799439014', name: 'Designer Blazer', price: 1800, image: demo1 },
+    { id: '507f1f77bcf86cd799439015', name: 'Evening Wear', price: 2200, image: demo2 },
+    { id: '507f1f77bcf86cd799439016', name: 'Business Suit', price: 1600, image: demo3 },
+    { id: '507f1f77bcf86cd799439017', name: 'Premium Suit', price: 1400, image: demo3 },
+    { id: '507f1f77bcf86cd799439018', name: 'Premium Suit', price: 1400, image: demo3 },
+    { id: '507f1f77bcf86cd799439019', name: 'Premium Suit', price: 1400, image: demo3 }
   ];
 
   const CATEGORIES = [
-    { id: 1, name: 'Premium Suit', image: '/src/assets/demo1.png', category: 'premium' },
-    { id: 2, name: 'Formal Wear', image: '/src/assets/demo2.png', category: 'formal' },
-    { id: 3, name: 'Sherwani', image: '/src/assets/demo3.png', category: 'sherwani' },
-    { id: 4, name: 'Kurta', image: '/src/assets/demo1.png', category: 'kurta' },
-    { id: 5, name: 'Indo-Western', image: '/src/assets/demo2.png', category: 'indo-western' },
-    { id: 6, name: 'Accessories', image: '/src/assets/demo3.png', category: 'accessories' }
+    { id: 1, name: 'Premium Suit', image: demo1, category: 'premium' },
+    { id: 2, name: 'Formal Wear', image: demo2, category: 'formal' },
+    { id: 3, name: 'Sherwani', image: demo3, category: 'sherwani' },
+    { id: 4, name: 'Kurta', image: demo1, category: 'kurta' },
+    { id: 5, name: 'Indo-Western', image: demo2, category: 'indo-western' },
+    { id: 6, name: 'Accessories', image: demo3, category: 'accessories' }
   ];
 
   const OCCASIONS = [
-    { id: 1, name: 'Wedding', image: '/src/assets/demo1.png', category: 'wedding' },
-    { id: 2, name: 'Party', image: '/src/assets/demo2.png', category: 'party' },
-    { id: 3, name: 'Formal', image: '/src/assets/demo3.png', category: 'formal' }
+    { id: 1, name: 'Wedding', image: demo1, category: 'wedding' },
+    { id: 2, name: 'Party', image: demo2, category: 'party' },
+    { id: 3, name: 'Formal', image: demo3, category: 'formal' }
   ];
 
   // Event handlers following clean code principles
@@ -98,7 +104,7 @@ const HomePageContent = () => {
       className="position-relative"
       style={{
         height: '50vh',
-        backgroundImage: 'url(/src/assets/HomePage.png)',
+        backgroundImage: `url(${HomePageImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

@@ -3,6 +3,9 @@ import { Container, Row, Col, Button, Form, Card, Nav, Tab, Modal } from 'react-
 import { ArrowLeft, Heart, Share, ChevronDown, Calendar, GeoAlt } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+// Import images
+import demo1 from '../assets/demo1.png';
+
 // Import reusable components
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -20,7 +23,7 @@ const ProductDetails = () => {
     id: '507f1f77bcf86cd799439021',
     name: 'Premium Black Tuxedo - Italian Fit',
     price: 1200,
-    image: '/src/assets/demo1.png'
+    image: demo1
   };
 
   // Ensure all required properties exist with defaults
@@ -30,7 +33,7 @@ const ProductDetails = () => {
     price: productData.price || 1200,
     actualPrice: productData.actualPrice || 13000,
     securityDeposit: productData.securityDeposit || 5000,
-    image: productData.image || '/src/assets/demo1.png',
+    image: productData.image || demo1,
     category: productData.category || 'Premium Suits',
     occasion: productData.occasion || 'Formal',
     size: productData.size || 'L',

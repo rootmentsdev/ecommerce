@@ -3,6 +3,11 @@ import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
 import { ArrowLeft, Search, Funnel } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+// Import images
+import demo1 from '../assets/demo1.png';
+import demo2 from '../assets/demo2.png';
+import demo3 from '../assets/demo3.png';
+
 // Import reusable components
 import ProductCard from '../components/common/ProductCard';
 import Header from '../components/Header';
@@ -29,7 +34,7 @@ const ProductListing = () => {
       price: 1200, 
       actualPrice: 13000,
       securityDeposit: 5000,
-      image: '/src/assets/demo1.png', 
+      image: demo1, 
       category: 'Premium Suits', 
       occasion: 'Formal', 
       size: 'M', 
@@ -48,7 +53,7 @@ const ProductListing = () => {
       price: 1400, 
       actualPrice: 15000,
       securityDeposit: 6000,
-      image: '/src/assets/demo2.png', 
+      image: demo2, 
       category: 'Premium Suits', 
       occasion: 'Wedding', 
       size: 'L', 
@@ -67,7 +72,7 @@ const ProductListing = () => {
       price: 1600, 
       actualPrice: 18000,
       securityDeposit: 7000,
-      image: '/src/assets/demo3.png', 
+      image: demo3, 
       category: 'Premium Suits', 
       occasion: 'Formal', 
       size: 'XL', 
@@ -86,7 +91,7 @@ const ProductListing = () => {
       price: 1000, 
       actualPrice: 8000,
       securityDeposit: 3000,
-      image: '/src/assets/demo1.png', 
+      image: demo1, 
       category: 'Kurta', 
       occasion: 'Wedding', 
       size: 'M', 
@@ -105,7 +110,7 @@ const ProductListing = () => {
       price: 1200, 
       actualPrice: 10000,
       securityDeposit: 4000,
-      image: '/src/assets/demo2.png', 
+      image: demo2, 
       category: 'Indo-Western', 
       occasion: 'Party', 
       size: 'L', 
@@ -124,7 +129,7 @@ const ProductListing = () => {
       price: 1800, 
       actualPrice: 20000,
       securityDeposit: 8000,
-      image: '/src/assets/demo3.png', 
+      image: demo3, 
       category: 'Formal Wear', 
       occasion: 'Formal', 
       size: 'S', 
@@ -143,7 +148,7 @@ const ProductListing = () => {
       price: 2200, 
       actualPrice: 25000,
       securityDeposit: 10000,
-      image: '/src/assets/demo1.png', 
+      image: demo1, 
       category: 'Sherwani', 
       occasion: 'Wedding', 
       size: 'M', 
@@ -162,7 +167,7 @@ const ProductListing = () => {
       price: 500, 
       actualPrice: 3000,
       securityDeposit: 1000,
-      image: '/src/assets/demo2.png', 
+      image: demo2, 
       category: 'Tie', 
       occasion: 'Formal', 
       size: 'M', 
@@ -181,7 +186,7 @@ const ProductListing = () => {
       price: 300, 
       actualPrice: 2000,
       securityDeposit: 500,
-      image: '/src/assets/demo3.png', 
+      image: demo3, 
       category: 'Cufflinks', 
       occasion: 'Formal', 
       size: 'M', 
@@ -200,7 +205,7 @@ const ProductListing = () => {
       price: 1600, 
       actualPrice: 18000,
       securityDeposit: 7000,
-      image: '/src/assets/demo1.png', 
+      image: demo1, 
       category: 'Premium Suits', 
       occasion: 'Formal', 
       size: 'L', 
