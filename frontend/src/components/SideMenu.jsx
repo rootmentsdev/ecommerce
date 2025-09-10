@@ -19,10 +19,33 @@ import { APP_CONFIG } from '../constants';
 const SideMenu = ({ show, handleClose }) => {
   const navigate = useNavigate();
   const [isDesktop, setIsDesktop] = useState(false);
+  const [userProfile, setUserProfile] = useState({
+    name: 'User',
+    phone: '',
+    avatar: 'https://via.placeholder.com/60x60/8B4513/FFFFFF?text=U'
+  });
+
+  // Load user data from localStorage
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        const userName = user.fullName || user.name || 'User';
+        setUserProfile({
+          name: userName.charAt(0).toUpperCase() + userName.slice(1).toLowerCase(),
+          phone: user.phone || user.mobileNumber || '',
+          avatar: `https://via.placeholder.com/60x60/8B4513/FFFFFF?text=${userName.charAt(0).toUpperCase()}`
+        });
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, []);
 
   // Constants following clean code principles
   const MENU_ITEMS = [
-    { icon: HouseDoor, label: 'Home', href: '/' },
+    { icon: HouseDoor, label: 'Home', href: '/home' },
     { icon: Person, label: 'Profile', href: '/profile' },
     { icon: ListUl, label: 'Categories', href: '/categories' },
     { icon: Box, label: 'My Orders', href: '/orders' },
@@ -36,12 +59,6 @@ const SideMenu = ({ show, handleClose }) => {
     { icon: Gear, label: 'Settings', href: '/settings' },
     { icon: BoxArrowRight, label: 'Log Out', action: 'logout' }
   ];
-
-  const USER_PROFILE = {
-    name: 'John Wick',
-    phone: '+91 98765 43210',
-    avatar: 'https://via.placeholder.com/60x60/8B4513/FFFFFF?text=JW'
-  };
 
   // Event handlers following clean code principles
   const handleLogout = () => {
@@ -120,7 +137,7 @@ const SideMenu = ({ show, handleClose }) => {
   const renderUserProfile = () => (
     <div className="d-flex align-items-center mb-4 profile-section">
       <Image 
-        src={USER_PROFILE.avatar}
+        src={userProfile.avatar}
         roundedCircle 
         className="me-3"
         style={avatarStyles}
@@ -131,13 +148,13 @@ const SideMenu = ({ show, handleClose }) => {
           className="mb-1 fw-bold text-dark"
           style={nameStyles}
         >
-          {USER_PROFILE.name}
+          {userProfile.name}
         </h5>
         <p 
           className="mb-0 text-muted small"
           style={phoneStyles}
         >
-          {USER_PROFILE.phone}
+          {userProfile.phone}
         </p>
       </div>
     </div>

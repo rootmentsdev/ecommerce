@@ -14,6 +14,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SideMenu from '../components/SideMenu';
 import FilterSidebar from '../components/common/FilterSidebar';
+import ModernSearchBar from '../components/common/ModernSearchBar';
 
 // Import constants and utilities
 import { APP_CONFIG } from '../constants';
@@ -347,32 +348,12 @@ const ProductListing = () => {
       
       <Row>
         <Col>
-          <InputGroup>
-            <InputGroup.Text 
-              className="bg-white border-end-0"
-              style={{ borderRadius: '8px 0px 0px 8px' }}
-            >
-              <Search size={16} className="text-muted" />
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="border-start-0 border-end-0"
-              style={{
-                borderRadius: '0px',
-                fontFamily: APP_CONFIG.FONTS.SECONDARY
-              }}
-            />
-            <Button 
-              variant="dark"
-              onClick={handleFilterClick}
-              style={{ borderRadius: '0px 8px 8px 0px' }}
-            >
-              <Funnel size={16} className="text-white" />
-            </Button>
-          </InputGroup>
+          <ModernSearchBar
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+            onFilterClick={handleFilterClick}
+            placeholder="Search products..."
+          />
         </Col>
       </Row>
     </Container>

@@ -69,7 +69,7 @@ const Header = ({ onMenuClick }) => {
       style={logoStyles}
       onClick={handleLogoClick}
     >
-      Dapper Squad
+      Dappr Squad
     </Navbar.Brand>
   );
 
@@ -148,6 +148,56 @@ const Header = ({ onMenuClick }) => {
           
           .cart-badge {
             transition: all 0.3s ease;
+            min-width: 18px;
+            min-height: 18px;
+            font-size: 10px;
+            font-weight: 600;
+          }
+          
+          /* Mobile header optimizations */
+          .navbar {
+            padding: 8px 0;
+          }
+          
+          .navbar .container-fluid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+          }
+          
+          .navbar .container-fluid > * {
+            flex-shrink: 0;
+          }
+          
+          /* iPhone 13 specific optimizations */
+          @media screen and (max-width: 428px) {
+            .navbar {
+              padding: 6px 0;
+            }
+            
+            .navbar .container-fluid {
+              padding: 0 12px;
+            }
+            
+            .header-btn {
+              padding: 8px;
+              margin: 0 1px;
+              min-width: 40px;
+              min-height: 40px;
+            }
+            
+            .header-logo {
+              font-size: 1.2rem;
+              padding: 8px 10px;
+              min-height: 40px;
+            }
+            
+            .cart-badge {
+              font-size: 9px;
+              min-width: 16px;
+              min-height: 16px;
+            }
           }
           
           .header-btn:hover .cart-badge,
@@ -183,10 +233,12 @@ const Header = ({ onMenuClick }) => {
         className="shadow-sm border-bottom"
         style={navbarStyles}
       >
-        <Container fluid className="px-4">
-          {renderMenuButton()}
-          {renderLogo()}
-          {renderRightIcons()}
+        <Container fluid className="px-3">
+          <div className="d-flex align-items-center w-100 justify-content-between">
+            {renderMenuButton()}
+            {renderLogo()}
+            {renderRightIcons()}
+          </div>
         </Container>
       </Navbar>
     </>

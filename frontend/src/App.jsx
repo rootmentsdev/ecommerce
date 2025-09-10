@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import AuthCheck from './components/AuthCheck';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import ProductListing from './pages/ProductListing';
@@ -15,13 +16,15 @@ function App() {
   return (
     <div className="app">
       <Routes>
-        {/* Login page at root path */}
-        <Route path="/" element={<LoginPage />} />
+        {/* Login page with auth check */}
+        <Route path="/" element={
+          <AuthCheck>
+            <LoginPage />
+          </AuthCheck>
+        } />
         
-        {/* Home page at /home */}
+        {/* Protected routes */}
         <Route path="/home" element={<HomePage />} />
-        
-        {/* Other protected routes */}
         <Route path="/products" element={<ProductListing />} />
         <Route path="/product-details" element={<ProductDetails />} />
         <Route path="/enquire" element={<EnquireNow />} />
