@@ -29,36 +29,51 @@ const Header = ({ onMenuClick }) => {
   // Style objects following clean code principles
   const navbarStyles = {
     backgroundColor: APP_CONFIG.COLORS.WHITE,
-    borderBottom: '1px solid #e9ecef'
+    borderBottom: '1px solid #e9ecef',
+    minHeight: '60px',
+    paddingTop: '8px',
+    paddingBottom: '8px'
   };
 
   const logoStyles = {
     color: APP_CONFIG.COLORS.SECONDARY,
-    fontSize: '1.5rem',
+    fontSize: '1.4rem',
     letterSpacing: '-0.02em',
     fontFamily: APP_CONFIG.FONTS.PRIMARY,
-    fontWeight: '700'
+    fontWeight: '700',
+    lineHeight: '1.2'
   };
 
   const buttonStyles = {
     border: 'none',
     background: 'none',
-    color: APP_CONFIG.COLORS.SECONDARY
+    color: APP_CONFIG.COLORS.SECONDARY,
+    padding: '10px',
+    borderRadius: '10px',
+    minWidth: '44px',
+    minHeight: '44px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   };
 
   const badgeStyles = {
-    fontSize: '0.6rem'
+    fontSize: '0.65rem',
+    fontWeight: '600',
+    minWidth: '18px',
+    height: '18px',
+    lineHeight: '18px'
   };
 
   // Render methods following single responsibility principle
   const renderMenuButton = () => (
     <button
       onClick={handleMenuClick}
-      className="btn btn-link me-3 header-btn"
+      className="btn btn-link me-2 header-btn"
       style={buttonStyles}
       aria-label="Open menu"
     >
-      <List size={24} />
+      <List size={22} />
     </button>
   );
 
@@ -76,11 +91,11 @@ const Header = ({ onMenuClick }) => {
   const renderSearchButton = () => (
     <button
       onClick={handleSearchClick}
-      className="btn btn-link me-3 header-btn"
+      className="btn btn-link me-2 header-btn"
       style={buttonStyles}
       aria-label="Search"
     >
-      <Search size={24} />
+      <Search size={22} />
     </button>
   );
 
@@ -91,7 +106,7 @@ const Header = ({ onMenuClick }) => {
       style={buttonStyles}
       aria-label="Shopping cart"
     >
-      <Bag size={24} />
+      <Bag size={22} />
       <span 
         className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge"
         style={badgeStyles}
@@ -117,62 +132,93 @@ const Header = ({ onMenuClick }) => {
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
           
           .header-btn {
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            padding: 8px 12px;
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            padding: 10px;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
           }
           
           .header-btn:hover,
           .header-btn:active,
           .header-btn:focus {
-            background-color: #000 !important;
-            color: white !important;
+            background-color: #f8f9fa !important;
+            color: #000 !important;
             transform: scale(1.05);
           }
           
           .header-logo {
-            transition: all 0.3s ease;
-            padding: 8px 16px;
+            transition: all 0.2s ease;
+            padding: 8px 12px;
             border-radius: 8px;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
           }
           
           .header-logo:hover,
           .header-logo:active,
           .header-logo:focus {
-            background-color: #000 !important;
-            color: white !important;
+            background-color: #f8f9fa !important;
+            color: #000 !important;
             transform: scale(1.02);
           }
           
           .cart-badge {
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            font-size: 0.65rem;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            line-height: 18px;
           }
           
           .header-btn:hover .cart-badge,
           .header-btn:active .cart-badge,
           .header-btn:focus .cart-badge {
-            background-color: white !important;
-            color: #000 !important;
+            background-color: #dc3545 !important;
+            color: white !important;
           }
           
+          /* iPhone 13 specific optimizations */
+          @media (max-width: 428px) {
+            .header-btn {
+              min-width: 44px;
+              min-height: 44px;
+              padding: 8px;
+            }
+            
+            .header-logo {
+              font-size: 1.3rem;
+              padding: 6px 10px;
+            }
+            
+            .cart-badge {
+              font-size: 0.6rem;
+              min-width: 16px;
+              height: 16px;
+              line-height: 16px;
+            }
+          }
+          
+          /* Touch device optimizations */
           @media (hover: none) and (pointer: coarse) {
             .header-btn:active {
-              background-color: #000 !important;
-              color: white !important;
+              background-color: #f8f9fa !important;
+              color: #000 !important;
               transform: scale(1.05);
             }
             
             .header-logo:active {
-              background-color: #000 !important;
-              color: white !important;
+              background-color: #f8f9fa !important;
+              color: #000 !important;
               transform: scale(1.02);
             }
             
             .header-btn:active .cart-badge {
-              background-color: white !important;
-              color: #000 !important;
+              background-color: #dc3545 !important;
+              color: white !important;
             }
           }
         `}
@@ -183,10 +229,12 @@ const Header = ({ onMenuClick }) => {
         className="shadow-sm border-bottom"
         style={navbarStyles}
       >
-        <Container fluid className="px-4">
-          {renderMenuButton()}
-          {renderLogo()}
-          {renderRightIcons()}
+        <Container fluid className="px-3">
+          <div className="d-flex align-items-center justify-content-between w-100">
+            {renderMenuButton()}
+            {renderLogo()}
+            {renderRightIcons()}
+          </div>
         </Container>
       </Navbar>
     </>
