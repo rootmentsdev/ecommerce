@@ -19,10 +19,12 @@ const EnquireNow = () => {
   // Get product data from navigation state
   const product = location.state?.product || {};
   const selectedSize = location.state?.selectedSize || '';
+  const selectedQuantity = location.state?.selectedQuantity || 1;
   
   // Debug: Log the product object and additional data
   console.log('Product object:', product);
   console.log('Selected size:', selectedSize);
+  console.log('Selected quantity:', selectedQuantity);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -34,7 +36,8 @@ const EnquireNow = () => {
     returnDate: '',
     city: '',
     specialNotes: '',
-    selectedSize: ''
+    selectedSize: '',
+    selectedQuantity: 1
   });
 
   const [showSideMenu, setShowSideMenu] = useState(false);
@@ -60,7 +63,8 @@ const EnquireNow = () => {
           fullName: user.name || user.fullName || '',
           email: user.email || '',
           mobileNumber: user.phone || user.mobileNumber || '',
-          selectedSize: selectedSize || ''
+          selectedSize: selectedSize || '',
+          selectedQuantity: selectedQuantity || 1
         }));
       } catch (error) {
         console.error('Error parsing user info:', error);
@@ -69,10 +73,11 @@ const EnquireNow = () => {
       // If no user info, still fill size
       setFormData(prev => ({
         ...prev,
-        selectedSize: selectedSize || ''
+        selectedSize: selectedSize || '',
+        selectedQuantity: selectedQuantity || 1
       }));
     }
-  }, [selectedSize]);
+  }, [selectedSize, selectedQuantity]);
 
   // Event handlers
   const handleInputChange = (e) => {

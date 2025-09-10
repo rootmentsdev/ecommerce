@@ -10,6 +10,7 @@ import demo1 from '../assets/demo1.png';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SideMenu from '../components/SideMenu';
+import SizeSelector from '../components/common/SizeSelector';
 
 // Import constants
 import { APP_CONFIG } from '../constants';
@@ -48,6 +49,7 @@ const ProductDetails = () => {
   };
 
   const [selectedSize, setSelectedSize] = useState('L');
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
@@ -62,6 +64,11 @@ const ProductDetails = () => {
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
+    setSelectedQuantity(1); // Reset quantity when size changes
+  };
+
+  const handleQuantityChange = (quantity) => {
+    setSelectedQuantity(quantity);
   };
 
   const handleFavoriteToggle = () => {
@@ -81,7 +88,8 @@ const ProductDetails = () => {
     navigate('/enquire', { 
       state: { 
         product,
-        selectedSize
+        selectedSize,
+        selectedQuantity
       } 
     });
   };
@@ -195,56 +203,14 @@ const ProductDetails = () => {
           </Col>
         </Row>
 
-        {/* Available Sizes */}
-        <div className="mb-4">
-          <Row className="align-items-center mb-3">
-            <Col>
-              <span 
-                className="fw-medium"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px'
-                }}
-              >
-                Available Sizes
-              </span>
-            </Col>
-            <Col className="text-end">
-              <Button 
-                variant="link" 
-                className="p-0 text-decoration-none"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '12px',
-                  color: '#000'
-                }}
-              >
-                Size Guide
-              </Button>
-            </Col>
-          </Row>
-          <Row className="g-2">
-            {sizes.map((size) => (
-              <Col key={size} xs="auto">
-                <Button
-                  variant={selectedSize === size ? 'dark' : 'outline-secondary'}
-                  size="sm"
-                  onClick={() => handleSizeSelect(size)}
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '8px',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}
-                >
-                  {size}
-                </Button>
-              </Col>
-            ))}
-          </Row>
-        </div>
+        {/* Size and Quantity Selection */}
+        <SizeSelector
+          selectedSize={selectedSize}
+          onSizeChange={handleSizeSelect}
+          selectedQuantity={selectedQuantity}
+          onQuantityChange={handleQuantityChange}
+          availableSizes={sizes}
+        />
 
         {/* Pickup & Return Store */}
         <div className="mb-4">

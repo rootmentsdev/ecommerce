@@ -600,7 +600,14 @@ const AdminDashboard = () => {
                                 </div>
                               </td>
                               <td style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px' }}>
-                                {enquiry.selectedSize || 'N/A'}
+                                <div>
+                                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '500' }}>
+                                    Size: {enquiry.selectedSize || 'N/A'}
+                                  </div>
+                                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', color: '#6c757d' }}>
+                                    Qty: {enquiry.selectedQuantity || 'N/A'}
+                                  </div>
+                                </div>
                               </td>
                               <td>
                                 <div>

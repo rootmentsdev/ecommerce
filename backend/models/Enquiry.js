@@ -42,6 +42,11 @@ const enquirySchema = new mongoose.Schema({
       message: 'Please select a valid size'
     }
   },
+  selectedQuantity: {
+    type: Number,
+    required: [true, 'Quantity is required'],
+    min: [1, 'Quantity must be at least 1']
+  },
   pickupDate: {
     type: Date,
     required: false,

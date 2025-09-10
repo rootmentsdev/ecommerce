@@ -57,6 +57,10 @@ const createEnquiryValidation = [
     .isIn(['XS', 'S', 'M', 'L', 'XL', 'XXL'])
     .withMessage('Please select a valid size'),
   
+  body('selectedQuantity')
+    .isInt({ min: 1 })
+    .withMessage('Quantity must be at least 1'),
+  
   body('pickupDate')
     .optional({ nullable: true })
     .custom((value) => {
