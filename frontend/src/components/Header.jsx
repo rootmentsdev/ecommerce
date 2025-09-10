@@ -69,7 +69,7 @@ const Header = ({ onMenuClick }) => {
       style={logoStyles}
       onClick={handleLogoClick}
     >
-      Logo
+      Dapper Squad
     </Navbar.Brand>
   );
 

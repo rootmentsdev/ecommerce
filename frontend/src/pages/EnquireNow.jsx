@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form, Modal, Alert } from 'react-bootstrap';
-import { Envelope, Telephone, Calendar, GeoAlt, ChevronDown } from 'react-bootstrap-icons';
+import { Envelope, Telephone, GeoAlt, ChevronDown } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // Import reusable components
@@ -38,7 +38,6 @@ const EnquireNow = () => {
   });
 
   const [showSideMenu, setShowSideMenu] = useState(false);
-  const [showDateModal, setShowDateModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,14 +102,6 @@ const EnquireNow = () => {
       pickupDate,
       returnDate
     }));
-  };
-
-  const handleDateSelect = (date) => {
-    setFormData(prev => ({
-      ...prev,
-      preferredBookingDate: date
-    }));
-    setShowDateModal(false);
   };
 
   const handleCitySelect = (city) => {
@@ -195,26 +186,6 @@ const EnquireNow = () => {
 
   const handleCloseSideMenu = () => {
     setShowSideMenu(false);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Pick Date';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-  };
-
-  const getMinDate = () => {
-    return new Date().toISOString().split('T')[0];
-  };
-
-  const getMaxDate = () => {
-    const maxDate = new Date();
-    maxDate.setMonth(maxDate.getMonth() + 3);
-    return maxDate.toISOString().split('T')[0];
   };
 
   // Render methods
@@ -372,44 +343,39 @@ const EnquireNow = () => {
               )}
             </div>
 
-            {/* Preferred Booking Date and City */}
-            <Row className="mb-4 g-3">
-              <Col xs={6}>
-                <Form.Label 
-                  className="fw-medium mb-2"
-                  style={{
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    color: '#000'
-                  }}
-                >
-                  Preferred Booking Date
-                </Form.Label>
-                <Button
-                  variant="outline-secondary"
-                  className="w-100 d-flex align-items-center justify-content-between p-3"
-                  onClick={() => setShowDateModal(true)}
-                  style={{
-                    borderRadius: '8px',
-                    border: errors.preferredBookingDate ? '1px solid #dc3545' : '1px solid #e9ecef',
-                    backgroundColor: '#fff',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    color: formData.preferredBookingDate ? '#000' : '#6c757d'
-                  }}
-                >
-                  <div className="d-flex align-items-center">
-                    <Calendar size={16} className="text-muted me-2" />
-                    <span>{formatDate(formData.preferredBookingDate)}</span>
-                  </div>
-                  <ChevronDown size={16} className="text-muted" />
-                </Button>
-                {errors.preferredBookingDate && (
-                  <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
-                    {errors.preferredBookingDate}
-                  </div>
-                )}
-              </Col>
+             {/* Preferred Booking Date and City */}
+             <Row className="mb-4 g-3">
+               <Col xs={6}>
+                 <Form.Label 
+                   className="fw-medium mb-2"
+                   style={{
+                     fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                     fontSize: '14px',
+                     color: '#000'
+                   }}
+                 >
+                   Preferred Booking Date
+                 </Form.Label>
+                 <Form.Control
+                   type="date"
+                   name="preferredBookingDate"
+                   value={formData.preferredBookingDate}
+                   onChange={handleInputChange}
+                   min={new Date().toISOString().split('T')[0]}
+                   style={{
+                     borderRadius: '8px',
+                     border: errors.preferredBookingDate ? '1px solid #dc3545' : '1px solid #e9ecef',
+                     fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                     fontSize: '14px',
+                     padding: '12px'
+                   }}
+                 />
+                 {errors.preferredBookingDate && (
+                   <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                     {errors.preferredBookingDate}
+                   </div>
+                 )}
+               </Col>
               <Col xs={6}>
                 <Form.Label 
                   className="fw-medium mb-2"
@@ -610,35 +576,6 @@ const EnquireNow = () => {
         handleClose={handleCloseSideMenu} 
       />
       
-      {/* Date Selection Modal */}
-      <Modal show={showDateModal} onHide={() => setShowDateModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title 
-            style={{
-              fontFamily: APP_CONFIG.FONTS.PRIMARY,
-              fontWeight: '600'
-            }}
-          >
-            Select Preferred Booking Date
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Control
-            type="date"
-            value={formData.preferredBookingDate}
-            onChange={(e) => handleDateSelect(e.target.value)}
-            min={getMinDate()}
-            max={getMaxDate()}
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '16px',
-              padding: '12px',
-              borderRadius: '8px'
-            }}
-          />
-        </Modal.Body>
-      </Modal>
-
       {/* City Selection Modal */}
       <Modal show={showCityModal} onHide={() => setShowCityModal(false)} centered>
         <Modal.Header closeButton>
