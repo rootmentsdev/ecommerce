@@ -128,8 +128,7 @@ const enquirySchema = new mongoose.Schema({
     default: null
   },
   contactedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     default: null
   }
 }, {

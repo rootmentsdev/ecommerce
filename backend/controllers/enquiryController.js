@@ -181,11 +181,14 @@ class EnquiryController {
   static async updateEnquiry(req, res) {
     try {
       const { id } = req.params;
-      const { status, priority, adminNotes } = req.body;
+      const { status, priority, adminNotes, specialNotes } = req.body;
+      
+      console.log('Update enquiry request:', { id, status, priority, adminNotes, specialNotes });
 
       // Check for validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('Validation errors:', errors.array());
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
@@ -197,19 +200,23 @@ class EnquiryController {
       if (status) updateData.status = status;
       if (priority) updateData.priority = priority;
       if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
+      if (specialNotes !== undefined) updateData.specialNotes = specialNotes;
+
+      console.log('Update data:', updateData);
 
       // If status is being updated to 'contacted', set contactedAt and contactedBy
       if (status === 'contacted') {
         updateData.contactedAt = new Date();
-        updateData.contactedBy = req.user?.id || null;
+        updateData.contactedBy = 'admin'; // Admin dashboard update
       }
 
       const enquiry = await Enquiry.findByIdAndUpdate(
         id,
         updateData,
         { new: true, runValidators: true }
-      ).populate('productId', 'name price image')
-       .populate('contactedBy', 'name email');
+      );
+
+      console.log('Updated enquiry:', enquiry ? 'Success' : 'Not found');
 
       if (!enquiry) {
         return res.status(404).json({
