@@ -42,28 +42,6 @@ const enquirySchema = new mongoose.Schema({
       message: 'Please select a valid size'
     }
   },
-  pickupDate: {
-    type: Date,
-    required: false,
-    validate: {
-      validator: function(date) {
-        if (!date) return true; // Optional field
-        return date >= new Date();
-      },
-      message: 'Pickup date must be in the future'
-    }
-  },
-  returnDate: {
-    type: Date,
-    required: false,
-    validate: {
-      validator: function(date) {
-        if (!date) return true; // Optional field
-        return date >= new Date();
-      },
-      message: 'Return date must be in the future'
-    }
-  },
   city: {
     type: String,
     required: [true, 'City is required'],

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Form, Card, Nav, Tab, Modal } from 'react-bootstrap';
-import { ArrowLeft, Heart, Share, ChevronDown, Calendar, GeoAlt } from 'react-bootstrap-icons';
+import { ArrowLeft, Heart, Share, ChevronDown, GeoAlt } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // Import images
@@ -51,10 +51,6 @@ const ProductDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
-  const [pickupDate, setPickupDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
-  const [showPickupCalendar, setShowPickupCalendar] = useState(false);
-  const [showReturnCalendar, setShowReturnCalendar] = useState(false);
 
   // Available sizes
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -80,19 +76,12 @@ const ProductDetails = () => {
     setShowSideMenu(false);
   };
 
-  const handleBookTrial = () => {
-    console.log('Book trial clicked');
-    // TODO: Implement book trial functionality
-  };
-
   const handleEnquireNow = () => {
     console.log('Enquire now clicked');
     navigate('/enquire', { 
       state: { 
         product,
-        selectedSize,
-        pickupDate,
-        returnDate
+        selectedSize
       } 
     });
   };
@@ -100,36 +89,6 @@ const ProductDetails = () => {
   const handleShare = () => {
     console.log('Share clicked');
     // TODO: Implement share functionality
-  };
-
-  const handlePickupDateSelect = (date) => {
-    setPickupDate(date);
-    setShowPickupCalendar(false);
-  };
-
-  const handleReturnDateSelect = (date) => {
-    setReturnDate(date);
-    setShowReturnCalendar(false);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Select Date';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-  };
-
-  const getMinDate = () => {
-    return new Date().toISOString().split('T')[0];
-  };
-
-  const getMaxDate = () => {
-    const maxDate = new Date();
-    maxDate.setMonth(maxDate.getMonth() + 3); // 3 months from now
-    return maxDate.toISOString().split('T')[0];
   };
 
   // Render methods
@@ -324,75 +283,6 @@ const ProductDetails = () => {
           </Button>
         </div>
 
-        {/* Pickup & Return Dates */}
-        <Row className="mb-4 g-3">
-          <Col xs={6}>
-            <div 
-              className="mb-2"
-              style={{
-                fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-            >
-              Pickup Date
-            </div>
-            <Button
-              variant="outline-secondary"
-              className="w-100 d-flex align-items-center p-3"
-              onClick={() => setShowPickupCalendar(true)}
-              style={{
-                borderRadius: '8px',
-                border: '1px solid #e9ecef',
-                backgroundColor: '#fff'
-              }}
-            >
-              <Calendar size={16} className="text-muted me-2" />
-              <span 
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  color: pickupDate ? '#000' : '#6c757d'
-                }}
-              >
-                {formatDate(pickupDate)}
-              </span>
-            </Button>
-          </Col>
-          <Col xs={6}>
-            <div 
-              className="mb-2"
-              style={{
-                fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-            >
-              Return Date
-            </div>
-            <Button
-              variant="outline-secondary"
-              className="w-100 d-flex align-items-center p-3"
-              onClick={() => setShowReturnCalendar(true)}
-              style={{
-                borderRadius: '8px',
-                border: '1px solid #e9ecef',
-                backgroundColor: '#fff'
-              }}
-            >
-              <Calendar size={16} className="text-muted me-2" />
-              <span 
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  color: returnDate ? '#000' : '#6c757d'
-                }}
-              >
-                {formatDate(returnDate)}
-              </span>
-            </Button>
-          </Col>
-        </Row>
 
         {/* Included Items */}
         <div className="mb-4">
@@ -694,15 +584,12 @@ const ProductDetails = () => {
               size="lg"
               className="w-100 h-100"
               onClick={handleEnquireNow}
-              disabled={!pickupDate || !returnDate}
               style={{
                 borderRadius: '8px',
                 fontFamily: APP_CONFIG.FONTS.SECONDARY,
                 fontSize: '16px',
                 fontWeight: '600',
-                height: '50px',
-                opacity: (!pickupDate || !returnDate) ? 0.5 : 1,
-                cursor: (!pickupDate || !returnDate) ? 'not-allowed' : 'pointer'
+                height: '50px'
               }}
             >
               Enquire now
@@ -728,63 +615,6 @@ const ProductDetails = () => {
         handleClose={handleCloseSideMenu} 
       />
       
-      {/* Pickup Date Calendar Modal */}
-      <Modal show={showPickupCalendar} onHide={() => setShowPickupCalendar(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title 
-            style={{
-              fontFamily: APP_CONFIG.FONTS.PRIMARY,
-              fontWeight: '600'
-            }}
-          >
-            Select Pickup Date
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Control
-            type="date"
-            value={pickupDate}
-            onChange={(e) => handlePickupDateSelect(e.target.value)}
-            min={getMinDate()}
-            max={getMaxDate()}
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '16px',
-              padding: '12px',
-              borderRadius: '8px'
-            }}
-          />
-        </Modal.Body>
-      </Modal>
-
-      {/* Return Date Calendar Modal */}
-      <Modal show={showReturnCalendar} onHide={() => setShowReturnCalendar(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title 
-            style={{
-              fontFamily: APP_CONFIG.FONTS.PRIMARY,
-              fontWeight: '600'
-            }}
-          >
-            Select Return Date
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Control
-            type="date"
-            value={returnDate}
-            onChange={(e) => handleReturnDateSelect(e.target.value)}
-            min={pickupDate || getMinDate()}
-            max={getMaxDate()}
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '16px',
-              padding: '12px',
-              borderRadius: '8px'
-            }}
-          />
-        </Modal.Body>
-      </Modal>
     </div>
   );
 };

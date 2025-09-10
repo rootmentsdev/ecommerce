@@ -19,14 +19,10 @@ const EnquireNow = () => {
   // Get product data from navigation state
   const product = location.state?.product || {};
   const selectedSize = location.state?.selectedSize || '';
-  const pickupDate = location.state?.pickupDate || '';
-  const returnDate = location.state?.returnDate || '';
   
   // Debug: Log the product object and additional data
   console.log('Product object:', product);
   console.log('Selected size:', selectedSize);
-  console.log('Pickup date:', pickupDate);
-  console.log('Return date:', returnDate);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -36,9 +32,7 @@ const EnquireNow = () => {
     preferredBookingDate: '',
     city: '',
     specialNotes: '',
-    selectedSize: '',
-    pickupDate: '',
-    returnDate: ''
+    selectedSize: ''
   });
 
   const [showSideMenu, setShowSideMenu] = useState(false);
@@ -65,23 +59,19 @@ const EnquireNow = () => {
           fullName: user.name || user.fullName || '',
           email: user.email || '',
           mobileNumber: user.phone || user.mobileNumber || '',
-          selectedSize: selectedSize || '',
-          pickupDate: pickupDate || '',
-          returnDate: returnDate || ''
+          selectedSize: selectedSize || ''
         }));
       } catch (error) {
         console.error('Error parsing user info:', error);
       }
     } else {
-      // If no user info, still fill size and dates
+      // If no user info, still fill size
       setFormData(prev => ({
         ...prev,
-        selectedSize: selectedSize || '',
-        pickupDate: pickupDate || '',
-        returnDate: returnDate || ''
+        selectedSize: selectedSize || ''
       }));
     }
-  }, [selectedSize, pickupDate, returnDate]);
+  }, [selectedSize]);
 
   // Event handlers
   const handleInputChange = (e) => {
@@ -129,9 +119,7 @@ const EnquireNow = () => {
       // Prepare enquiry data
       const enquiryData = {
         ...formData,
-        preferredBookingDate: new Date(formData.preferredBookingDate).toISOString(),
-        pickupDate: formData.pickupDate ? new Date(formData.pickupDate).toISOString() : null,
-        returnDate: formData.returnDate ? new Date(formData.returnDate).toISOString() : null
+        preferredBookingDate: new Date(formData.preferredBookingDate).toISOString()
       };
       
       // Only add productId if it's a valid MongoDB ObjectId format
