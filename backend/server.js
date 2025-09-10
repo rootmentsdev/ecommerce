@@ -62,6 +62,11 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.send("Ecommerce API is running 🚀");
+});
+
+
 // Start server
 const PORT = config.PORT;
 app.listen(PORT, () => {
