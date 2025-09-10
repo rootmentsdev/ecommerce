@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage';
 import ProductListing from './pages/ProductListing';
 import ProductDetails from './pages/ProductDetails';
 import EnquireNow from './pages/EnquireNow';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
 import './fonts.css';
 
@@ -18,6 +20,8 @@ function App() {
         <Route path="/products" element={<ProductListing />} />
         <Route path="/product-details" element={<ProductDetails />} />
         <Route path="/enquire" element={<EnquireNow />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </div>
   );

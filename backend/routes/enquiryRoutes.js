@@ -3,6 +3,7 @@ const router = express.Router();
 const EnquiryController = require('../controllers/enquiryController');
 const { body, param, query } = require('express-validator');
 const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 
 /**
  * Enquiry Routes
@@ -130,7 +131,7 @@ const updateEnquiryValidation = [
   
   body('status')
     .optional()
-    .isIn(['pending', 'contacted', 'confirmed', 'cancelled'])
+    .isIn(['new', 'contacted', 'interested', 'converted', 'cancelled'])
     .withMessage('Invalid status value'),
   
   body('priority')
@@ -142,7 +143,13 @@ const updateEnquiryValidation = [
     .optional()
     .trim()
     .isLength({ max: 1000 })
-    .withMessage('Admin notes cannot exceed 1000 characters')
+    .withMessage('Admin notes cannot exceed 1000 characters'),
+  
+  body('specialNotes')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Special notes cannot exceed 500 characters')
 ];
 
 const getEnquiryValidation = [
@@ -192,6 +199,19 @@ const getAllEnquiriesValidation = [
 // Routes
 
 /**
+ * @route   GET /api/enquiries/test
+ * @desc    Test endpoint to verify server is working
+ * @access  Public
+ */
+router.get('/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Enquiry API is working!',
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
  * @route   POST /api/enquiries
  * @desc    Create a new enquiry
  * @access  Public
@@ -201,9 +221,16 @@ router.post('/', createEnquiryValidation, EnquiryController.createEnquiry);
 /**
  * @route   GET /api/enquiries
  * @desc    Get all enquiries with pagination and filtering
+ * @access  Public (for admin dashboard)
+ */
+router.get('/', getAllEnquiriesValidation, EnquiryController.getAllEnquiries);
+
+/**
+ * @route   GET /api/enquiries/admin
+ * @desc    Get all enquiries with pagination and filtering (Admin only)
  * @access  Private (Admin only)
  */
-router.get('/', auth, getAllEnquiriesValidation, EnquiryController.getAllEnquiries);
+router.get('/admin', auth, getAllEnquiriesValidation, EnquiryController.getAllEnquiries);
 
 /**
  * @route   GET /api/enquiries/stats
@@ -222,9 +249,9 @@ router.get('/:id', auth, getEnquiryValidation, EnquiryController.getEnquiryById)
 /**
  * @route   PUT /api/enquiries/:id
  * @desc    Update enquiry status and admin notes
- * @access  Private (Admin only)
+ * @access  Public (for admin dashboard)
  */
-router.put('/:id', auth, updateEnquiryValidation, EnquiryController.updateEnquiry);
+router.put('/:id', updateEnquiryValidation, EnquiryController.updateEnquiry);
 
 /**
  * @route   DELETE /api/enquiries/:id
@@ -232,5 +259,25 @@ router.put('/:id', auth, updateEnquiryValidation, EnquiryController.updateEnquir
  * @access  Private (Admin only)
  */
 router.delete('/:id', auth, getEnquiryValidation, EnquiryController.deleteEnquiry);
+
+/**
+ * Admin Routes - Dashboard Access
+ * @route   GET /api/enquiries/admin/dashboard
+ * @desc    Get all enquiries for admin dashboard
+ * @access  Private (Admin only)
+ */
+router.get('/admin/dashboard', adminAuth, EnquiryController.getAllEnquiries);
+
+/**
+ * @route   PUT /api/enquiries/admin/:id/status
+ * @desc    Update enquiry status (Admin only)
+ * @access  Private (Admin only)
+ */
+router.put('/admin/:id/status', adminAuth, [
+  param('id').isMongoId().withMessage('Invalid enquiry ID'),
+  body('status')
+    .isIn(['new', 'contacted', 'interested', 'converted', 'cancelled'])
+    .withMessage('Invalid status value')
+], EnquiryController.updateEnquiryStatus);
 
 module.exports = router;

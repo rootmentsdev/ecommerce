@@ -84,8 +84,7 @@ const enquirySchema = new mongoose.Schema({
 
   // Product Information (if enquiry is from product page)
   productId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
+    type: String,
     default: null
   },
   productName: {
@@ -97,8 +96,8 @@ const enquirySchema = new mongoose.Schema({
   // Enquiry Status
   status: {
     type: String,
-    enum: ['pending', 'contacted', 'confirmed', 'cancelled'],
-    default: 'pending'
+    enum: ['new', 'contacted', 'interested', 'converted', 'cancelled'],
+    default: 'new'
   },
   priority: {
     type: String,

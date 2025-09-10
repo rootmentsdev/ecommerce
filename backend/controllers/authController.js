@@ -17,6 +17,7 @@ const register = async (req, res) => {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Register validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -25,6 +26,7 @@ const register = async (req, res) => {
     }
 
     const { fullName, email, phone, password } = req.body;
+    console.log('Register attempt for:', { fullName, email, phone });
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -32,6 +34,7 @@ const register = async (req, res) => {
     });
 
     if (existingUser) {
+      console.log('User already exists:', existingUser.email || existingUser.phone);
       return res.status(400).json({
         success: false,
         message: 'User already exists with this email or phone number'
@@ -45,6 +48,8 @@ const register = async (req, res) => {
       phone,
       password
     });
+
+    console.log('User created successfully:', user.email);
 
     // Generate token
     const token = generateToken(user._id);
@@ -75,6 +80,7 @@ const login = async (req, res) => {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Login validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -83,6 +89,7 @@ const login = async (req, res) => {
     }
 
     const { emailOrPhone, password } = req.body;
+    console.log('Login attempt for:', emailOrPhone);
 
     // Find user by email or phone
     const user = await User.findOne({
@@ -91,6 +98,13 @@ const login = async (req, res) => {
         { phone: emailOrPhone }
       ]
     }).select('+password');
+
+    console.log('User found:', user ? 'Yes' : 'No');
+    if (user) {
+      console.log('User email:', user.email);
+      console.log('User phone:', user.phone);
+      console.log('User isActive:', user.isActive);
+    }
 
     if (!user) {
       return res.status(401).json({
@@ -109,6 +123,8 @@ const login = async (req, res) => {
 
     // Compare password
     const isPasswordValid = await user.comparePassword(password);
+    console.log('Password valid:', isPasswordValid);
+    
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,

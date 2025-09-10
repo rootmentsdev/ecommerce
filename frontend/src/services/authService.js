@@ -4,6 +4,8 @@ class AuthService {
   // Register new user
   static async register(userData) {
     try {
+      console.log('Register attempt with userData:', userData);
+      
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -12,7 +14,9 @@ class AuthService {
         body: JSON.stringify(userData),
       });
 
+      console.log('Register response status:', response.status);
       const data = await response.json();
+      console.log('Register response data:', data);
       
       if (data.success) {
         // Store token in localStorage
@@ -33,6 +37,8 @@ class AuthService {
   // Login user
   static async login(credentials) {
     try {
+      console.log('Login attempt with credentials:', credentials);
+      
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -41,7 +47,9 @@ class AuthService {
         body: JSON.stringify(credentials),
       });
 
+      console.log('Login response status:', response.status);
       const data = await response.json();
+      console.log('Login response data:', data);
       
       if (data.success) {
         // Store token in localStorage

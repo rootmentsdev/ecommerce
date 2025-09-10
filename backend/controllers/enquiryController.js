@@ -109,9 +109,7 @@ class EnquiryController {
       const enquiries = await Enquiry.find(filter)
         .sort(sort)
         .skip(skip)
-        .limit(parseInt(limit))
-        .populate('productId', 'name price image')
-        .populate('contactedBy', 'name email');
+        .limit(parseInt(limit));
 
       // Get total count for pagination
       const total = await Enquiry.countDocuments(filter);
@@ -353,6 +351,49 @@ class EnquiryController {
 
     } catch (error) {
       console.error('Get enquiry stats error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+
+  /**
+   * Update enquiry status (Admin only)
+   * PUT /api/enquiries/admin/:id/status
+   */
+  static async updateEnquiryStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const enquiry = await Enquiry.findByIdAndUpdate(
+        id,
+        { 
+          status,
+          updatedAt: new Date()
+        },
+        { new: true, runValidators: true }
+      );
+
+      if (!enquiry) {
+        return res.status(404).json({
+          success: false,
+          message: 'Enquiry not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Enquiry status updated successfully',
+        data: {
+          enquiry
+        }
+      });
+
+    } catch (error) {
+      console.error('Update enquiry status error:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error',
