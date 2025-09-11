@@ -1,0 +1,48 @@
+/* Page Transition Animations */
+.page-transition {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.page-transition.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition.fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Smooth transitions for all interactive elements */
+.btn, .form-control, .card, .navbar {
+  transition: all 0.3s ease;
+}
+
+/* Enhanced hover effects */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth loading states */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Mobile-optimized transitions */
+@media (max-width: 768px) {
+  .page-transition {
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+  
+  .btn:hover, .card:hover {
+    transform: none; /* Disable hover transforms on mobile */
+  }
+}

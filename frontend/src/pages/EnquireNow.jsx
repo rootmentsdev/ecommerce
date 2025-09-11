@@ -162,6 +162,9 @@ const EnquireNow = () => {
     setIsSubmitting(true);
     
     try {
+      // Add 3-second delay to make submission feel more natural
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       // Prepare enquiry data
       const enquiryData = {
         ...formData,
@@ -194,7 +197,11 @@ const EnquireNow = () => {
         
         // Reset form after successful submission
         setTimeout(() => {
-          navigate(-1);
+          navigate('/');
+          // Ensure we scroll to top when navigating to home
+          setTimeout(() => {
+            window.scrollTo(0, 0);
+          }, 100);
         }, 2000);
       }
     } catch (error) {
@@ -210,6 +217,10 @@ const EnquireNow = () => {
 
   const handleCancel = () => {
     navigate(-1); // Go back to previous page
+    // Ensure we scroll to top when navigating back
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 100);
   };
 
   const handleShowSideMenu = () => {
@@ -238,21 +249,6 @@ const EnquireNow = () => {
               Enquire Now
             </h1>
           </div>
-
-          {/* Success/Error Message */}
-          {submitMessage.text && (
-            <Alert 
-              variant={submitMessage.type} 
-              className="mb-4"
-              style={{
-                borderRadius: '8px',
-                fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                fontSize: '14px'
-              }}
-            >
-              {submitMessage.text}
-            </Alert>
-          )}
 
           <Form onSubmit={handleSubmit}>
             {/* Full Name */}
@@ -590,6 +586,21 @@ const EnquireNow = () => {
                 </Button>
               </Col>
             </Row>
+
+            {/* Success/Error Message */}
+            {submitMessage.text && (
+              <Alert 
+                variant={submitMessage.type} 
+                className="mt-3 mb-0"
+                style={{
+                  borderRadius: '8px',
+                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                  fontSize: '14px'
+                }}
+              >
+                {submitMessage.text}
+              </Alert>
+            )}
           </Form>
         </Col>
       </Row>
