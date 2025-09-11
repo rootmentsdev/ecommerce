@@ -16,8 +16,11 @@ function App() {
   return (
     <div className="app">
       <Routes>
+        {/* Home page as base route */}
+        <Route path="/" element={<HomePage />} />
+        
         {/* Login page with auth check */}
-        <Route path="/" element={
+        <Route path="/login" element={
           <AuthCheck>
             <LoginPage />
           </AuthCheck>
