@@ -2,6 +2,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AuthCheck from './components/AuthCheck';
+import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import ProductListing from './pages/ProductListing';
@@ -15,6 +16,7 @@ import './fonts.css';
 function App() {
   return (
     <div className="app">
+      <ScrollToTop />
       <Routes>
         {/* Home page as base route */}
         <Route path="/" element={<HomePage />} />

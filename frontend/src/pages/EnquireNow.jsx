@@ -86,6 +86,15 @@ const EnquireNow = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear specific field error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   // Calculate return date (5 days after pickup date)
@@ -107,6 +116,15 @@ const EnquireNow = () => {
       pickupDate,
       returnDate
     }));
+    
+    // Clear pickup date error when user changes the date
+    if (errors.pickupDate) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.pickupDate;
+        return newErrors;
+      });
+    }
   };
 
   const handleCitySelect = (city) => {
@@ -115,6 +133,15 @@ const EnquireNow = () => {
       city: city
     }));
     setShowCityModal(false);
+    
+    // Clear city error when user selects a city
+    if (errors.city) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.city;
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -547,7 +574,7 @@ const EnquireNow = () => {
                   type="submit"
                   variant="dark"
                   className="w-100"
-                  disabled={isSubmitting || Object.keys(errors).length > 0 || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.preferredBookingDate || !formData.city}
+                  disabled={isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.preferredBookingDate || !formData.city}
                   style={{
                     borderRadius: '8px',
                     fontFamily: APP_CONFIG.FONTS.SECONDARY,
@@ -556,7 +583,7 @@ const EnquireNow = () => {
                     padding: '12px',
                     backgroundColor: '#000',
                     border: 'none',
-                    opacity: (isSubmitting || Object.keys(errors).length > 0 || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.preferredBookingDate || !formData.city) ? 0.6 : 1
+                    opacity: (isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.preferredBookingDate || !formData.city) ? 0.6 : 1
                   }}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit'}

@@ -163,28 +163,41 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
       style={{ width: '300px' }}
     >
       <Offcanvas.Header className="border-bottom pb-3">
-        <Offcanvas.Title 
-          className="fw-bold"
-          style={{ fontFamily: APP_CONFIG.FONTS.PRIMARY }}
-        >
-          Filters
-        </Offcanvas.Title>
-        <div className="d-flex align-items-center gap-3">
-          <Button
-            variant="link"
-            className="p-0 text-decoration-none text-dark"
-            onClick={handleClearFilters}
-            style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
+        <div className="d-flex justify-content-between align-items-center w-100">
+          <Offcanvas.Title 
+            className="fw-bold mb-0"
+            style={{ fontFamily: APP_CONFIG.FONTS.PRIMARY }}
           >
-            Clear Filter
-          </Button>
-          <Button
-            variant="link"
-            className="p-0 text-dark"
-            onClick={handleClose}
-          >
-            <X size={20} />
-          </Button>
+            Filters
+          </Offcanvas.Title>
+          <div className="d-flex align-items-center gap-2">
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              className="px-2 py-1"
+              onClick={handleClearFilters}
+              style={{ 
+                fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                fontSize: '11px',
+                fontWeight: '500',
+                borderRadius: '4px',
+                border: '1px solid #dee2e6',
+                color: '#6c757d',
+                backgroundColor: 'transparent',
+                minWidth: '70px'
+              }}
+            >
+              Clear Filter
+            </Button>
+            <Button
+              variant="link"
+              className="p-1 text-dark"
+              onClick={handleClose}
+              style={{ borderRadius: '4px' }}
+            >
+              <X size={18} />
+            </Button>
+          </div>
         </div>
       </Offcanvas.Header>
       
@@ -193,7 +206,6 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
         {renderCheckboxList(CATEGORIES, filters.categories, handleCategoryChange, 'Categories')}
         {renderCheckboxList(OCCASIONS, filters.occasions, handleOccasionChange, 'Occasion')}
         {renderCheckboxList(SIZES, filters.sizes, handleSizeChange, 'Size')}
-        {renderCheckboxList(OCCASIONS, filters.occasions, handleOccasionChange, 'Occasion')}
         {renderApplyButton()}
       </Offcanvas.Body>
     </Offcanvas>
