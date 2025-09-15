@@ -1114,6 +1114,17 @@ const ProductListing = () => {
     });
   };
 
+  const handleEnquireClick = () => {
+    console.log('Enquire Now clicked');
+    navigate('/enquire', { 
+      state: { 
+        isRental: isRentalPage,
+        isBuy: isBuyPage,
+        title: isRentalPage ? 'Rental Enquiry' : 'Purchase Enquiry'
+      } 
+    });
+  };
+
   // Filter products based on search term and applied filters
   const filteredProducts = products.filter(product => {
     // Search filter
@@ -1254,6 +1265,35 @@ const ProductListing = () => {
             </Col>
           ))}
         </Row>
+        
+        <Row className="mt-4">
+          <Col className="text-center">
+            <Button 
+              variant="dark"
+              size="lg"
+              className="px-5 py-3 rounded-pill fw-bold"
+              style={{
+                borderRadius: '50px',
+                fontFamily: APP_CONFIG.FONTS.PRIMARY,
+                fontSize: '16px',
+                letterSpacing: '0.5px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onClick={handleEnquireClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+              }}
+            >
+              Enquire Now
+            </Button>
+          </Col>
+        </Row>
       </Container>
     </div>
   );
@@ -1331,6 +1371,35 @@ const ProductListing = () => {
               </Card>
             </Col>
           ))}
+        </Row>
+        
+        <Row className="mt-4">
+          <Col className="text-center">
+            <Button 
+              variant="dark"
+              size="lg"
+              className="px-5 py-3 rounded-pill fw-bold"
+              style={{
+                borderRadius: '50px',
+                fontFamily: APP_CONFIG.FONTS.PRIMARY,
+                fontSize: '16px',
+                letterSpacing: '0.5px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onClick={handleEnquireClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+              }}
+            >
+              Enquire Now
+            </Button>
+          </Col>
         </Row>
       </Container>
     </div>
