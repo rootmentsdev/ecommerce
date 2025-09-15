@@ -6,7 +6,7 @@ import { APP_CONFIG } from '../../constants';
 const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
   // Filter state following clean code principles
   const [filters, setFilters] = useState({
-    priceRange: [2100, 8400],
+    priceRange: [600, 25000],
     categories: [],
     occasions: [],
     sizes: []
@@ -15,12 +15,16 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
   // Filter options data
   const CATEGORIES = [
     'Premium Suits',
+    'Traditional Wear',
+    'Party Wear',
+    'Kids Wear',
     'Formal Wear', 
     'Sherwani',
     'Kurta',
     'Indo-Western',
     'Tie',
-    'Cufflinks'
+    'Cufflinks',
+    'suits'
   ];
 
   const OCCASIONS = [
@@ -63,7 +67,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
 
   const handleClearFilters = () => {
     const clearedFilters = {
-      priceRange: [2100, 8400],
+      priceRange: [600, 25000],
       categories: [],
       occasions: [],
       sizes: []
@@ -88,8 +92,8 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
       </h6>
       <div className="px-2">
         <Form.Range
-          min="2100"
-          max="8400"
+          min="600"
+          max="25000"
           step="100"
           value={filters.priceRange[1]}
           onChange={(e) => handlePriceChange(1, e.target.value)}
