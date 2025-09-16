@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Collapse } from 'react-bootstrap';
+import { Container, Row, Col, Collapse, Image } from 'react-bootstrap';
 import { ChevronRight, Whatsapp, Facebook, Instagram } from 'react-bootstrap-icons';
+import Logo from '../assets/Logo.png';
 
 const Footer = () => {
   const [quickLinksOpen, setQuickLinksOpen] = useState(false);
@@ -47,7 +48,16 @@ const Footer = () => {
         {/* Logo and Description Section */}
         <Row className="mb-4">
           <Col>
-            <h4 className="fw-bold mb-3" style={{ color: 'white' }}>Logo</h4>
+            <div className="mb-3">
+              <Image 
+                src={Logo} 
+                alt="dappr SQUAD Logo"
+                style={{
+                  height: '40px',
+                  width: 'auto'
+                }}
+              />
+            </div>
             <p 
               className="mb-0"
               style={{ 

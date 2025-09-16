@@ -20,6 +20,7 @@ const EnquireNow = () => {
   const product = location.state?.product || {};
   const selectedSize = location.state?.selectedSize || '';
   const selectedQuantity = location.state?.selectedQuantity || 1;
+  const enquiryType = location.state?.enquiryType || 'rent'; // 'rent' or 'buy'
   
   // Debug: Log the product object and additional data
   console.log('Product object:', product);
@@ -371,40 +372,42 @@ const EnquireNow = () => {
               )}
             </div>
 
-             {/* Preferred Booking Date and City */}
+             {/* Preferred Booking Date and City - Only show booking date for rent enquiries */}
              <Row className="mb-4 g-3">
-               <Col xs={6}>
-                 <Form.Label 
-                   className="fw-medium mb-2"
-                   style={{
-                     fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                     fontSize: '14px',
-                     color: '#000'
-                   }}
-                 >
-                   Preferred Booking Date
-                 </Form.Label>
-                 <Form.Control
-                   type="date"
-                   name="preferredBookingDate"
-                   value={formData.preferredBookingDate}
-                   onChange={handleInputChange}
-                   min={new Date().toISOString().split('T')[0]}
-                   style={{
-                     borderRadius: '8px',
-                     border: errors.preferredBookingDate ? '1px solid #dc3545' : '1px solid #e9ecef',
-                     fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                     fontSize: '14px',
-                     padding: '12px'
-                   }}
-                 />
-                 {errors.preferredBookingDate && (
-                   <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
-                     {errors.preferredBookingDate}
-                   </div>
-                 )}
-               </Col>
-              <Col xs={6}>
+               {enquiryType === 'rent' && (
+                 <Col xs={6}>
+                   <Form.Label 
+                     className="fw-medium mb-2"
+                     style={{
+                       fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                       fontSize: '14px',
+                       color: '#000'
+                     }}
+                   >
+                     Preferred Booking Date
+                   </Form.Label>
+                   <Form.Control
+                     type="date"
+                     name="preferredBookingDate"
+                     value={formData.preferredBookingDate}
+                     onChange={handleInputChange}
+                     min={new Date().toISOString().split('T')[0]}
+                     style={{
+                       borderRadius: '8px',
+                       border: errors.preferredBookingDate ? '1px solid #dc3545' : '1px solid #e9ecef',
+                       fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                       fontSize: '14px',
+                       padding: '12px'
+                     }}
+                   />
+                   {errors.preferredBookingDate && (
+                     <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                       {errors.preferredBookingDate}
+                     </div>
+                   )}
+                 </Col>
+               )}
+              <Col xs={enquiryType === 'rent' ? 6 : 12}>
                 <Form.Label 
                   className="fw-medium mb-2"
                   style={{
@@ -442,70 +445,72 @@ const EnquireNow = () => {
               </Col>
             </Row>
 
-            {/* Pickup and Return Dates */}
-            <Row className="mb-4 g-3">
-              <Col xs={6}>
-                <Form.Label 
-                  className="fw-medium mb-2"
-                  style={{
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    color: '#000'
-                  }}
-                >
-                  Pickup Date
-                </Form.Label>
-                <Form.Control
-                  type="date"
-                  name="pickupDate"
-                  value={formData.pickupDate}
-                  onChange={handlePickupDateChange}
-                  min={new Date().toISOString().split('T')[0]}
-                  style={{
-                    borderRadius: '8px',
-                    border: errors.pickupDate ? '1px solid #dc3545' : '1px solid #e9ecef',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    padding: '12px'
-                  }}
-                />
-                {errors.pickupDate && (
-                  <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
-                    {errors.pickupDate}
-                  </div>
-                )}
-              </Col>
-              <Col xs={6}>
-                <Form.Label 
-                  className="fw-medium mb-2"
-                  style={{
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    color: '#000'
-                  }}
-                >
-                  Return Date
-                </Form.Label>
-                <Form.Control
-                  type="date"
-                  name="returnDate"
-                  value={formData.returnDate}
-                  readOnly
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #e9ecef',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    padding: '12px',
-                    backgroundColor: '#f8f9fa',
-                    color: '#6c757d'
-                  }}
-                />
-                <small className="text-muted" style={{ fontSize: '11px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
-                  Automatically set to 5 days after pickup
-                </small>
-              </Col>
-            </Row>
+            {/* Pickup and Return Dates - Only show for rent enquiries */}
+            {enquiryType === 'rent' && (
+              <Row className="mb-4 g-3">
+                <Col xs={6}>
+                  <Form.Label 
+                    className="fw-medium mb-2"
+                    style={{
+                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                      fontSize: '14px',
+                      color: '#000'
+                    }}
+                  >
+                    Pickup Date
+                  </Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="pickupDate"
+                    value={formData.pickupDate}
+                    onChange={handlePickupDateChange}
+                    min={new Date().toISOString().split('T')[0]}
+                    style={{
+                      borderRadius: '8px',
+                      border: errors.pickupDate ? '1px solid #dc3545' : '1px solid #e9ecef',
+                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                      fontSize: '14px',
+                      padding: '12px'
+                    }}
+                  />
+                  {errors.pickupDate && (
+                    <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                      {errors.pickupDate}
+                    </div>
+                  )}
+                </Col>
+                <Col xs={6}>
+                  <Form.Label 
+                    className="fw-medium mb-2"
+                    style={{
+                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                      fontSize: '14px',
+                      color: '#000'
+                    }}
+                  >
+                    Return Date
+                  </Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="returnDate"
+                    value={formData.returnDate}
+                    readOnly
+                    style={{
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef',
+                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                      fontSize: '14px',
+                      padding: '12px',
+                      backgroundColor: '#f8f9fa',
+                      color: '#6c757d'
+                    }}
+                  />
+                  <small className="text-muted" style={{ fontSize: '11px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                    Automatically set to 5 days after pickup
+                  </small>
+                </Col>
+              </Row>
+            )}
 
             {/* Special Notes */}
             <div className="mb-4">
@@ -570,7 +575,7 @@ const EnquireNow = () => {
                   type="submit"
                   variant="dark"
                   className="w-100"
-                  disabled={isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.preferredBookingDate || !formData.city}
+                  disabled={isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (enquiryType === 'rent' && (!formData.preferredBookingDate || !formData.pickupDate))}
                   style={{
                     borderRadius: '8px',
                     fontFamily: APP_CONFIG.FONTS.SECONDARY,
@@ -579,7 +584,7 @@ const EnquireNow = () => {
                     padding: '12px',
                     backgroundColor: '#000',
                     border: 'none',
-                    opacity: (isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.preferredBookingDate || !formData.city) ? 0.6 : 1
+                    opacity: (isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (enquiryType === 'rent' && (!formData.preferredBookingDate || !formData.pickupDate))) ? 0.6 : 1
                   }}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit'}

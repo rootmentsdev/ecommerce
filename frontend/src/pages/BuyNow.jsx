@@ -46,20 +46,28 @@ const BuyNow = () => {
 
   const handleCategoryClick = (category) => {
     console.log('Category clicked:', category);
-    navigate(`/products?category=${category.category}`);
+    navigate(`/products?category=${category.category}`, {
+      state: { enquiryType: 'buy' }
+    });
   };
 
   const handleExploreMoreClick = () => {
     console.log('Explore more clicked');
-    navigate('/products');
+    navigate('/products', {
+      state: { enquiryType: 'buy' }
+    });
   };
 
   const handleBrowseProducts = () => {
-    navigate('/products');
+    navigate('/products', {
+      state: { enquiryType: 'buy' }
+    });
   };
 
   const handleShopNow = () => {
-    navigate('/products');
+    navigate('/products', {
+      state: { enquiryType: 'buy' }
+    });
   };
 
   // Render methods
@@ -115,17 +123,16 @@ const BuyNow = () => {
               <div 
                 className="position-absolute"
                 style={{
-                  bottom: '20px',
-                  right: '20px',
-                  width: '40px',
-                  height: '40px',
+                  bottom: '15px',
+                  right: '-5px',
+                  width: '35px',
+                  height: '35px',
                   backgroundColor: '#000',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer',
-                  zIndex: 10
+                  cursor: 'pointer'
                 }}
                 onClick={handleNextImage}
               >

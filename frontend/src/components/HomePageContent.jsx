@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
+import { Container, Row, Col, Button, Carousel, Card, Image } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Search, Cart, Truck, ArrowClockwise, ChevronRight } from 'react-bootstrap-icons';
 
@@ -132,9 +132,10 @@ const HomePageContent = () => {
               >
                 {heroImages.map((image, index) => (
                   <Carousel.Item key={index}>
-                    <img 
+                    <Image 
                       src={image} 
                       alt={`Hero ${index + 1}`}
+                      fluid
                       style={{
                         width: '380px',
                         height: '480px',
@@ -318,10 +319,10 @@ const HomePageContent = () => {
               style={{ cursor: 'pointer' }}
               onClick={() => handleCategoryClick(category)}
             >
-              <img 
+              <Image 
                 src={category.image} 
                 alt={category.name}
-                className="img-fluid"
+                fluid
                 style={{
                   width: '100%',
                   height: '250px',
@@ -384,10 +385,11 @@ const HomePageContent = () => {
         <Row className="align-items-center">
           <Col lg={6}>
             <div className="position-relative">
-               <img 
+               <Image 
                  src={Who} 
                  alt="Who we are"
-                 className="img-fluid rounded"
+                 fluid
+                 rounded
                  style={{
                    width: '100%',
                    height: '300px',
@@ -536,10 +538,11 @@ const HomePageContent = () => {
         <Row className="align-items-center">
           <Col lg={6}>
             <div className="position-relative">
-               <img 
+               <Image 
                  src={What} 
                  alt="What we do"
-                 className="img-fluid rounded"
+                 fluid
+                 rounded
                  style={{
                    width: '100%',
                    height: '300px',
@@ -607,10 +610,11 @@ const HomePageContent = () => {
         <Row className="align-items-center">
           <Col lg={6}>
             <div className="position-relative">
-               <img 
+               <Image 
                  src={How} 
                  alt="How We Do It"
-                 className="img-fluid rounded"
+                 fluid
+                 rounded
                  style={{
                    width: '100%',
                    height: '300px',
@@ -717,10 +721,11 @@ const HomePageContent = () => {
       <Container>
         {/* Image Section */}
         <div className="text-center mb-5">
-          <img 
+          <Image 
             src={Aboutus4} 
             alt="Final CTA"
-            className="img-fluid rounded"
+            fluid
+            rounded
             style={{
               width: '100%',
               maxWidth: '800px',

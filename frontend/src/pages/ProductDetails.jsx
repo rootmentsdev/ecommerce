@@ -27,6 +27,9 @@ const ProductDetails = () => {
     image: demo1
   };
 
+  // Get enquiry type from navigation state
+  const enquiryType = location.state?.enquiryType || 'rent';
+
   // Ensure all required properties exist with defaults
   const product = {
     id: productData.id || '507f1f77bcf86cd799439021',
@@ -85,11 +88,15 @@ const ProductDetails = () => {
 
   const handleEnquireNow = () => {
     console.log('Enquire now clicked');
+    // Get enquiry type from navigation state
+    const enquiryType = location.state?.enquiryType || 'rent';
+    
     navigate('/enquire', { 
       state: { 
         product,
         selectedSize,
-        selectedQuantity
+        selectedQuantity,
+        enquiryType
       } 
     });
   };
@@ -157,7 +164,7 @@ const ProductDetails = () => {
 
         {/* Pricing */}
         <Row className="mb-4">
-          <Col xs={6}>
+          <Col xs={12}>
             <div>
               <div 
                 className="h4 fw-bold mb-1"
@@ -177,43 +184,33 @@ const ProductDetails = () => {
               >
                 Actual Price: ₹{product.actualPrice}
               </div>
-            </div>
-          </Col>
-          <Col xs={6} className="text-end">
-            <div>
-              <div 
-                className="h5 fw-bold mb-1"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.PRIMARY,
-                  color: '#000'
-                }}
-              >
-                ₹{product.securityDeposit}
-              </div>
-              <div 
-                className="text-muted"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '12px'
-                }}
-              >
-                Security Deposit
-              </div>
+              {enquiryType === 'rent' && (
+                <div 
+                  className="text-info mt-2"
+                  style={{
+                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                    fontSize: '12px',
+                    fontWeight: '500'
+                  }}
+                >
+                  MOQ: 4 qty
+                </div>
+              )}
             </div>
           </Col>
         </Row>
 
-        {/* Size and Quantity Selection */}
-        <SizeSelector
+        {/* Size and Quantity Selection - Hidden for both rent and buy enquiries */}
+        {/* <SizeSelector
           selectedSize={selectedSize}
           onSizeChange={handleSizeSelect}
           selectedQuantity={selectedQuantity}
           onQuantityChange={handleQuantityChange}
           availableSizes={sizes}
-        />
+        /> */}
 
-        {/* Pickup & Return Store */}
-        <div className="mb-4">
+        {/* Pickup & Return Store - Hidden for both rent and buy enquiries */}
+        {/* <div className="mb-4">
           <div 
             className="mb-2"
             style={{
@@ -247,7 +244,7 @@ const ProductDetails = () => {
             </div>
             <ChevronDown size={16} className="text-muted" />
           </Button>
-        </div>
+        </div> */}
 
 
         {/* Included Items */}
@@ -317,7 +314,10 @@ const ProductDetails = () => {
                 lineHeight: '1.4'
               }}
             >
-              Free cancellation up to 24 hours before pickup. Security deposit refunded within 5-7 business days after return.
+              {enquiryType === 'rent' 
+                ? 'Free cancellation up to 48 hours before rental start date. Minimum order quantity of 4 items required for rental bookings. Full refund processed within 3-5 business days after cancellation.'
+                : 'Free cancellation up to 48 hours before purchase delivery. Full refund processed within 3-5 business days after cancellation.'
+              }
             </p>
             <Button 
               variant="link" 
@@ -435,66 +435,6 @@ const ProductDetails = () => {
             }}
           >
             {product.style}
-          </div>
-        </div>
-        <div className="col-6">
-          <div 
-            className="text-muted"
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '12px'
-            }}
-          >
-            Occasions
-          </div>
-          <div 
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            {product.occasions.join(', ')}
-          </div>
-        </div>
-        <div className="col-6">
-          <div 
-            className="text-muted"
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '12px'
-            }}
-          >
-            Inclusions
-          </div>
-          <div 
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            {product.inclusions.join(', ')}
-          </div>
-        </div>
-        <div className="col-6">
-          <div 
-            className="text-muted"
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '12px'
-            }}
-          >
-            Care
-          </div>
-          <div 
-            style={{
-              fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            {product.care}
           </div>
         </div>
       </div>

@@ -66,7 +66,10 @@ const ProductListing = () => {
   const handleProductClick = (product) => {
     console.log('Product clicked:', product);
     navigate('/product-details', { 
-      state: { product } 
+      state: { 
+        product,
+        enquiryType: location.state?.enquiryType || 'rent'
+      } 
     });
   };
 

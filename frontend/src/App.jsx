@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import AuthCheck from './components/AuthCheck';
 import ScrollToTop from './components/ScrollToTop';
 import PageTransition from './components/PageTransition';
+import FloatingWhatsAppButton from './components/FloatingWhatsAppButton';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import ProductListing from './pages/ProductListing';
@@ -21,6 +22,7 @@ function App() {
   return (
     <div className="app">
       <ScrollToTop />
+      <FloatingWhatsAppButton />
       <Routes>
         {/* Home page as base route */}
         <Route path="/" element={

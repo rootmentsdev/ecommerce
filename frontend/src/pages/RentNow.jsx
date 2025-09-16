@@ -76,20 +76,28 @@ const RentNow = () => {
   // Event handlers
   const handleCategoryClick = (category) => {
     console.log('Category clicked:', category);
-    navigate(`/products?category=${category.category}`);
+    navigate(`/products?category=${category.category}`, {
+      state: { enquiryType: 'rent' }
+    });
   };
 
   const handleExploreMoreClick = () => {
     console.log('Explore more clicked');
-    navigate('/products');
+    navigate('/products', {
+      state: { enquiryType: 'rent' }
+    });
   };
 
   const handleBrowseDeals = () => {
-    navigate('/products');
+    navigate('/products', {
+      state: { enquiryType: 'rent' }
+    });
   };
 
-  const handleRentNow = () => {
-    navigate('/products');
+  const handleEnquireNow = () => {
+    navigate('/enquire', {
+      state: { enquiryType: 'rent' }
+    });
   };
 
   // Render methods following clean code principles
@@ -306,9 +314,9 @@ const RentNow = () => {
                 className="position-absolute"
                 style={{
                   bottom: '15px',
-                  right: '15px',
-                  width: '30px',
-                  height: '30px',
+                  right: '-5px',
+                  width: '35px',
+                  height: '35px',
                   backgroundColor: '#000',
                   borderRadius: '50%',
                   display: 'flex',
@@ -515,7 +523,7 @@ const RentNow = () => {
             <Button 
               variant="outline-dark"
               size="lg"
-              onClick={handleRentNow}
+              onClick={handleEnquireNow}
               className="btn-custom"
                style={{
                  borderRadius: '50px !important',
@@ -525,7 +533,7 @@ const RentNow = () => {
                  fontWeight: 600
                }}
             >
-              Rent Now
+              Enquire Now
             </Button>
           </Col>
         </Row>
