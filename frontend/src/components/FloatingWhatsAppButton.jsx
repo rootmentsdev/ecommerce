@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { Whatsapp } from 'react-bootstrap-icons';
+import { useLocation } from 'react-router-dom';
 
 const FloatingWhatsAppButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +16,11 @@ const FloatingWhatsAppButton = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Hide WhatsApp button on Product Details page
+  if (location.pathname === '/product-details') {
+    return null;
+  }
 
   const handleWhatsAppClick = () => {
     // Replace with your actual WhatsApp number
