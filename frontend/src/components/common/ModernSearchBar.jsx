@@ -9,6 +9,12 @@ const ModernSearchBar = ({
   onFilterClick,
   placeholder = "Search" 
 }) => {
+  const handleSearchChange = (e) => {
+    if (onSearchChange) {
+      onSearchChange(e.target.value);
+    }
+  };
+
   return (
     <div className="w-100">
       <div className="modern-search-container">
@@ -22,8 +28,8 @@ const ModernSearchBar = ({
         <Form.Control
           type="text"
           placeholder={placeholder}
-          value={searchTerm}
-          onChange={onSearchChange}
+          value={searchTerm || ''}
+          onChange={handleSearchChange}
           className="search-input-modern"
         />
         
@@ -35,7 +41,7 @@ const ModernSearchBar = ({
         />
       </div>
       
-      <style jsx>{`
+      <style>{`
         .modern-search-container {
           position: relative;
           display: flex;

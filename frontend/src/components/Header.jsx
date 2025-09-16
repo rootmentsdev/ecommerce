@@ -33,11 +33,8 @@ const Header = ({ onMenuClick }) => {
   };
 
   const logoStyles = {
-    color: APP_CONFIG.COLORS.SECONDARY,
-    fontSize: '1.5rem',
-    letterSpacing: '-0.02em',
-    fontFamily: APP_CONFIG.FONTS.PRIMARY,
-    fontWeight: '700'
+    color: '#000',
+    fontFamily: 'Stoshi'
   };
 
   const buttonStyles = {
@@ -69,7 +66,24 @@ const Header = ({ onMenuClick }) => {
       style={logoStyles}
       onClick={handleLogoClick}
     >
-      Dappr Squad
+      <div style={{ textAlign: 'center', lineHeight: '1.1' }}>
+        <div style={{ 
+          fontFamily: 'Stoshi',
+          fontWeight: 700,
+          fontSize: '1.4rem',
+          color: '#000'
+        }}>
+          dappr
+        </div>
+        <div style={{ 
+          fontFamily: 'Stoshi',
+          fontWeight: 400,
+          fontSize: '1rem',
+          color: '#000'
+        }}>
+          SQUAD
+        </div>
+      </div>
     </Navbar.Brand>
   );
 
@@ -141,9 +155,14 @@ const Header = ({ onMenuClick }) => {
           .header-logo:hover,
           .header-logo:active,
           .header-logo:focus {
-            background-color: #000 !important;
-            color: white !important;
+            background-color: #f8f9fa !important;
             transform: scale(1.02);
+          }
+          
+          .header-logo:hover div,
+          .header-logo:active div,
+          .header-logo:focus div {
+            color: #000 !important;
           }
           
           .cart-badge {
@@ -188,9 +207,16 @@ const Header = ({ onMenuClick }) => {
             }
             
             .header-logo {
-              font-size: 1.2rem;
               padding: 8px 10px;
               min-height: 40px;
+            }
+            
+            .header-logo div:first-child {
+              font-size: 1.1rem;
+            }
+            
+            .header-logo div:last-child {
+              font-size: 0.8rem;
             }
             
             .cart-badge {
@@ -215,9 +241,12 @@ const Header = ({ onMenuClick }) => {
             }
             
             .header-logo:active {
-              background-color: #000 !important;
-              color: white !important;
+              background-color: #f8f9fa !important;
               transform: scale(1.02);
+            }
+            
+            .header-logo:active div {
+              color: #000 !important;
             }
             
             .header-btn:active .cart-badge {

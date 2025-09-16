@@ -51,7 +51,8 @@ const SideMenu = ({ show, handleClose }) => {
     { icon: Box, label: 'My Orders', href: '/orders' },
     { icon: Heart, label: 'Wishlist', href: '/wishlist' },
     { icon: ArrowClockwise, label: 'How it Works', href: '/how-it-works' },
-    { icon: GeoAlt, label: 'Store Near Me', href: '/store-locator' }
+    { icon: GeoAlt, label: 'Store Near Me', href: '/store-locator' },
+    { icon: ChatDots, label: 'About Us', href: '/about' }
   ];
 
   const UTILITY_ITEMS = [

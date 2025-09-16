@@ -2,31 +2,26 @@ import React, { useState } from 'react';
 import { Offcanvas, Form, Button, Row, Col } from 'react-bootstrap';
 import { X } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../../constants';
+import { CATEGORIES } from '../../data/products';
 
 const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
   // Filter state following clean code principles
   const [filters, setFilters] = useState({
-    priceRange: [2100, 8400],
+    priceRange: [1000, 3500],
     categories: [],
     occasions: [],
     sizes: []
   });
 
   // Filter options data
-  const CATEGORIES = [
-    'Premium Suits',
-    'Formal Wear', 
-    'Sherwani',
-    'Kurta',
-    'Indo-Western',
-    'Tie',
-    'Cufflinks'
-  ];
+  const CATEGORY_OPTIONS = CATEGORIES.map(cat => cat.name);
 
   const OCCASIONS = [
     'Wedding',
     'Formal',
-    'Party'
+    'Party',
+    'Business',
+    'Casual'
   ];
 
   const SIZES = [
@@ -63,7 +58,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
 
   const handleClearFilters = () => {
     const clearedFilters = {
-      priceRange: [2100, 8400],
+      priceRange: [1000, 3500],
       categories: [],
       occasions: [],
       sizes: []
@@ -88,8 +83,8 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
       </h6>
       <div className="px-2">
         <Form.Range
-          min="2100"
-          max="8400"
+          min="1000"
+          max="3500"
           step="100"
           value={filters.priceRange[1]}
           onChange={(e) => handlePriceChange(1, e.target.value)}
@@ -203,7 +198,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
       
       <Offcanvas.Body className="pt-3">
         {renderPriceFilter()}
-        {renderCheckboxList(CATEGORIES, filters.categories, handleCategoryChange, 'Categories')}
+        {renderCheckboxList(CATEGORY_OPTIONS, filters.categories, handleCategoryChange, 'Categories')}
         {renderCheckboxList(OCCASIONS, filters.occasions, handleOccasionChange, 'Occasion')}
         {renderCheckboxList(SIZES, filters.sizes, handleSizeChange, 'Size')}
         {renderApplyButton()}

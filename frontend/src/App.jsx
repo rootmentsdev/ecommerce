@@ -11,6 +11,9 @@ import ProductDetails from './pages/ProductDetails';
 import EnquireNow from './pages/EnquireNow';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import AboutUs from './pages/AboutUs';
+import BuyNow from './pages/BuyNow';
+import RentNow from './pages/RentNow';
 import './App.css';
 import './fonts.css';
 
@@ -54,6 +57,21 @@ function App() {
         <Route path="/enquire" element={
           <PageTransition>
             <EnquireNow />
+          </PageTransition>
+        } />
+        <Route path="/about" element={
+          <PageTransition>
+            <AboutUs />
+          </PageTransition>
+        } />
+        <Route path="/buy-now" element={
+          <PageTransition>
+            <BuyNow />
+          </PageTransition>
+        } />
+        <Route path="/rent-now" element={
+          <PageTransition>
+            <RentNow />
           </PageTransition>
         } />
         

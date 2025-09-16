@@ -34,10 +34,16 @@ const Footer = () => {
         backgroundColor: '#2c2c2c',
         color: 'white',
         minHeight: '300px',
-        fontFamily: 'Poppins, sans-serif'
+        fontFamily: 'Poppins, sans-serif',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
+        width: '100vw'
       }}
     >
-      <Container>
+      <div style={{ padding: '0 20px', maxWidth: '1200px', margin: '0 auto' }}>
         {/* Logo and Description Section */}
         <Row className="mb-4">
           <Col>
@@ -165,7 +171,7 @@ const Footer = () => {
             </p>
           </Col>
         </Row>
-      </Container>
+      </div>
 
       <style>
         {`
