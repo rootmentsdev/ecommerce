@@ -34,7 +34,7 @@ const Header = ({ onMenuClick }) => {
 
   const logoStyles = {
     color: '#000',
-    fontFamily: 'Stoshi'
+    fontFamily: 'Century Gothic'
   };
 
   const buttonStyles = {
@@ -68,7 +68,7 @@ const Header = ({ onMenuClick }) => {
     >
       <div style={{ textAlign: 'center', lineHeight: '1.1' }}>
         <div style={{ 
-          fontFamily: 'Stoshi',
+          fontFamily: 'Century Gothic',
           fontWeight: 700,
           fontSize: '1.4rem',
           color: '#000'
@@ -76,7 +76,7 @@ const Header = ({ onMenuClick }) => {
           dappr
         </div>
         <div style={{ 
-          fontFamily: 'Stoshi',
+          fontFamily: 'Century Gothic',
           fontWeight: 400,
           fontSize: '1rem',
           color: '#000'

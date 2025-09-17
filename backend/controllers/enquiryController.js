@@ -31,6 +31,7 @@ class EnquiryController {
         fullName,
         mobileNumber,
         email,
+        enquiryType,
         preferredBookingDate,
         selectedSize,
         selectedQuantity,
@@ -42,14 +43,26 @@ class EnquiryController {
         productName
       } = req.body;
 
+      // Additional validation for rent enquiries
+      const finalEnquiryType = enquiryType || 'rent';
+      
+      if (finalEnquiryType === 'rent' && !preferredBookingDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: [{ msg: 'Preferred booking date is required for rent enquiries', param: 'preferredBookingDate' }]
+        });
+      }
+
       // Create new enquiry
       const enquiry = new Enquiry({
         fullName,
         mobileNumber,
         email,
-        preferredBookingDate: new Date(preferredBookingDate),
-        selectedSize,
-        selectedQuantity,
+        enquiryType: finalEnquiryType,
+        preferredBookingDate: preferredBookingDate ? new Date(preferredBookingDate) : null,
+        selectedSize: selectedSize && selectedSize.trim() !== '' ? selectedSize : null,
+        selectedQuantity: selectedQuantity || 1,
         pickupDate: pickupDate ? new Date(pickupDate) : null,
         returnDate: returnDate ? new Date(returnDate) : null,
         city,

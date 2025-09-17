@@ -64,8 +64,8 @@ const BuyNow = () => {
     });
   };
 
-  const handleShopNow = () => {
-    navigate('/products', {
+  const handleEnquireNow = () => {
+    navigate('/enquire', {
       state: { enquiryType: 'buy' }
     });
   };
@@ -378,7 +378,7 @@ const BuyNow = () => {
             <Button 
               variant="outline-dark"
               size="lg"
-              onClick={handleShopNow}
+              onClick={handleEnquireNow}
               className="btn-custom"
               style={{
                 borderRadius: '20px !important',
@@ -388,7 +388,7 @@ const BuyNow = () => {
                 fontWeight: 600
               }}
             >
-              Shop Now
+              Enquire Now
             </Button>
           </Col>
         </Row>

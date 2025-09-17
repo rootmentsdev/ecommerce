@@ -1,3 +1,16 @@
+/* Global Font Settings */
+body {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Century Gothic', sans-serif !important;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
 /* Page Transition Animations */
 .page-transition {
   width: 100%;
@@ -23,6 +36,28 @@
 .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Button font styling */
+.btn {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+}
+
+/* Form elements font styling */
+.form-control, .form-select, .form-label {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* Table font styling */
+.table th {
+  font-family: 'Century Gothic', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.table td {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .card:hover {

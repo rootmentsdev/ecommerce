@@ -145,7 +145,7 @@ const ProductListing = () => {
           <h1 
             className="h4 fw-bold mb-0"
             style={{
-              fontFamily: 'Stoshi',
+              fontFamily: 'Century Gothic',
               letterSpacing: '-0.02em'
             }}
           >

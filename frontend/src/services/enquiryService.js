@@ -214,9 +214,10 @@ class EnquiryService {
   /**
    * Validate enquiry form data
    * @param {Object} formData - The form data to validate
+   * @param {string} enquiryType - The type of enquiry ('rent' or 'buy')
    * @returns {Object} - Validation result with errors
    */
-  static validateEnquiryForm(formData) {
+  static validateEnquiryForm(formData, enquiryType = 'rent') {
     const errors = {};
 
     // Full Name validation
@@ -240,27 +241,27 @@ class EnquiryService {
       errors.email = 'Please enter a valid email address';
     }
 
-    // Preferred Booking Date validation
-    if (!formData.preferredBookingDate) {
-      errors.preferredBookingDate = 'Preferred booking date is required';
-    } else {
-      const selectedDate = new Date(formData.preferredBookingDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        errors.preferredBookingDate = 'Preferred booking date must be in the future';
+    // Preferred Booking Date validation - only required for rent enquiries
+    if (enquiryType === 'rent') {
+      if (!formData.preferredBookingDate) {
+        errors.preferredBookingDate = 'Preferred booking date is required';
+      } else {
+        const selectedDate = new Date(formData.preferredBookingDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selectedDate < today) {
+          errors.preferredBookingDate = 'Preferred booking date must be in the future';
+        }
       }
     }
 
-    // Size validation
-    if (!formData.selectedSize || formData.selectedSize.trim().length === 0) {
-      errors.selectedSize = 'Size selection is required';
-    } else if (!['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(formData.selectedSize)) {
+    // Size validation - optional since product details page doesn't always have sizes
+    if (formData.selectedSize && !['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(formData.selectedSize)) {
       errors.selectedSize = 'Please select a valid size';
     }
 
-    // Pickup Date validation (optional)
-    if (formData.pickupDate) {
+    // Pickup Date validation - only for rent enquiries
+    if (enquiryType === 'rent' && formData.pickupDate) {
       const pickupDate = new Date(formData.pickupDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -269,8 +270,8 @@ class EnquiryService {
       }
     }
 
-    // Return Date validation (optional)
-    if (formData.returnDate) {
+    // Return Date validation - only for rent enquiries
+    if (enquiryType === 'rent' && formData.returnDate) {
       const returnDate = new Date(formData.returnDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);

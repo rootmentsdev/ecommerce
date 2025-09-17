@@ -34,30 +34,49 @@ const createEnquiryValidation = [
     .withMessage('Please enter a valid email address')
     .normalizeEmail(),
   
+  body('enquiryType')
+    .optional()
+    .isIn(['rent', 'buy'])
+    .withMessage('Enquiry type must be either rent or buy'),
+  
   body('preferredBookingDate')
-    .notEmpty()
-    .withMessage('Preferred booking date is required')
-    .custom((value) => {
-      const date = new Date(value);
-      if (isNaN(date.getTime())) {
-        throw new Error('Please enter a valid date');
-      }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (date < today) {
-        throw new Error('Preferred booking date must be in the future');
+    .custom((value, { req }) => {
+      const enquiryType = req.body.enquiryType || 'rent';
+      
+      // Only required for rent enquiries
+      if (enquiryType === 'rent') {
+        if (!value) {
+          throw new Error('Preferred booking date is required for rent enquiries');
+        }
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+          throw new Error('Please enter a valid date');
+        }
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (date < today) {
+          throw new Error('Preferred booking date must be in the future');
+        }
       }
       return true;
     }),
   
   body('selectedSize')
-    .trim()
-    .notEmpty()
-    .withMessage('Size selection is required')
-    .isIn(['XS', 'S', 'M', 'L', 'XL', 'XXL'])
-    .withMessage('Please select a valid size'),
+    .optional({ nullable: true })
+    .custom((value) => {
+      // If value is empty, null, or undefined, it's valid (optional field)
+      if (!value || value.trim() === '') {
+        return true;
+      }
+      // If value is provided, it must be a valid size
+      if (!['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(value.trim())) {
+        throw new Error('Please select a valid size');
+      }
+      return true;
+    }),
   
   body('selectedQuantity')
+    .optional()
     .isInt({ min: 1 })
     .withMessage('Quantity must be at least 1'),
   
@@ -98,10 +117,22 @@ const createEnquiryValidation = [
     .notEmpty()
     .withMessage('City is required')
     .isIn([
-      'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 
-      'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Surat'
+      'Thiruvananthapuram',
+      'Kollam',
+      'Pathanamthitta',
+      'Alappuzha',
+      'Kottayam',
+      'Idukki',
+      'Ernakulam',
+      'Thrissur',
+      'Palakkad',
+      'Malappuram',
+      'Kozhikode',
+      'Wayanad',
+      'Kannur',
+      'Kasaragod'
     ])
-    .withMessage('Please select a valid city'),
+    .withMessage('Please select a valid district'),
   
   body('specialNotes')
     .optional()

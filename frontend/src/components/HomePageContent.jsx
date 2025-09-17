@@ -178,7 +178,8 @@ const HomePageContent = () => {
             <h1 
               className="fw-bold mb-3"
                 style={{
-                width: '343px',
+                width: 'auto',
+                minWidth: '343px',
                 height: '29px',
                 fontFamily: 'Century Gothic',
                 fontWeight: 700,
@@ -190,7 +191,9 @@ const HomePageContent = () => {
                 verticalAlign: 'middle',
                 opacity: 1,
                 color: '#000',
-                margin: '0 auto'
+                margin: '0 auto',
+                whiteSpace: 'nowrap',
+                overflow: 'visible'
               }}
             >
               Style Together, Shine Together

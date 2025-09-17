@@ -28,12 +28,10 @@ const AboutUs = () => {
         <div className="about-us-page">
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-          
           .about-us-page {
             background-color: white;
             min-height: 100vh;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             color: #000;
             padding: 0;
             margin: 0;
@@ -41,7 +39,7 @@ const AboutUs = () => {
 
           .about-title {
             font-family: 'Century Gothic', sans-serif;
-            font-weight: 700;
+            font-weight: 400;
             font-size: 22px;
             line-height: 120%;
             letter-spacing: 0%;
@@ -79,7 +77,7 @@ const AboutUs = () => {
           }
 
           .step-text {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-weight: 400;
             font-size: 12px;
             line-height: 1.2;
@@ -115,7 +113,7 @@ const AboutUs = () => {
 
           .section-title {
             font-family: 'Century Gothic', sans-serif;
-            font-weight: 700;
+            font-weight: 400;
             font-size: 22px;
             line-height: 120%;
             letter-spacing: 0%;
@@ -125,13 +123,13 @@ const AboutUs = () => {
           }
 
           .description-text {
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
             font-size: 14px;
-            line-height: 100%;
+            line-height: 140%;
             letter-spacing: 0%;
             text-align: justify;
-            color: #000;
+            color: #333;
             margin-bottom: 20px;
           }
 
@@ -152,14 +150,14 @@ const AboutUs = () => {
 
           .service-title {
             font-family: 'Century Gothic', sans-serif;
-            font-weight: 700;
+            font-weight: 400;
             font-size: 16px;
             color: #333;
             margin-bottom: 4px;
           }
 
           .service-description {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-weight: 400;
             font-size: 14px;
             line-height: 100%;
@@ -190,21 +188,21 @@ const AboutUs = () => {
             position: relative;
             padding-left: 20px;
             margin-bottom: 12px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
             font-size: 14px;
-            line-height: 100%;
+            line-height: 140%;
             letter-spacing: 0%;
             text-align: justify;
-            color: #000;
+            color: #333;
           }
 
           .bullet-list li::before {
             content: '•';
             position: absolute;
             left: 0;
-            color: #000;
-            font-weight: bold;
+            color: #666;
+            font-weight: 500;
             font-size: 18px;
           }
 
@@ -219,7 +217,7 @@ const AboutUs = () => {
             padding: 12px 24px;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 400;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;

@@ -47,10 +47,22 @@ const EnquireNow = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
 
-  // Available cities
+  // Available cities - All Kerala Districts
   const cities = [
-    'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 
-    'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Surat'
+    'Thiruvananthapuram',
+    'Kollam',
+    'Pathanamthitta',
+    'Alappuzha',
+    'Kottayam',
+    'Idukki',
+    'Ernakulam',
+    'Thrissur',
+    'Palakkad',
+    'Malappuram',
+    'Kozhikode',
+    'Wayanad',
+    'Kannur',
+    'Kasaragod'
   ];
 
   // Auto-fill user information from localStorage and product details
@@ -153,7 +165,7 @@ const EnquireNow = () => {
     setSubmitMessage({ type: '', text: '' });
     
     // Validate form data
-    const validation = EnquiryService.validateEnquiryForm(formData);
+    const validation = EnquiryService.validateEnquiryForm(formData, enquiryType);
     
     if (!validation.isValid) {
       setErrors(validation.errors);
@@ -169,9 +181,12 @@ const EnquireNow = () => {
       // Prepare enquiry data
       const enquiryData = {
         ...formData,
-        preferredBookingDate: new Date(formData.preferredBookingDate).toISOString(),
+        enquiryType: enquiryType, // Add enquiry type to the data
+        preferredBookingDate: formData.preferredBookingDate ? new Date(formData.preferredBookingDate).toISOString() : null,
         pickupDate: formData.pickupDate ? new Date(formData.pickupDate).toISOString() : null,
-        returnDate: formData.returnDate ? new Date(formData.returnDate).toISOString() : null
+        returnDate: formData.returnDate ? new Date(formData.returnDate).toISOString() : null,
+        selectedSize: formData.selectedSize && formData.selectedSize.trim() !== '' ? formData.selectedSize : null,
+        selectedQuantity: formData.selectedQuantity || 1
       };
       
       // Only add productId if it's a valid MongoDB ObjectId format
@@ -416,7 +431,7 @@ const EnquireNow = () => {
                     color: '#000'
                   }}
                 >
-                  City
+                  District
                 </Form.Label>
                 <Button
                   variant="outline-secondary"
@@ -433,7 +448,7 @@ const EnquireNow = () => {
                 >
                   <div className="d-flex align-items-center">
                     <GeoAlt size={16} className="text-muted me-2" />
-                    <span>{formData.city || 'Select City'}</span>
+                    <span>{formData.city || 'Select District'}</span>
                   </div>
                   <ChevronDown size={16} className="text-muted" />
                 </Button>
@@ -633,7 +648,7 @@ const EnquireNow = () => {
               fontWeight: '600'
             }}
           >
-            Select City
+            Select District
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

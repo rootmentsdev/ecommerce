@@ -187,7 +187,7 @@ const RentNow = () => {
              <h1 
                className="h2 fw-bold mb-4"
                style={{
-                 fontFamily: 'Stoshi',
+                 fontFamily: 'Century Gothic',
                  fontWeight: 700,
                  fontSize: '2.5rem',
                  color: '#000'
@@ -203,7 +203,7 @@ const RentNow = () => {
                     key={index}
                     className="mb-2"
                      style={{
-                       fontFamily: 'Stoshi',
+                       fontFamily: 'Century Gothic',
                        fontWeight: 400,
                        fontSize: '16px',
                        lineHeight: '1.6',
@@ -227,7 +227,7 @@ const RentNow = () => {
                    borderRadius: '50px !important',
                    padding: '12px 30px',
                    fontSize: '16px',
-                   fontFamily: 'Stoshi',
+                   fontFamily: 'Century Gothic',
                    fontWeight: 600
                  }}
                >
@@ -265,7 +265,7 @@ const RentNow = () => {
            <h2 
              className="h3 fw-bold mb-0"
              style={{
-               fontFamily: 'Stoshi',
+               fontFamily: 'Century Gothic',
                fontWeight: 700,
                letterSpacing: '-0.02em'
              }}
@@ -278,7 +278,7 @@ const RentNow = () => {
             variant="link" 
             className="p-0 text-decoration-none text-muted"
             style={{ 
-              fontFamily: 'Stoshi',
+              fontFamily: 'Century Gothic',
               fontWeight: 400,
               fontSize: '14px'
             }}
@@ -343,7 +343,7 @@ const RentNow = () => {
                 <h6 
                   className="text-white mb-0 fw-medium"
                    style={{
-                     fontFamily: 'Stoshi',
+                     fontFamily: 'Century Gothic',
                      fontWeight: 400
                    }}
                 >
@@ -390,7 +390,7 @@ const RentNow = () => {
                  <h2 
                    className="h3 fw-bold mb-0"
                    style={{
-                     fontFamily: 'Stoshi',
+                     fontFamily: 'Century Gothic',
                      fontWeight: 700,
                      fontSize: '2.5rem',
                      color: '#000',
@@ -421,7 +421,7 @@ const RentNow = () => {
                       <h4 
                         className="h5 fw-bold mb-1"
                          style={{
-                           fontFamily: 'Stoshi',
+                           fontFamily: 'Century Gothic',
                            fontWeight: 700,
                            fontSize: '18px',
                            color: '#000'
@@ -432,7 +432,7 @@ const RentNow = () => {
                       <p 
                         className="mb-0"
                          style={{
-                           fontFamily: 'Stoshi',
+                           fontFamily: 'Century Gothic',
                            fontWeight: 400,
                            fontSize: '16px',
                            color: '#666',
@@ -455,7 +455,7 @@ const RentNow = () => {
                           color: 'white',
                            fontSize: '24px',
                            fontWeight: 'bold',
-                           fontFamily: 'Stoshi'
+                           fontFamily: 'Century Gothic'
                         }}
                       >
                         {step.number}
@@ -496,7 +496,7 @@ const RentNow = () => {
              <h2 
                className="h3 fw-bold mb-3"
                style={{
-                 fontFamily: 'Stoshi',
+                 fontFamily: 'Century Gothic',
                  fontWeight: 700,
                  fontSize: '2rem',
                  color: '#000'
@@ -508,7 +508,7 @@ const RentNow = () => {
             <p 
               className="mb-4"
               style={{
-                fontFamily: 'Stoshi',
+                fontFamily: 'Century Gothic',
                 fontWeight: 400,
                 fontSize: '16px',
                 lineHeight: '1.6',
@@ -529,7 +529,7 @@ const RentNow = () => {
                  borderRadius: '50px !important',
                  padding: '12px 30px',
                  fontSize: '16px',
-                 fontFamily: 'Stoshi',
+                 fontFamily: 'Century Gothic',
                  fontWeight: 600
                }}
             >

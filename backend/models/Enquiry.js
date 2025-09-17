@@ -22,30 +22,48 @@ const enquirySchema = new mongoose.Schema({
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address']
   },
 
+  // Enquiry Type
+  enquiryType: {
+    type: String,
+    enum: ['rent', 'buy'],
+    default: 'rent'
+  },
+
   // Booking Information
   preferredBookingDate: {
     type: Date,
-    required: [true, 'Preferred booking date is required'],
+    required: false, // Handle validation in controller instead
     validate: {
       validator: function(date) {
-        return date >= new Date();
+        if (!date) return true; // Allow null values
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to beginning of day for fair comparison
+        return date >= today;
       },
       message: 'Preferred booking date must be in the future'
     }
   },
   selectedSize: {
     type: String,
-    required: [true, 'Size selection is required'],
+    required: false, // Make optional since product details page doesn't always have sizes
     trim: true,
-    enum: {
-      values: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    validate: {
+      validator: function(value) {
+        // Allow empty/null values (optional field)
+        if (!value || value.trim() === '') {
+          return true;
+        }
+        // If value is provided, it must be a valid size
+        return ['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(value);
+      },
       message: 'Please select a valid size'
     }
   },
   selectedQuantity: {
     type: Number,
-    required: [true, 'Quantity is required'],
-    min: [1, 'Quantity must be at least 1']
+    required: false, // Make optional
+    min: [1, 'Quantity must be at least 1'],
+    default: 1
   },
   pickupDate: {
     type: Date,
@@ -53,7 +71,9 @@ const enquirySchema = new mongoose.Schema({
     validate: {
       validator: function(date) {
         if (!date) return true; // Optional field
-        return date >= new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
       },
       message: 'Pickup date must be in the future'
     }
@@ -64,7 +84,9 @@ const enquirySchema = new mongoose.Schema({
     validate: {
       validator: function(date) {
         if (!date) return true; // Optional field
-        return date >= new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
       },
       message: 'Return date must be in the future'
     }
@@ -75,10 +97,22 @@ const enquirySchema = new mongoose.Schema({
     trim: true,
     enum: {
       values: [
-        'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 
-        'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Surat'
+        'Thiruvananthapuram',
+        'Kollam',
+        'Pathanamthitta',
+        'Alappuzha',
+        'Kottayam',
+        'Idukki',
+        'Ernakulam',
+        'Thrissur',
+        'Palakkad',
+        'Malappuram',
+        'Kozhikode',
+        'Wayanad',
+        'Kannur',
+        'Kasaragod'
       ],
-      message: 'Please select a valid city'
+      message: 'Please select a valid district'
     }
   },
   specialNotes: {
@@ -154,6 +188,9 @@ enquirySchema.pre('save', function(next) {
 
 // Virtual for formatted date
 enquirySchema.virtual('formattedBookingDate').get(function() {
+  if (!this.preferredBookingDate) {
+    return 'Not specified';
+  }
   return this.preferredBookingDate.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

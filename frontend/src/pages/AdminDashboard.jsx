@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Table, Badge, Dropdown, Pagination } from 'react-bootstrap';
-import { Search, Bell, QuestionCircle, Calendar, Download, ChevronDown, ThreeDotsVertical } from 'react-bootstrap-icons';
+import { Container, Row, Col, Card, Button, Form, Table, Badge, Dropdown, Pagination, Modal } from 'react-bootstrap';
+import { Search, Bell, QuestionCircle, Calendar, Download, ChevronDown, ThreeDotsVertical, X } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import API_CONFIG, { getApiUrl } from '../config/api';
 
@@ -20,6 +20,9 @@ const AdminDashboard = () => {
   const [editingEnquiry, setEditingEnquiry] = useState(null);
   const [editingField, setEditingField] = useState('');
   const [editValue, setEditValue] = useState('');
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // Check admin authentication
   useEffect(() => {
@@ -36,8 +39,8 @@ const AdminDashboard = () => {
       setIsLoading(true);
       console.log('Fetching dashboard data...');
       
-      // Use the public API endpoint for now (we'll add admin auth later)
-      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.GET_ALL), {
+      // Fetch all enquiries with a higher limit to get all data
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.GET_ALL) + '?limit=1000', {
         method: 'GET',
         headers: API_CONFIG.DEFAULT_HEADERS
       });
@@ -87,6 +90,23 @@ const AdminDashboard = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
     navigate('/admin/login');
+  };
+
+  const handleDateFilterToggle = () => {
+    setShowDateFilter(!showDateFilter);
+  };
+
+  const handleDateFilterApply = () => {
+    // Reset to first page when applying date filter
+    setCurrentPage(1);
+    setShowDateFilter(false);
+  };
+
+  const handleDateFilterClear = () => {
+    setStartDate('');
+    setEndDate('');
+    setCurrentPage(1);
+    setShowDateFilter(false);
   };
 
   const handleEditStart = (enquiryId, field, currentValue) => {
@@ -162,8 +182,8 @@ const AdminDashboard = () => {
     const statusConfig = {
       new: { variant: 'primary', text: 'New' },
       contacted: { variant: 'warning', text: 'Contacted' },
-      interested: { variant: 'danger', text: 'Interested' },
-      converted: { variant: 'success', text: 'Converted' }
+      converted: { variant: 'success', text: 'Converted' },
+      cancelled: { variant: 'secondary', text: 'Cancelled' }
     };
     
     const config = statusConfig[status] || { variant: 'secondary', text: status };
@@ -172,13 +192,45 @@ const AdminDashboard = () => {
 
   const filteredEnquiries = enquiries.filter(enquiry => {
     const enquiryStatus = enquiry.status || 'new';
-    const matchesFilter = activeFilter === 'All' || enquiryStatus === activeFilter.toLowerCase();
+    const enquiryType = enquiry.enquiryType || 'rent';
+    
+    // Status filter logic
+    let matchesFilter = false;
+    if (activeFilter === 'All') {
+      matchesFilter = true;
+    } else if (activeFilter === 'Rent') {
+      matchesFilter = enquiryType === 'rent';
+    } else if (activeFilter === 'Buy') {
+      matchesFilter = enquiryType === 'buy';
+    } else {
+      matchesFilter = enquiryStatus === activeFilter.toLowerCase();
+    }
+    
+    // Search filter logic
     const matchesSearch = searchTerm === '' || 
       enquiry.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       enquiry.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       enquiry.mobileNumber?.includes(searchTerm);
     
-    return matchesFilter && matchesSearch;
+    // Date range filter logic
+    let matchesDateRange = true;
+    if (startDate || endDate) {
+      const enquiryDate = new Date(enquiry.createdAt);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      
+      if (start) {
+        start.setHours(0, 0, 0, 0);
+        matchesDateRange = matchesDateRange && enquiryDate >= start;
+      }
+      
+      if (end) {
+        end.setHours(23, 59, 59, 999);
+        matchesDateRange = matchesDateRange && enquiryDate <= end;
+      }
+    }
+    
+    return matchesFilter && matchesSearch && matchesDateRange;
   });
 
   const itemsPerPage = 10;
@@ -489,7 +541,8 @@ const AdminDashboard = () => {
 
                   {/* Filter Buttons */}
                   <div className="d-flex flex-wrap gap-2 mb-3">
-                    {['All', 'New', 'Contacted', 'Interested', 'Converted'].map((filter) => (
+                    {/* Status Filters */}
+                    {['All', 'New', 'Contacted', 'Converted'].map((filter) => (
                       <Button
                         key={filter}
                         variant={activeFilter === filter ? 'dark' : 'outline-secondary'}
@@ -505,6 +558,26 @@ const AdminDashboard = () => {
                         )}
                       </Button>
                     ))}
+                    
+                    {/* Type Filters */}
+                    <div className="ms-3 d-flex gap-2">
+                      <Button
+                        variant={activeFilter === 'Rent' ? 'info' : 'outline-info'}
+                        size="sm"
+                        onClick={() => setActiveFilter('Rent')}
+                        style={{ borderRadius: '20px', fontSize: '12px' }}
+                      >
+                        Rent Only
+                      </Button>
+                      <Button
+                        variant={activeFilter === 'Buy' ? 'success' : 'outline-success'}
+                        size="sm"
+                        onClick={() => setActiveFilter('Buy')}
+                        style={{ borderRadius: '20px', fontSize: '12px' }}
+                      >
+                        Buy Only
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Search and Actions */}
@@ -541,10 +614,20 @@ const AdminDashboard = () => {
                         <Download size={14} className="me-1" />
                         Export CSV / PDF
                       </Button>
-                      <Button variant="outline-secondary" size="sm" style={{ borderRadius: '8px' }}>
+                      <Button 
+                        variant={startDate || endDate ? "dark" : "outline-secondary"}
+                        size="sm" 
+                        style={{ borderRadius: '8px' }}
+                        onClick={handleDateFilterToggle}
+                      >
                         <Calendar size={14} className="me-1" />
-                        Date Range
+                        {startDate || endDate ? 'Date Filtered' : 'Date Range'}
                         <ChevronDown size={12} className="ms-1" />
+                        {(startDate || endDate) && (
+                          <Badge bg="light" text="dark" className="ms-1" style={{ fontSize: '10px' }}>
+                            {filteredEnquiries.length}
+                          </Badge>
+                        )}
                       </Button>
                     </Col>
                   </Row>
@@ -555,13 +638,13 @@ const AdminDashboard = () => {
                       <thead style={{ backgroundColor: '#f8f9fa' }}>
                         <tr>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>DATE</th>
+                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>TYPE</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>PRODUCT NAME</th>
-                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>SIZE & QUANTITY</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>FULL NAME</th>
-                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>MOBILE NUMBER</th>
-                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>CITY</th>
+                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>MOBILE</th>
+                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>DISTRICT</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>STATUS</th>
-                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>RE</th>
+                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>REMARKS</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -570,6 +653,14 @@ const AdminDashboard = () => {
                             <tr key={enquiry._id || index}>
                               <td style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px' }}>
                                 {formatDate(enquiry.createdAt)}
+                              </td>
+                              <td>
+                                <Badge 
+                                  bg={enquiry.enquiryType === 'buy' ? 'success' : 'info'} 
+                                  style={{ fontSize: '10px', textTransform: 'uppercase' }}
+                                >
+                                  {enquiry.enquiryType || 'rent'}
+                                </Badge>
                               </td>
                               <td>
                                 <div className="d-flex align-items-center">
@@ -596,16 +687,6 @@ const AdminDashboard = () => {
                                     <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', color: '#6c757d' }}>
                                       #{enquiry.productId?.slice(-8) || 'N/A'}
                                     </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px' }}>
-                                <div>
-                                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '500' }}>
-                                    Size: {enquiry.selectedSize || 'N/A'}
-                                  </div>
-                                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', color: '#6c757d' }}>
-                                    Qty: {enquiry.selectedQuantity || 'N/A'}
                                   </div>
                                 </div>
                               </td>
@@ -637,7 +718,6 @@ const AdminDashboard = () => {
                                       >
                                         <option value="new">New</option>
                                         <option value="contacted">Contacted</option>
-                                        <option value="interested">Interested</option>
                                         <option value="converted">Converted</option>
                                         <option value="cancelled">Cancelled</option>
                                       </Form.Select>
@@ -727,39 +807,121 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="d-flex justify-content-center mt-3">
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#6c757d' }}>
+                      Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredEnquiries.length)} of {filteredEnquiries.length} enquiries
+                    </div>
+                    {totalPages > 1 && (
                       <Pagination>
+                        <Pagination.First 
+                          disabled={currentPage === 1}
+                          onClick={() => setCurrentPage(1)}
+                        />
                         <Pagination.Prev 
                           disabled={currentPage === 1}
                           onClick={() => setCurrentPage(currentPage - 1)}
                         />
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        
+                        {/* Show page numbers with smart pagination */}
+                        {Array.from({ length: totalPages }, (_, i) => {
                           const pageNum = i + 1;
-                          return (
-                            <Pagination.Item
-                              key={pageNum}
-                              active={pageNum === currentPage}
-                              onClick={() => setCurrentPage(pageNum)}
-                            >
-                              {pageNum}
-                            </Pagination.Item>
-                          );
+                          // Show first page, last page, current page, and 2 pages around current
+                          if (
+                            pageNum === 1 || 
+                            pageNum === totalPages || 
+                            (pageNum >= currentPage - 2 && pageNum <= currentPage + 2)
+                          ) {
+                            return (
+                              <Pagination.Item
+                                key={pageNum}
+                                active={pageNum === currentPage}
+                                onClick={() => setCurrentPage(pageNum)}
+                              >
+                                {pageNum}
+                              </Pagination.Item>
+                            );
+                          } else if (pageNum === currentPage - 3 || pageNum === currentPage + 3) {
+                            return <Pagination.Ellipsis key={`ellipsis-${pageNum}`} />;
+                          }
+                          return null;
                         })}
-                        {totalPages > 5 && <Pagination.Ellipsis />}
+                        
                         <Pagination.Next 
                           disabled={currentPage === totalPages}
                           onClick={() => setCurrentPage(currentPage + 1)}
                         />
+                        <Pagination.Last 
+                          disabled={currentPage === totalPages}
+                          onClick={() => setCurrentPage(totalPages)}
+                        />
                       </Pagination>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </Card.Body>
               </Card>
             </div>
           </Col>
         </Row>
       </Container>
+
+      {/* Date Range Filter Modal */}
+      <Modal show={showDateFilter} onHide={() => setShowDateFilter(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}>
+            Filter by Date Range
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row className="g-3">
+            <Col xs={12} md={6}>
+              <Form.Label style={{ fontFamily: 'Inter, sans-serif', fontWeight: '500' }}>
+                Start Date
+              </Form.Label>
+              <Form.Control
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              />
+            </Col>
+            <Col xs={12} md={6}>
+              <Form.Label style={{ fontFamily: 'Inter, sans-serif', fontWeight: '500' }}>
+                End Date
+              </Form.Label>
+              <Form.Control
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              />
+            </Col>
+          </Row>
+          
+          {(startDate || endDate) && (
+            <div className="mt-3 p-2 bg-light rounded" style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}>
+              <strong>Current Filter:</strong>
+              {startDate && <span> From: {new Date(startDate).toLocaleDateString()}</span>}
+              {endDate && <span> To: {new Date(endDate).toLocaleDateString()}</span>}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={handleDateFilterClear}
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Clear Filter
+          </Button>
+          <Button
+            variant="dark"
+            onClick={handleDateFilterApply}
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Apply Filter
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

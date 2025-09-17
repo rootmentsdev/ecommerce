@@ -17,8 +17,8 @@ const FloatingWhatsAppButton = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hide WhatsApp button on Product Details page
-  if (location.pathname === '/product-details') {
+  // Hide WhatsApp button on Product Details page and Admin pages
+  if (location.pathname === '/product-details' || location.pathname.startsWith('/admin')) {
     return null;
   }
 
