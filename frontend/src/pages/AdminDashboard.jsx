@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Table, Badge, Dropdown, Pagination, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Table, Badge, Dropdown, Pagination, Modal, Image } from 'react-bootstrap';
 import { Search, Bell, QuestionCircle, Calendar, Download, ChevronDown, ThreeDotsVertical, X } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import API_CONFIG, { getApiUrl } from '../config/api';
+import Logo from '../assets/Logo.png';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -267,14 +268,15 @@ const AdminDashboard = () => {
       }}>
         <Row className="align-items-center">
           <Col>
-            <h4 style={{ 
-              fontFamily: 'Playfair Display, serif',
-              fontWeight: '700',
-              color: '#2c3e50',
-              margin: 0
-            }}>
-              LOGO
-            </h4>
+            <Image 
+              src={Logo} 
+              alt="Logo" 
+              style={{
+                height: '40px',
+                width: 'auto',
+                objectFit: 'contain'
+              }}
+            />
           </Col>
           <Col xs={6}>
             <div style={{ position: 'relative' }}>
