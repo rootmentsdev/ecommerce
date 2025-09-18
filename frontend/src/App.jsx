@@ -12,7 +12,9 @@ import ProductDetails from './pages/ProductDetails';
 import EnquireNow from './pages/EnquireNow';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminImageManagement from './pages/AdminImageManagement';
 import AboutUs from './pages/AboutUs';
+import ImageTestPage from './components/ImageTestPage';
 import BuyNow from './pages/BuyNow';
 import RentNow from './pages/RentNow';
 import './App.css';
@@ -86,6 +88,16 @@ function App() {
         <Route path="/admin/dashboard" element={
           <PageTransition>
             <AdminDashboard />
+          </PageTransition>
+        } />
+        <Route path="/admin/images" element={
+          <PageTransition>
+            <AdminImageManagement />
+          </PageTransition>
+        } />
+        <Route path="/test-images" element={
+          <PageTransition>
+            <ImageTestPage />
           </PageTransition>
         } />
       </Routes>

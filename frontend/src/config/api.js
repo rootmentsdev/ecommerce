@@ -59,6 +59,18 @@ const API_CONFIG = {
       UPDATE_STATUS: (id) => `/enquiries/admin/${id}/status`
     },
     
+    // Images
+    IMAGES: {
+      BASE: '/images',
+      GET_ALL: '/images',
+      GET_BY_ID: (id) => `/images/${id}`,
+      CREATE: '/images',
+      UPDATE: (id) => `/images/${id}`,
+      DELETE: (id) => `/images/${id}`,
+      TOGGLE_STATUS: (id) => `/images/${id}/toggle`,
+      CATEGORIES: '/images/categories'
+    },
+    
     // Products (if you add product management later)
     PRODUCTS: {
       BASE: '/products',

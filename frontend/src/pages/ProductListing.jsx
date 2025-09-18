@@ -13,6 +13,7 @@ import Footer from '../components/Footer';
 import SideMenu from '../components/SideMenu';
 import FilterSidebar from '../components/common/FilterSidebar';
 import ModernSearchBar from '../components/common/ModernSearchBar';
+import ProductImageGallery from '../components/common/ProductImageGallery';
 
 // Import constants and utilities
 import { APP_CONFIG } from '../constants';
@@ -167,6 +168,37 @@ const ProductListing = () => {
     </Container>
   );
 
+  const renderAdminImages = () => (
+    <Container className="py-4">
+      <Row>
+        <Col>
+          <h3 style={{
+            fontFamily: 'Century Gothic, sans-serif',
+            fontWeight: '600',
+            color: '#2c3e50',
+            marginBottom: '20px'
+          }}>
+            Featured Images {categoryParam && `(${categoryParam})`}
+          </h3>
+          <ProductImageGallery
+            category="product"
+            tags={categoryParam ? [categoryParam] : []}
+            searchKeyword={searchQuery}
+            limit={8}
+            columns={{ xs: 1, sm: 2, md: 3, lg: 4 }}
+            showTitle={true}
+            showDescription={true}
+            imageHeight="200px"
+            onImageClick={(image) => {
+              console.log('Image clicked:', image);
+              // You can add navigation or modal logic here
+            }}
+          />
+        </Col>
+      </Row>
+    </Container>
+  );
+
   const renderProductGrid = () => (
     <Container className="py-3">
       <Row className="g-3">
@@ -201,6 +233,7 @@ const ProductListing = () => {
       
       <main className="flex-grow-1">
         {renderPageHeader()}
+        {renderAdminImages()}
         {renderProductGrid()}
       </main>
       

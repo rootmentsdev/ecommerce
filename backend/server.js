@@ -7,6 +7,7 @@ const config = require('./config/config');
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const enquiryRoutes = require('./routes/enquiryRoutes');
+const imageRoutes = require('./routes/imageRoutes');
 
 const app = express();
 
@@ -16,7 +17,7 @@ connectDB();
 // Middleware
 app.use(cors({
   origin: function (origin, callback) {
-    console.log('CORS Origin:', origin);
+    // Only log CORS issues, not every request
     
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
@@ -40,7 +41,8 @@ app.use(cors({
       return callback(null, true);
     }
     
-    // Reject origin
+    // Only log rejected origins
+    console.log('🚫 CORS rejected origin:', origin);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true
@@ -80,6 +82,7 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/enquiries', enquiryRoutes);
+app.use('/api/images', imageRoutes);
 
 // API Info endpoint
 app.get('/api', (req, res) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Table, Badge, Dropdown, Pagination, Modal, Image } from 'react-bootstrap';
-import { Search, Bell, QuestionCircle, Calendar, Download, ChevronDown, ThreeDotsVertical, X } from 'react-bootstrap-icons';
+import { Search, Bell, QuestionCircle, Calendar, Download, ChevronDown, ThreeDotsVertical, X, Image as ImageIcon } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import API_CONFIG, { getApiUrl } from '../config/api';
 import Logo from '../assets/Logo.png';
@@ -363,6 +363,36 @@ const AdminDashboard = () => {
                 >
                   <Calendar size={16} />
                   Enquiries
+                </div>
+
+                <div 
+                  style={{
+                    backgroundColor: '#f8f9fa',
+                    color: '#495057',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginTop: '8px',
+                    border: '1px solid #dee2e6',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onClick={() => navigate('/admin/images')}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#e9ecef';
+                    e.target.style.borderColor = '#adb5bd';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#f8f9fa';
+                    e.target.style.borderColor = '#dee2e6';
+                  }}
+                >
+                  <ImageIcon size={16} />
+                  Image Management
                 </div>
 
                 <div className="mt-3">
