@@ -33,13 +33,18 @@ import {
   SortAlphaDown,
   SortAlphaUp,
   Calendar,
-  Tag
+  Tag,
+  Bell,
+  PersonCircle
 } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import ImageService from '../services/imageService';
-import ImageUploader from '../components/ImageUploader';
+import ImageUploadService from '../services/imageUploadService';
+import ImageUploadComponent from '../components/ImageUploadComponent';
 import { createTestImageData, validateImageData } from '../utils/testImageCreation';
+import DashboardSidebar from '../components/DashboardSidebar';
 import Logo from '../assets/Logo.png';
+import '../styles/AdminDashboard.css';
 
 const AdminImageManagement = () => {
   const navigate = useNavigate();
@@ -71,7 +76,6 @@ const AdminImageManagement = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    imageUrl: '',
     altText: '',
     seoTitle: '',
     seoDescription: '',
@@ -80,15 +84,16 @@ const AdminImageManagement = () => {
     tags: '',
     isActive: true,
     displayOrder: 0,
-    metadata: {
-      fileSize: '',
-      dimensions: { width: '', height: '' },
-      format: '',
-      originalFormat: '',
-      compressionQuality: 85,
-      isOptimized: false
-    }
+    quality: 85,
+    maxWidth: '',
+    maxHeight: ''
   });
+
+  // File upload state
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [seoAnalysis, setSeoAnalysis] = useState(null);
 
   const [formErrors, setFormErrors] = useState({});
 
@@ -195,22 +200,9 @@ const AdminImageManagement = () => {
       errors.description = 'Description cannot exceed 500 characters';
     }
 
-    if (!formData.imageUrl.trim()) {
-      errors.imageUrl = 'Image URL is required';
-    } else {
-      try {
-        new URL(formData.imageUrl);
-      } catch {
-        errors.imageUrl = 'Please enter a valid URL';
-      }
-    }
-
-    if (!formData.altText.trim()) {
-      errors.altText = 'Alt text is required for accessibility';
-    } else if (formData.altText.length < 10) {
-      errors.altText = 'Alt text must be at least 10 characters for optimal SEO';
-    } else if (formData.altText.length > 125) {
-      errors.altText = 'Alt text cannot exceed 125 characters';
+    // For new images, check if image is selected
+    if (!selectedImage && selectedImages.length === 0) {
+      errors.image = 'Please select an image to upload';
     }
 
     if (!formData.category) {
@@ -230,61 +222,92 @@ const AdminImageManagement = () => {
       errors.focusKeyword = 'Focus keyword cannot exceed 50 characters';
     }
 
+    // Quality validation
+    if (formData.quality && (formData.quality < 1 || formData.quality > 100)) {
+      errors.quality = 'Quality must be between 1 and 100';
+    }
+
+    // Dimension validation
+    if (formData.maxWidth && formData.maxWidth < 1) {
+      errors.maxWidth = 'Max width must be a positive number';
+    }
+
+    if (formData.maxHeight && formData.maxHeight < 1) {
+      errors.maxHeight = 'Max height must be a positive number';
+    }
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   /**
-   * Handle successful image upload
+   * Handle image selection from upload component
    */
-  const handleUploadSuccess = (imageData) => {
-    setFormData(prev => ({
-      ...prev,
-      imageUrl: imageData.url,
-      metadata: {
-        ...prev.metadata,
-        fileSize: imageData.size,
-        dimensions: {
-          width: imageData.dimensions.width,
-          height: imageData.dimensions.height
-        },
-        format: imageData.optimization?.format || imageData.type.split('/')[1],
-        originalFormat: imageData.optimization?.originalFormat?.split('/')[1],
-        compressionQuality: imageData.optimization?.compressionQuality || 85,
-        isOptimized: imageData.optimization?.isOptimized || false
-      }
-    }));
-
-    // Auto-fill alt text if empty with SEO-friendly format
-    if (!formData.altText.trim()) {
-      const baseText = imageData.filename.split('.')[0].replace(/[-_]/g, ' ');
-      const generatedAltText = `${baseText} - ${formData.category} image for ${formData.title || 'website'}`;
-      // Ensure alt text is at least 10 characters
-      const finalAltText = generatedAltText.length >= 10 
-        ? generatedAltText 
-        : `${generatedAltText} optimized for web`;
-      
+  const handleImageSelect = (imageData) => {
+    setSelectedImages([imageData]); // Only allow one image for now
+    
+    // Auto-fill form data based on image metadata
+    if (!formData.altText.trim() && imageData.metadata) {
+      const suggestedAltText = `${formData.title || imageData.file.name.split('.')[0].replace(/[-_]/g, ' ')} - ${formData.category} image`;
       setFormData(prev => ({
         ...prev,
-        altText: finalAltText.substring(0, 125) // Ensure it doesn't exceed max length
+        altText: suggestedAltText.substring(0, 125)
       }));
     }
-
-    // Auto-generate focus keyword from filename
+    
+    // Auto-generate focus keyword
     if (!formData.focusKeyword.trim()) {
-      const keyword = imageData.filename.split('.')[0].replace(/[-_]/g, ' ').toLowerCase();
+      const keyword = (formData.title || imageData.file.name.split('.')[0]).replace(/[-_]/g, ' ').toLowerCase();
       setFormData(prev => ({
         ...prev,
-        focusKeyword: keyword
+        focusKeyword: keyword.substring(0, 50)
       }));
     }
   };
 
   /**
-   * Handle upload error
+   * Handle image removal
    */
-  const handleUploadError = (error) => {
-    setError(`Upload failed: ${error.message}`);
+  const handleImageRemove = (imageId) => {
+    setSelectedImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  /**
+   * Handle actual file upload to server
+   */
+  const handleFileUpload = async () => {
+    if (selectedImages.length === 0) {
+      setError('Please select an image to upload');
+      return null;
+    }
+
+    const imageData = selectedImages[0];
+    
+    try {
+      setIsUploading(true);
+      setUploadProgress(0);
+      
+      const uploadResponse = await ImageUploadService.uploadImage(
+        imageData.file,
+        formData,
+        (progress) => setUploadProgress(progress)
+      );
+      
+      if (uploadResponse.success) {
+        setSeoAnalysis(uploadResponse.data.seoAnalysis);
+        setSuccess('Image uploaded and optimized successfully!');
+        return uploadResponse.data;
+      } else {
+        throw new Error(uploadResponse.message || 'Upload failed');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setError(`Upload failed: ${error.message}`);
+      return null;
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   /**
@@ -301,76 +324,30 @@ const AdminImageManagement = () => {
       setLoading(true);
       setError('');
 
-      // Prepare metadata only if we have valid data
-      const hasMetadata = formData.metadata && (
-        formData.metadata.fileSize || 
-        formData.metadata.dimensions?.width || 
-        formData.metadata.dimensions?.height ||
-        formData.metadata.format ||
-        formData.metadata.originalFormat ||
-        formData.metadata.compressionQuality ||
-        formData.metadata.isOptimized
-      );
-
-      const submitData = {
-        ...formData,
-        displayOrder: parseInt(formData.displayOrder) || 0,
-        // Ensure SEO fields are properly formatted
-        seoTitle: formData.seoTitle?.trim() || undefined,
-        seoDescription: formData.seoDescription?.trim() || undefined,
-        focusKeyword: formData.focusKeyword?.trim()?.toLowerCase() || undefined
-      };
-
-      // Only include metadata if we have actual metadata to send
-      if (hasMetadata) {
-        submitData.metadata = {
-          fileSize: formData.metadata.fileSize ? parseInt(formData.metadata.fileSize) : undefined,
-          dimensions: {
-            width: formData.metadata.dimensions?.width ? parseInt(formData.metadata.dimensions.width) : undefined,
-            height: formData.metadata.dimensions?.height ? parseInt(formData.metadata.dimensions.height) : undefined
-          },
-          format: formData.metadata.format && formData.metadata.format.trim() ? formData.metadata.format.trim() : undefined,
-          originalFormat: formData.metadata.originalFormat && formData.metadata.originalFormat.trim() ? formData.metadata.originalFormat.trim() : undefined,
-          compressionQuality: formData.metadata.compressionQuality ? parseInt(formData.metadata.compressionQuality) : 85,
-          isOptimized: Boolean(formData.metadata.isOptimized)
+      let response;
+      
+      if (selectedImage) {
+        // Update existing image (legacy method)
+        const submitData = {
+          ...formData,
+          displayOrder: parseInt(formData.displayOrder) || 0,
+          seoTitle: formData.seoTitle?.trim() || undefined,
+          seoDescription: formData.seoDescription?.trim() || undefined,
+          focusKeyword: formData.focusKeyword?.trim()?.toLowerCase() || undefined
         };
 
-        // Clean up undefined values from metadata
-        Object.keys(submitData.metadata).forEach(key => {
-          if (submitData.metadata[key] === undefined || submitData.metadata[key] === '') {
-            delete submitData.metadata[key];
-          }
-        });
-
-        // Clean up empty dimensions object
-        if (submitData.metadata.dimensions && 
-            !submitData.metadata.dimensions.width && 
-            !submitData.metadata.dimensions.height) {
-          delete submitData.metadata.dimensions;
-        }
-
-        // If metadata is now empty, don't send it
-        if (Object.keys(submitData.metadata).length === 0) {
-          delete submitData.metadata;
-        }
-      }
-
-      // Clean up undefined values from main object
-      Object.keys(submitData).forEach(key => {
-        if (submitData[key] === undefined || submitData[key] === '') {
-          delete submitData[key];
-        }
-      });
-
-      console.log('Submitting form data:', JSON.stringify(submitData, null, 2));
-
-      let response;
-      if (selectedImage) {
         response = await ImageService.updateImage(selectedImage._id, submitData);
         setSuccess('Image updated successfully!');
       } else {
-        response = await ImageService.createImage(submitData);
-        setSuccess('Image created successfully!');
+        // Create new image with file upload
+        const uploadedImageData = await handleFileUpload();
+        
+        if (!uploadedImageData) {
+          return; // Error already set in handleFileUpload
+        }
+
+        setSuccess('Image uploaded and created successfully!');
+        response = { success: true, data: uploadedImageData };
       }
 
       if (response.success) {
@@ -431,7 +408,6 @@ const AdminImageManagement = () => {
     setFormData({
       title: '',
       description: '',
-      imageUrl: '',
       altText: '',
       seoTitle: '',
       seoDescription: '',
@@ -440,15 +416,12 @@ const AdminImageManagement = () => {
       tags: '',
       isActive: true,
       displayOrder: 0,
-      metadata: {
-        fileSize: '',
-        dimensions: { width: '', height: '' },
-        format: '',
-        originalFormat: '',
-        compressionQuality: 85,
-        isOptimized: false
-      }
+      quality: 85,
+      maxWidth: '',
+      maxHeight: ''
     });
+    setSelectedImages([]);
+    setSeoAnalysis(null);
     setFormErrors({});
     setShowCreateModal(true);
   };
@@ -505,7 +478,6 @@ const AdminImageManagement = () => {
     setFormData({
       title: '',
       description: '',
-      imageUrl: '',
       altText: '',
       seoTitle: '',
       seoDescription: '',
@@ -514,15 +486,12 @@ const AdminImageManagement = () => {
       tags: '',
       isActive: true,
       displayOrder: 0,
-      metadata: {
-        fileSize: '',
-        dimensions: { width: '', height: '' },
-        format: '',
-        originalFormat: '',
-        compressionQuality: 85,
-        isOptimized: false
-      }
+      quality: 85,
+      maxWidth: '',
+      maxHeight: ''
     });
+    setSelectedImages([]);
+    setSeoAnalysis(null);
     setFormErrors({});
   };
 
@@ -605,504 +574,880 @@ const AdminImageManagement = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-      {/* Header */}
-      <Card style={{ borderRadius: 0, borderBottom: '1px solid #e9ecef' }}>
-        <Card.Body style={{ padding: '16px 24px' }}>
-          <Row className="align-items-center">
-            <Col>
-              <Image 
-                src={Logo} 
-                alt="Logo" 
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+      {/* Sidebar */}
+      <DashboardSidebar 
+        onLogout={handleLogout}
+        userInfo={{ name: 'Desaport', role: 'Marketing@desaport...' }}
+      />
+
+      {/* Main Content */}
+      <div style={{ flex: 1, marginLeft: '250px', display: 'flex', flexDirection: 'column' }}>
+        {/* Top Header */}
+        <div
+          style={{
+            backgroundColor: '#ffffff',
+            borderBottom: '1px solid #e2e8f0',
+            padding: '16px 32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            zIndex: 999,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h4
+              style={{
+                margin: 0,
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: '600',
+                color: '#1e293b',
+                fontSize: '24px',
+              }}
+            >
+              Product
+            </h4>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* Search Bar */}
+            <div style={{ position: 'relative', width: '320px' }}>
+              <Form.Control
+                type="text"
+                placeholder="Search data, users, or reports"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
+                  paddingLeft: '40px',
+                  paddingRight: '16px',
                   height: '40px',
-                  width: 'auto',
-                  objectFit: 'contain'
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: '14px',
+                  backgroundColor: '#f8fafc',
                 }}
               />
-            </Col>
-            <Col xs="auto">
-              <h5 style={{ 
-                fontFamily: 'Century Gothic, sans-serif',
-                fontWeight: '600',
-                color: '#2c3e50',
-                margin: 0
-              }}>
-                Image Management
-              </h5>
-            </Col>
-            <Col xs="auto">
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={handleLogout}
-                style={{ fontFamily: 'Poppins, sans-serif' }}
+              <Search
+                size={18}
+                style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#64748b',
+                }}
+              />
+            </div>
+
+            {/* Notification Bell */}
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '8px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <Bell size={18} color="#64748b" />
+            </div>
+
+            {/* User Profile */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  backgroundColor: '#e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
-                Logout
-              </Button>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+                <PersonCircle size={24} color="#64748b" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <Container fluid style={{ padding: '24px' }}>
-        {/* Alerts */}
-        {error && (
-          <Alert variant="danger" dismissible onClose={() => setError('')}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert variant="success" dismissible onClose={() => setSuccess('')}>
-            {success}
-          </Alert>
-        )}
+        {/* Main Content Area */}
+        <div style={{ padding: '32px', flex: 1 }}>
+          {/* Alerts */}
+          {error && (
+            <Alert 
+              variant="danger" 
+              dismissible 
+              onClose={() => setError('')}
+              style={{
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: '#fef2f2',
+                color: '#dc2626',
+                fontFamily: 'Poppins, sans-serif',
+              }}
+            >
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert 
+              variant="success" 
+              dismissible 
+              onClose={() => setSuccess('')}
+              style={{
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: '#f0fdf4',
+                color: '#16a34a',
+                fontFamily: 'Poppins, sans-serif',
+              }}
+            >
+              {success}
+            </Alert>
+          )}
 
-        {/* Controls */}
-        <Card className="mb-4">
-          <Card.Body>
-            <Row className="align-items-center">
-              <Col md={4}>
-                <Form onSubmit={handleSearch}>
-                  <InputGroup>
-                    <Form.Control
-                      type="text"
-                      placeholder="Search images..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ fontFamily: 'Poppins, sans-serif' }}
-                    />
-                    <Button variant="outline-secondary" type="submit">
-                      <Search />
-                    </Button>
-                  </InputGroup>
-                </Form>
-              </Col>
-              <Col md={2}>
-                <Form.Select
-                  value={selectedCategory}
-                  onChange={(e) => {
-                    setSelectedCategory(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  style={{ fontFamily: 'Poppins, sans-serif' }}
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map(cat => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Col>
-              <Col md={2}>
-                <Form.Select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  style={{ fontFamily: 'Poppins, sans-serif' }}
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </Form.Select>
-              </Col>
-              <Col md={2}>
-                <Dropdown>
-                  <Dropdown.Toggle variant="outline-secondary" size="sm">
-                    <Filter className="me-1" />
-                    Sort
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item
-                      active={sortBy === 'createdAt'}
-                      onClick={() => setSortBy('createdAt')}
-                    >
-                      <Calendar className="me-2" />
-                      Date Created
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      active={sortBy === 'title'}
-                      onClick={() => setSortBy('title')}
-                    >
-                      <SortAlphaDown className="me-2" />
-                      Title
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      active={sortBy === 'category'}
-                      onClick={() => setSortBy('category')}
-                    >
-                      <Tag className="me-2" />
-                      Category
-                    </Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item
-                      onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    >
-                      {sortOrder === 'asc' ? <SortAlphaUp /> : <SortAlphaDown />}
-                      {' '}
-                      {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Col>
-              <Col md={1}>
-                <Button
-                  variant={viewMode === 'grid' ? 'primary' : 'outline-secondary'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                >
-                  <Grid />
-                </Button>
-              </Col>
-              <Col md={1}>
-                <Button
-                  variant={viewMode === 'list' ? 'primary' : 'outline-secondary'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                >
-                  <List />
-                </Button>
-              </Col>
-            </Row>
-            <Row className="mt-3">
-              <Col>
-                <Button
-                  variant="primary"
-                  onClick={handleCreateClick}
-                  style={{ fontFamily: 'Poppins, sans-serif' }}
-                  className="me-2"
-                >
-                  <Plus className="me-2" />
-                  Add New Image
-                </Button>
+          {/* Page Header */}
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  fontSize: '32px',
+                }}
+              >
+                Add Item
+              </h2>
+              <div style={{ display: 'flex', gap: '12px' }}>
                 <Button
                   variant="outline-secondary"
-                  onClick={handleTestImageCreation}
-                  disabled={loading}
-                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                  style={{
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    border: '1px solid #e2e8f0',
+                    color: '#64748b',
+                  }}
                 >
-                  {loading ? 'Testing...' : 'Test Create'}
+                  Save to Draft
                 </Button>
-                <span className="ms-3 text-muted" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  Total: {totalCount} images
-                </span>
-              </Col>
-            </Row>
-          </Card.Body>
-        </Card>
-
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-5">
-            <Spinner animation="border" variant="primary" />
-            <p className="mt-2" style={{ fontFamily: 'Poppins, sans-serif' }}>Loading images...</p>
+                <Button
+                  onClick={handleCreateClick}
+                  style={{
+                    borderRadius: '8px',
+                    padding: '8px 20px',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    backgroundColor: '#1e293b',
+                    border: 'none',
+                    color: 'white',
+                  }}
+                >
+                  Publish Product
+                </Button>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* Images Grid View */}
-        {!loading && viewMode === 'grid' && (
+          {/* Form Layout */}
           <Row>
-            {images.map(image => (
-              <Col key={image._id} md={4} lg={3} className="mb-4">
-                <Card style={{ height: '100%' }}>
-                  <div style={{ position: 'relative', height: '200px', overflow: 'hidden' }}>
-                    <Image
-                      src={image.imageUrl}
-                      alt={image.altText}
+            <Col lg={8}>
+              {/* Basic Details Card */}
+              <Card
+                style={{
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  marginBottom: '24px',
+                  boxShadow: 'none',
+                }}
+              >
+                <Card.Body style={{ padding: '24px' }}>
+                  <h5
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      marginBottom: '20px',
+                      fontSize: '18px',
+                    }}
+                  >
+                    Basic Details
+                  </h5>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label
                       style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: '500',
+                        color: '#374151',
+                        fontSize: '14px',
+                        marginBottom: '8px',
                       }}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        // Show a simple text placeholder instead
-                        const placeholder = document.createElement('div');
-                        placeholder.style.cssText = `
-                          width: 100%;
-                          height: 100%;
-                          background: #f8f9fa;
-                          display: flex;
-                          align-items: center;
-                          justify-content: center;
-                          color: #6c757d;
-                          font-size: 12px;
-                          position: absolute;
-                          top: 0;
-                          left: 0;
-                        `;
-                        placeholder.textContent = 'Image not available';
-                        e.target.parentNode.style.position = 'relative';
-                        e.target.parentNode.appendChild(placeholder);
+                    >
+                      Product Name *
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Navy Blue Indo-Western Kurta with Jacket"
+                      style={{
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        padding: '12px 16px',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '14px',
                       }}
                     />
-                    <div 
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label
                       style={{
-                        position: 'absolute',
-                        top: '8px',
-                        right: '8px',
-                        display: 'flex',
-                        gap: '4px'
-                      }}
-                    >
-                      <Badge bg={getCategoryBadgeVariant(image.category)}>
-                        {image.category}
-                      </Badge>
-                      <Badge bg={image.isActive ? 'success' : 'secondary'}>
-                        {image.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </div>
-                  </div>
-                  <Card.Body>
-                    <Card.Title 
-                      style={{ 
-                        fontFamily: 'Century Gothic, sans-serif',
-                        fontSize: '1rem',
-                        fontWeight: '600'
-                      }}
-                    >
-                      {image.title}
-                    </Card.Title>
-                    <Card.Text 
-                      style={{ 
                         fontFamily: 'Poppins, sans-serif',
-                        fontSize: '0.85rem',
-                        color: '#6c757d'
+                        fontWeight: '500',
+                        color: '#374151',
+                        fontSize: '14px',
+                        marginBottom: '8px',
                       }}
                     >
-                      {image.description.length > 60 
-                        ? `${image.description.substring(0, 60)}...`
-                        : image.description
-                      }
-                    </Card.Text>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <small 
-                        className="text-muted"
-                        style={{ fontFamily: 'Poppins, sans-serif' }}
-                      >
-                        {formatDate(image.createdAt)}
-                      </small>
-                      <div>
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={<Tooltip>Toggle Status</Tooltip>}
+                      Product Description *
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={4}
+                      placeholder="A stylish navy blue Indo-Western kurta set with embroidered Nehru jacket. Perfect for engagements, sangeet, or wedding ceremonies. Includes kurta, churidar, and detachable jacket."
+                      style={{
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        padding: '12px 16px',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '14px',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </Form.Group>
+
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
                         >
+                          Category *
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>Groom Wear</option>
+                          {categories.map(cat => (
+                            <option key={cat.value} value={cat.value}>
+                              {cat.label}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Sub Category *
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>Indo-Western</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+
+              {/* Measurements Card */}
+              <Card
+                style={{
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  marginBottom: '24px',
+                  boxShadow: 'none',
+                }}
+              >
+                <Card.Body style={{ padding: '24px' }}>
+                  <h5
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      marginBottom: '20px',
+                      fontSize: '18px',
+                    }}
+                  >
+                    Measurements
+                  </h5>
+
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Size *
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>XL</option>
+                          <option>S</option>
+                          <option>M</option>
+                          <option>L</option>
+                          <option>XXL</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Stock Quantity *
+                        </Form.Label>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
                           <Button
                             variant="outline-secondary"
                             size="sm"
-                            className="me-1"
-                            onClick={() => handleToggleStatus(image)}
+                            style={{
+                              borderRadius: '6px 0 0 6px',
+                              border: '1px solid #e2e8f0',
+                              width: '36px',
+                              height: '44px',
+                            }}
                           >
-                            {image.isActive ? <EyeSlash /> : <Eye />}
+                            -
                           </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={<Tooltip>Edit</Tooltip>}
-                        >
+                          <Form.Control
+                            type="number"
+                            value="18"
+                            style={{
+                              borderRadius: '0',
+                              border: '1px solid #e2e8f0',
+                              borderLeft: 'none',
+                              borderRight: 'none',
+                              textAlign: 'center',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontSize: '14px',
+                              width: '60px',
+                            }}
+                          />
                           <Button
-                            variant="outline-primary"
+                            variant="outline-secondary"
                             size="sm"
-                            className="me-1"
-                            onClick={() => handleEditClick(image)}
+                            style={{
+                              borderRadius: '0 6px 6px 0',
+                              border: '1px solid #e2e8f0',
+                              width: '36px',
+                              height: '44px',
+                            }}
                           >
-                            <Pencil />
+                            +
                           </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={<Tooltip>Delete</Tooltip>}
+                        </div>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col md={3}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
                         >
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleDeleteClick(image)}
-                          >
-                            <Trash />
-                          </Button>
-                        </OverlayTrigger>
+                          Chest
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>40 in</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Waist
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>34 in</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Hip
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>40 in</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Length
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>44 in</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Sleeve Length
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>25 in</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+
+              {/* Rental & Pricing Card */}
+              <Card
+                style={{
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  marginBottom: '24px',
+                  boxShadow: 'none',
+                }}
+              >
+                <Card.Body style={{ padding: '24px' }}>
+                  <h5
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      marginBottom: '20px',
+                      fontSize: '18px',
+                    }}
+                  >
+                    Rental & Pricing
+                  </h5>
+
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Rental Price (4 Days) *
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>₹6,500</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Security Deposit *
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>₹3,000</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: '500',
+                            color: '#374151',
+                            fontSize: '14px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          Discount Price (Optional)
+                        </Form.Label>
+                        <Form.Select
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            padding: '12px 16px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <option>₹5,800</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {/* Right Sidebar */}
+            <Col lg={4}>
+              {/* Upload Product Image Card */}
+              <Card
+                style={{
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  marginBottom: '24px',
+                  boxShadow: 'none',
+                }}
+              >
+                <Card.Body style={{ padding: '24px' }}>
+                  <h5
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      marginBottom: '20px',
+                      fontSize: '18px',
+                    }}
+                  >
+                    Upload Product Image
+                  </h5>
+
+                  <ImageUploadComponent
+                    onImageSelect={handleImageSelect}
+                    onImageRemove={handleImageRemove}
+                    selectedImages={selectedImages}
+                    maxFiles={1}
+                    showPreview={true}
+                    showMetadata={true}
+                    showSEOAnalysis={true}
+                  />
+
+                  {/* Upload Progress */}
+                  {isUploading && (
+                    <div style={{ marginTop: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>
+                          Uploading and optimizing...
+                        </span>
+                        <span style={{ fontSize: '12px', color: '#64748b' }}>
+                          {Math.round(uploadProgress)}%
+                        </span>
+                      </div>
+                      <div style={{ 
+                        width: '100%', 
+                        height: '8px', 
+                        backgroundColor: '#e2e8f0', 
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}>
+                        <div 
+                          style={{ 
+                            width: `${uploadProgress}%`, 
+                            height: '100%', 
+                            backgroundColor: '#3b82f6',
+                            transition: 'width 0.3s ease'
+                          }} 
+                        />
                       </div>
                     </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        )}
+                  )}
 
-        {/* Images List View */}
-        {!loading && viewMode === 'list' && (
-          <Card>
-            <Table responsive hover>
-              <thead>
-                <tr style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-                  <th>Image</th>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody style={{ fontFamily: 'Poppins, sans-serif' }}>
-                {images.map(image => (
-                  <tr key={image._id}>
-                    <td>
-                      <Image
-                        src={image.imageUrl}
-                        alt={image.altText}
-                        style={{
-                          width: '60px',
-                          height: '40px',
-                          objectFit: 'cover',
-                          borderRadius: '4px'
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          // Show a simple text placeholder instead
-                          const placeholder = document.createElement('div');
-                          placeholder.style.cssText = `
-                            width: 60px;
-                            height: 40px;
-                            background: #f8f9fa;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            color: #6c757d;
-                            font-size: 10px;
-                            border-radius: 4px;
-                            border: 1px solid #dee2e6;
-                          `;
-                          placeholder.textContent = 'No Image';
-                          e.target.parentNode.appendChild(placeholder);
-                        }}
-                      />
-                    </td>
-                    <td>
-                      <div>
-                        <strong>{image.title}</strong>
-                        <br />
-                        <small className="text-muted">
-                          {image.description.length > 50 
-                            ? `${image.description.substring(0, 50)}...`
-                            : image.description
-                          }
-                        </small>
+                  {/* SEO Analysis */}
+                  {seoAnalysis && (
+                    <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#0369a1', marginBottom: '8px' }}>
+                        📊 SEO Analysis Score: {seoAnalysis.score}/100
                       </div>
-                    </td>
-                    <td>
-                      <Badge bg={getCategoryBadgeVariant(image.category)}>
-                        {image.category}
-                      </Badge>
-                    </td>
-                    <td>
-                      <Badge bg={image.isActive ? 'success' : 'secondary'}>
-                        {image.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </td>
-                    <td>{formatDate(image.createdAt)}</td>
-                    <td>
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        className="me-1"
-                        onClick={() => handleToggleStatus(image)}
-                      >
-                        {image.isActive ? <EyeSlash /> : <Eye />}
-                      </Button>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="me-1"
-                        onClick={() => handleEditClick(image)}
-                      >
-                        <Pencil />
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => handleDeleteClick(image)}
-                      >
-                        <Trash />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Card>
-        )}
+                      {seoAnalysis.recommendations && seoAnalysis.recommendations.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: '12px', fontWeight: '500', color: '#075985', marginBottom: '4px' }}>
+                            Recommendations:
+                          </div>
+                          <ul style={{ fontSize: '11px', color: '#075985', margin: '0', paddingLeft: '16px' }}>
+                            {seoAnalysis.recommendations.slice(0, 3).map((rec, index) => (
+                              <li key={index}>{rec}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Card.Body>
+              </Card>
 
-        {/* No images found */}
-        {!loading && images.length === 0 && (
-          <Card>
-            <Card.Body className="text-center py-5">
-              <h5 style={{ fontFamily: 'Century Gothic, sans-serif' }}>No images found</h5>
-              <p style={{ fontFamily: 'Poppins, sans-serif', color: '#6c757d' }}>
-                {searchTerm || selectedCategory !== 'all' || statusFilter !== 'all'
-                  ? 'Try adjusting your search criteria or filters.'
-                  : 'Get started by adding your first image.'
-                }
-              </p>
-              <Button variant="primary" onClick={handleCreateClick}>
-                <Plus className="me-2" />
-                Add New Image
-              </Button>
-            </Card.Body>
-          </Card>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="d-flex justify-content-center mt-4">
-            <Pagination>
-              <Pagination.First
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(1)}
-              />
-              <Pagination.Prev
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-              />
-              
-              {Array.from({ length: Math.min(5, totalPages) }, (_, index) => {
-                let pageNumber;
-                if (totalPages <= 5) {
-                  pageNumber = index + 1;
-                } else if (currentPage <= 3) {
-                  pageNumber = index + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNumber = totalPages - 4 + index;
-                } else {
-                  pageNumber = currentPage - 2 + index;
-                }
-
-                return (
-                  <Pagination.Item
-                    key={pageNumber}
-                    active={pageNumber === currentPage}
-                    onClick={() => setCurrentPage(pageNumber)}
+              {/* Additional Info Card */}
+              <Card
+                style={{
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  marginBottom: '24px',
+                  boxShadow: 'none',
+                }}
+              >
+                <Card.Body style={{ padding: '24px' }}>
+                  <h5
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      marginBottom: '20px',
+                      fontSize: '18px',
+                    }}
                   >
-                    {pageNumber}
-                  </Pagination.Item>
-                );
-              })}
+                    Additional Info
+                  </h5>
 
-              <Pagination.Next
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-              />
-              <Pagination.Last
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(totalPages)}
-              />
-            </Pagination>
-          </div>
-        )}
-      </Container>
+                  <Form.Group className="mb-3">
+                    <Form.Label
+                      style={{
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: '500',
+                        color: '#374151',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      Items Included *
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      placeholder="Dry clean only. Jacket embroidery is delicate, avoid rough handling."
+                      style={{
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        padding: '12px 16px',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '14px',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label
+                      style={{
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: '500',
+                        color: '#374151',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      Condition Notes
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      placeholder="Dry clean only. Jacket embroidery is delicate, avoid rough handling."
+                      style={{
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        padding: '12px 16px',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '14px',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label
+                      style={{
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: '500',
+                        color: '#374151',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      Remarks
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={2}
+                      placeholder="Best paired with embroidered mojris (available separately)."
+                      style={{
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        padding: '12px 16px',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '14px',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </Form.Group>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </div>
+
 
       {/* Create Image Modal */}
       <Modal show={showCreateModal} onHide={handleCloseModal} size="lg">

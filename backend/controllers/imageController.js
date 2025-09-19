@@ -1,5 +1,7 @@
 const Image = require('../models/Image');
 const { validationResult } = require('express-validator');
+const path = require('path');
+const fs = require('fs').promises;
 
 /**
  * Image Controller
@@ -204,7 +206,143 @@ class ImageController {
   }
 
   /**
-   * Create new image
+   * Upload and create new image with file processing
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  static async uploadImage(req, res) {
+    try {
+      // Check for validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array()
+        });
+      }
+
+      // Check if image was processed by middleware
+      if (!req.processedImage) {
+        return res.status(400).json({
+          success: false,
+          message: 'No processed image data found'
+        });
+      }
+
+      const {
+        title,
+        description,
+        altText,
+        seoTitle,
+        seoDescription,
+        focusKeyword,
+        category,
+        tags,
+        isActive = true,
+        displayOrder = 0
+      } = req.body;
+
+      const { processedImage } = req;
+
+      // Use processed image data
+      const imageUrl = `${req.protocol}://${req.get('host')}${processedImage.primaryImage.url}`;
+      
+      // Use suggested SEO data if not provided
+      const finalAltText = altText || processedImage.seoMetadata.suggestedAltText;
+      const finalSEOTitle = seoTitle || processedImage.seoMetadata.suggestedSEOTitle;
+
+      // Process tags
+      const processedTags = tags 
+        ? tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag.length > 0)
+        : [];
+
+      const imageData = {
+        title: title.trim(),
+        description: description.trim(),
+        imageUrl,
+        altText: finalAltText,
+        seoTitle: finalSEOTitle,
+        seoDescription: seoDescription || '',
+        focusKeyword: focusKeyword || '',
+        category,
+        tags: processedTags,
+        isActive,
+        displayOrder: parseInt(displayOrder) || 0,
+        metadata: {
+          ...processedImage.metadata,
+          originalFilename: processedImage.originalFile.originalname,
+          uploadPath: processedImage.primaryImage.path,
+          fallbackUrl: `${req.protocol}://${req.get('host')}${processedImage.processed.jpeg.url}`,
+          technicalSEO: processedImage.seoMetadata.technicalSEO
+        },
+        uploadedBy: req.user?.email || 'admin'
+      };
+
+      const newImage = new Image(imageData);
+      await newImage.save();
+
+      // Add SEO analysis to response
+      const response = {
+        success: true,
+        data: {
+          ...newImage.toObject(),
+          seoAnalysis: {
+            score: newImage.seoScore,
+            recommendations: newImage.seoRecommendations,
+            uploadAnalysis: {
+              originalScore: processedImage.seoMetadata.seoScore,
+              improvements: processedImage.seoMetadata.recommendations
+            }
+          },
+          processingInfo: {
+            originalSize: processedImage.original.size,
+            optimizedSize: processedImage.metadata.fileSize,
+            compressionRatio: ((processedImage.original.size - processedImage.metadata.fileSize) / processedImage.original.size * 100).toFixed(1) + '%',
+            formats: Object.keys(processedImage.processed)
+          }
+        },
+        message: 'Image uploaded and optimized successfully'
+      };
+
+      res.status(201).json(response);
+
+    } catch (error) {
+      console.error('Upload image error:', error);
+      
+      // Clean up uploaded files on error
+      if (req.processedImage) {
+        const filesToCleanup = Object.values(req.processedImage.processed).map(p => p.path);
+        try {
+          await Promise.all(filesToCleanup.map(filePath => fs.unlink(filePath).catch(() => {})));
+        } catch (cleanupError) {
+          console.error('Cleanup error:', cleanupError);
+        }
+      }
+      
+      if (error.name === 'ValidationError') {
+        const validationErrors = Object.values(error.errors).map(err => ({
+          field: err.path,
+          message: err.message
+        }));
+        
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: validationErrors
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        message: 'Failed to upload image',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      });
+    }
+  }
+
+  /**
+   * Create new image (legacy method for URL-based images)
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */

@@ -2,11 +2,92 @@ const express = require('express');
 const { body, param, query } = require('express-validator');
 const ImageController = require('../controllers/imageController');
 const adminAuth = require('../middleware/adminAuth');
+const { uploadSingle, processUploadedImage } = require('../middleware/imageUpload');
 
 const router = express.Router();
 
 /**
- * Validation middleware for image creation and updates
+ * Validation middleware for image upload
+ */
+const imageUploadValidation = [
+  body('title')
+    .trim()
+    .notEmpty()
+    .withMessage('Title is required')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Title must be between 1 and 100 characters'),
+    
+  body('description')
+    .trim()
+    .notEmpty()
+    .withMessage('Description is required')
+    .isLength({ min: 1, max: 500 })
+    .withMessage('Description must be between 1 and 500 characters'),
+    
+  body('altText')
+    .optional()
+    .trim()
+    .isLength({ max: 125 })
+    .withMessage('Alt text cannot exceed 125 characters'),
+    
+  body('seoTitle')
+    .optional()
+    .trim()
+    .isLength({ max: 60 })
+    .withMessage('SEO title cannot exceed 60 characters'),
+    
+  body('seoDescription')
+    .optional()
+    .trim()
+    .isLength({ max: 160 })
+    .withMessage('SEO description cannot exceed 160 characters'),
+    
+  body('focusKeyword')
+    .optional()
+    .trim()
+    .toLowerCase()
+    .isLength({ max: 50 })
+    .withMessage('Focus keyword cannot exceed 50 characters'),
+    
+  body('category')
+    .notEmpty()
+    .withMessage('Category is required')
+    .isIn(['hero', 'product', 'banner', 'gallery', 'testimonial', 'about'])
+    .withMessage('Category must be one of: hero, product, banner, gallery, testimonial, about'),
+    
+  body('tags')
+    .optional()
+    .isString()
+    .withMessage('Tags must be a comma-separated string'),
+    
+  body('isActive')
+    .optional()
+    .isBoolean()
+    .withMessage('isActive must be a boolean value'),
+    
+  body('displayOrder')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Display order must be a non-negative integer'),
+    
+  body('quality')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Quality must be between 1 and 100'),
+    
+  body('maxWidth')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Max width must be a positive integer'),
+    
+  body('maxHeight')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Max height must be a positive integer')
+];
+
+/**
+ * Validation middleware for image creation and updates (legacy URL method)
  */
 const imageValidation = [
   body('title')
@@ -208,8 +289,22 @@ router.get(
 );
 
 /**
+ * @route   POST /api/images/upload
+ * @desc    Upload and create new image with file processing
+ * @access  Admin
+ */
+router.post(
+  '/upload',
+  adminAuth,
+  uploadSingle,
+  imageUploadValidation,
+  processUploadedImage,
+  ImageController.uploadImage
+);
+
+/**
  * @route   POST /api/images
- * @desc    Create new image
+ * @desc    Create new image (legacy URL method)
  * @access  Admin
  */
 router.post(
