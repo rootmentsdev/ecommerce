@@ -27,8 +27,10 @@ class ImageController {
       const filter = { isActive: true };
       
       if (category && category !== 'all') {
+        console.log('🎯 Backend getPublicImages filtering by category:', category);
         filter.category = category;
       }
+      
       
       if (search && search.trim()) {
         filter.$or = [
@@ -64,6 +66,21 @@ class ImageController {
       ]);
 
       const totalPages = Math.ceil(totalCount / parseInt(limit));
+
+      // Debug: Log retrieved images
+      if (images && images.length > 0) {
+        console.log('🎯 Backend getPublicImages - Retrieved images:', images.map(img => ({
+          id: img._id,
+          title: img.title,
+          price: img.price,
+          rentalPrice: img.rentalPrice,
+          actualPrice: img.actualPrice,
+          fabric: img.fabric,
+          color: img.color,
+          style: img.style,
+          category: img.category
+        })));
+      }
 
       res.status(200).json({
         success: true,
@@ -113,6 +130,7 @@ class ImageController {
       if (category && category !== 'all') {
         filter.category = category;
       }
+      
       
       if (isActive !== undefined) {
         filter.isActive = isActive === 'true';
@@ -220,6 +238,32 @@ class ImageController {
         });
       }
 
+      const requestData = req.body;
+      console.log('🎯 Backend createImage - Received data:', {
+        title: requestData.title,
+        description: requestData.description,
+        seoTitle: requestData.seoTitle,
+        seoDescription: requestData.seoDescription,
+        focusKeyword: requestData.focusKeyword,
+        price: requestData.price,
+        rentalPrice: requestData.rentalPrice,
+        actualPrice: requestData.actualPrice,
+        securityDeposit: requestData.securityDeposit,
+        fabric: requestData.fabric,
+        color: requestData.color,
+        colors: requestData.colors,
+        style: requestData.style,
+        occasions: requestData.occasions,
+        inclusions: requestData.inclusions,
+        care: requestData.care,
+        sizes: requestData.sizes,
+        type: requestData.type,
+        category: requestData.category,
+        tags: requestData.tags,
+        isActive: requestData.isActive,
+        inStock: requestData.inStock
+      });
+
       const {
         title,
         description,
@@ -246,7 +290,26 @@ class ImageController {
         tags: processedTags,
         isActive,
         displayOrder: parseInt(displayOrder) || 0,
-        uploadedBy: req.user?.email || 'admin'
+        uploadedBy: req.user?.email || 'admin',
+        // SEO fields
+        seoTitle: req.body.seoTitle,
+        seoDescription: req.body.seoDescription,
+        focusKeyword: req.body.focusKeyword,
+        // Product-related fields
+        price: req.body.price,
+        rentalPrice: req.body.rentalPrice,
+        actualPrice: req.body.actualPrice,
+        securityDeposit: req.body.securityDeposit,
+        fabric: req.body.fabric,
+        color: req.body.color,
+        colors: req.body.colors,
+        style: req.body.style,
+        occasions: req.body.occasions,
+        inclusions: req.body.inclusions,
+        care: req.body.care,
+        sizes: req.body.sizes,
+        type: req.body.type,
+        inStock: req.body.inStock
       };
 
       // Add metadata if provided
@@ -256,6 +319,33 @@ class ImageController {
 
       const newImage = new Image(imageData);
       await newImage.save();
+      
+      console.log('🎯 Backend createImage - Saved to database:', {
+        id: newImage._id,
+        title: newImage.title,
+        description: newImage.description,
+        seoTitle: newImage.seoTitle,
+        seoDescription: newImage.seoDescription,
+        focusKeyword: newImage.focusKeyword,
+        price: newImage.price,
+        rentalPrice: newImage.rentalPrice,
+        actualPrice: newImage.actualPrice,
+        securityDeposit: newImage.securityDeposit,
+        fabric: newImage.fabric,
+        color: newImage.color,
+        colors: newImage.colors,
+        style: newImage.style,
+        occasions: newImage.occasions,
+        inclusions: newImage.inclusions,
+        care: newImage.care,
+        sizes: newImage.sizes,
+        type: newImage.type,
+        category: newImage.category,
+        tags: newImage.tags,
+        isActive: newImage.isActive,
+        inStock: newImage.inStock,
+        metadata: newImage.metadata
+      });
 
       res.status(201).json({
         success: true,
@@ -305,6 +395,24 @@ class ImageController {
 
       const { id } = req.params;
       const updateData = { ...req.body };
+      
+      console.log('🎯 Backend updateImage - Received data:', {
+        title: updateData.title,
+        price: updateData.price,
+        rentalPrice: updateData.rentalPrice,
+        actualPrice: updateData.actualPrice,
+        securityDeposit: updateData.securityDeposit,
+        fabric: updateData.fabric,
+        color: updateData.color,
+        colors: updateData.colors,
+        style: updateData.style,
+        occasions: updateData.occasions,
+        inclusions: updateData.inclusions,
+        care: updateData.care,
+        sizes: updateData.sizes,
+        type: updateData.type,
+        category: updateData.category
+      });
 
       // Process tags if provided
       if (updateData.tags && typeof updateData.tags === 'string') {
@@ -425,6 +533,52 @@ class ImageController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve categories',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      });
+    }
+  }
+
+  /**
+   * Migrate existing categories to new category system
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  static async migrateCategories(req, res) {
+    try {
+      const categoryMapping = {
+        'hero': 'featured',
+        'banner': 'featured', 
+        'gallery': 'trending',
+        'testimonial': 'featured',
+        'about': 'featured',
+        'product': 'rent'
+      };
+
+      const updatePromises = Object.entries(categoryMapping).map(([oldCategory, newCategory]) => {
+        return Image.updateMany(
+          { category: oldCategory },
+          { $set: { category: newCategory } }
+        );
+      });
+
+      const results = await Promise.all(updatePromises);
+      
+      const totalUpdated = results.reduce((sum, result) => sum + result.modifiedCount, 0);
+
+      res.status(200).json({
+        success: true,
+        message: `Successfully migrated ${totalUpdated} images to new category system`,
+        data: {
+          totalUpdated,
+          mappings: categoryMapping
+        }
+      });
+
+    } catch (error) {
+      console.error('Category migration error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to migrate categories',
         error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }

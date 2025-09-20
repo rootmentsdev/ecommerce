@@ -215,6 +215,33 @@ class ImageService {
   }
 
   /**
+   * Migrate existing categories to new category system
+   * @returns {Promise<Object>} API response
+   */
+  static async migrateCategories() {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/images/migrate-categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to migrate categories');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Migrate categories error:', error);
+      throw new Error(error.message || 'Failed to migrate categories');
+    }
+  }
+
+  /**
    * Upload image file (placeholder for future implementation)
    * @param {File} file - Image file
    * @returns {Promise<string>} Image URL

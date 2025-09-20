@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Spinner, Alert } from 'react-bootstrap';
+import { Row, Col, Card, Spinner, Alert, Button } from 'react-bootstrap';
+import { Heart } from 'react-bootstrap-icons';
 import FrontendImageService from '../../services/frontendImageService';
 import AdminImage from './AdminImage';
+import { APP_CONFIG } from '../../constants';
 
 /**
  * ProductImageGallery Component
@@ -11,10 +13,10 @@ const ProductImageGallery = ({
   category = 'product',
   tags = [],
   limit = 12,
-  columns = { xs: 1, sm: 2, md: 3, lg: 4 },
+  columns = { xs: 2, sm: 2, md: 3, lg: 4 },
   showTitle = true,
   showDescription = false,
-  imageHeight = '200px',
+  imageHeight = '240px',
   className = '',
   onImageClick = null,
   searchKeyword = ''
@@ -45,7 +47,7 @@ const ProductImageGallery = ({
         console.log('🏷️ Getting images by tags:', tags);
         fetchedImages = await FrontendImageService.getImagesByTags(tags);
       } else {
-        // Get images by category
+        // Get images by category (now using product categories: buy, rent, featured, trending)
         console.log('📂 Getting images by category:', category);
         fetchedImages = await FrontendImageService.getImagesByCategory(category, { limit });
       }
@@ -97,111 +99,183 @@ const ProductImageGallery = ({
     );
   }
 
+  // Helper function to convert image to product format for display
+  const convertImageToProduct = (image) => {
+    console.log('💰 ProductImageGallery - Raw image data:', {
+      id: image._id,
+      title: image.title,
+      price: image.price,
+      rentalPrice: image.rentalPrice,
+      actualPrice: image.actualPrice,
+      securityDeposit: image.securityDeposit
+    });
+    
+    const parseCommaSeparated = (value, defaultValue = []) => {
+      if (!value || value.trim() === '') return defaultValue;
+      return value.split(',').map(item => item.trim()).filter(item => item.length > 0);
+    };
+
+    const product = {
+      id: image._id,
+      name: image.title || 'Untitled Product',
+      price: image.price ? parseInt(image.price) : (image.rentalPrice ? parseInt(image.rentalPrice) : 1200),
+      rentalPrice: image.rentalPrice ? parseInt(image.rentalPrice) : (image.price ? parseInt(image.price) : 800),
+      actualPrice: image.actualPrice ? parseInt(image.actualPrice) : 13000,
+      securityDeposit: image.securityDeposit ? parseInt(image.securityDeposit) : 5000,
+      image: image.imageUrl,
+      category: image.category || 'product',
+      occasion: parseCommaSeparated(image.occasions, ['Formal'])[0] || 'Formal', // Use first occasion from admin, fallback to default
+      size: parseCommaSeparated(image.sizes, ['L'])[0] || 'L', // Use first size from admin, fallback to default
+      type: image.type || 'newArrivals', // Use provided type or default
+      productCategory: image.category || 'rent', // Use category field for routing
+      description: image.description || 'No description available',
+      fabric: image.fabric || 'Premium Fabric',
+      color: image.color || 'Various',
+      style: image.style || 'Modern Fit',
+      occasions: parseCommaSeparated(image.occasions, ['Wedding Guest', 'Corporate Events', 'Reception', 'Cocktail Party']),
+      inclusions: parseCommaSeparated(image.inclusions, ['Complete Outfit', 'Accessories included']),
+      care: image.care || 'Dry Clean Only',
+      sizes: parseCommaSeparated(image.sizes, ['S', 'M', 'L', 'XL', 'XXL']),
+      colors: parseCommaSeparated(image.colors || image.color, ['Various']),
+      inStock: image.inStock !== false && image.isActive !== false
+    };
+    
+    console.log('💰 ProductImageGallery - Final converted product data:', {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      rentalPrice: product.rentalPrice,
+      actualPrice: product.actualPrice,
+      securityDeposit: product.securityDeposit
+    });
+    
+    return product;
+  };
+
+  const handleHeartClick = (e, image) => {
+    e.stopPropagation();
+    console.log('Add to wishlist:', image);
+    // TODO: Add to wishlist functionality
+  };
+
+  const cardStyles = {
+    width: '100%',
+    height: 'auto',
+    cursor: onImageClick ? 'pointer' : 'default',
+    borderRadius: '12px'
+  };
+
+  const imageContainerStyles = {
+    position: 'relative',
+    height: imageHeight,
+    overflow: 'hidden',
+    borderRadius: '12px 12px 0px 0px'
+  };
+
+  const imageStyles = {
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
+    borderRadius: '12px 12px 0px 0px'
+  };
+
+  const heartButtonStyles = {
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    border: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+
+  const titleStyles = {
+    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+    fontWeight: '500',
+    fontSize: '14px',
+    lineHeight: '1.3',
+    color: '#333333'
+  };
+
+  const priceStyles = {
+    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+    fontWeight: '700',
+    fontSize: '16px',
+    color: '#000000'
+  };
+
   return (
     <div className={className}>
-      <Row>
-        {images.map((image) => (
-          <Col
-            key={image._id}
-            xs={12 / columns.xs}
-            sm={12 / columns.sm}
-            md={12 / columns.md}
-            lg={12 / columns.lg}
-            className="mb-4"
-          >
-            <Card 
-              style={{ 
-                height: '100%',
-                cursor: onImageClick ? 'pointer' : 'default',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-              }}
-              className={onImageClick ? 'hover-card' : ''}
-              onMouseEnter={(e) => {
-                if (onImageClick) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (onImageClick) {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = 'none';
-                }
-              }}
+      <Row className="g-3">
+        {images.map((image) => {
+          const product = convertImageToProduct(image);
+          
+          return (
+            <Col
+              key={image._id}
+              xs={12 / columns.xs}
+              sm={12 / columns.sm}
+              md={12 / columns.md}
+              lg={12 / columns.lg}
+              className="mb-4"
             >
-              <div style={{ height: imageHeight, overflow: 'hidden' }}>
-                <AdminImage
-                  image={image}
-                  height={imageHeight}
-                  onClick={() => handleImageClick(image)}
-                  style={{
-                    borderTopLeftRadius: 'calc(0.375rem - 1px)',
-                    borderTopRightRadius: 'calc(0.375rem - 1px)',
-                    borderBottomLeftRadius: showTitle || showDescription ? '0' : 'calc(0.375rem - 1px)',
-                    borderBottomRightRadius: showTitle || showDescription ? '0' : 'calc(0.375rem - 1px)'
-                  }}
-                />
-              </div>
-              
-              {(showTitle || showDescription) && (
-                <Card.Body style={{ padding: '12px' }}>
-                  {showTitle && image.title && (
-                    <Card.Title 
-                      style={{ 
-                        fontFamily: 'Century Gothic, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        marginBottom: showDescription ? '8px' : '0',
-                        color: '#2c3e50'
-                      }}
-                    >
-                      {image.title}
-                    </Card.Title>
-                  )}
-                  
-                  {showDescription && image.description && (
-                    <Card.Text 
-                      style={{ 
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '14px',
-                        color: '#6c757d',
-                        marginBottom: '0',
-                        lineHeight: '1.4'
-                      }}
-                    >
-                      {image.description.length > 80 
-                        ? `${image.description.substring(0, 80)}...`
-                        : image.description
-                      }
-                    </Card.Text>
-                  )}
-
-                  {/* SEO and metadata info */}
-                  {image.tags && image.tags.length > 0 && (
-                    <div className="mt-2">
-                      {image.tags.slice(0, 3).map((tag, index) => (
-                        <small
-                          key={index}
-                          style={{
-                            backgroundColor: '#e9ecef',
-                            color: '#495057',
-                            padding: '2px 6px',
-                            borderRadius: '10px',
-                            fontSize: '10px',
-                            marginRight: '4px',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}
-                        >
-                          {tag}
-                        </small>
-                      ))}
-                    </div>
-                  )}
+              <Card 
+                className="border-0 shadow-sm h-100" 
+                style={cardStyles}
+                onClick={() => handleImageClick(image)}
+              >
+                <div style={imageContainerStyles}>
+                  <Card.Img 
+                    variant="top" 
+                    src={image.imageUrl}
+                    alt={image.altText || image.title}
+                    style={imageStyles}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const placeholder = document.createElement('div');
+                      placeholder.style.cssText = `
+                        width: 100%;
+                        height: 100%;
+                        background: #f8f9fa;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #6c757d;
+                        font-size: 12px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                      `;
+                      placeholder.textContent = 'Image not available';
+                      e.target.parentNode.style.position = 'relative';
+                      e.target.parentNode.appendChild(placeholder);
+                    }}
+                  />
+                  <Button 
+                    variant="light"
+                    style={heartButtonStyles}
+                    onClick={(e) => handleHeartClick(e, image)}
+                  >
+                    <Heart size={16} className="text-dark" />
+                  </Button>
+                </div>
+                
+                <Card.Body className="p-3">
+                  <Card.Title className="h6 mb-2" style={titleStyles}>
+                    {image.title || 'Untitled Product'}
+                  </Card.Title>
+                  <Card.Text className="h5 mb-3 fw-bold" style={priceStyles}>
+                    ₹{product.price}
+                  </Card.Text>
                 </Card.Body>
-              )}
-            </Card>
-          </Col>
-        ))}
+              </Card>
+            </Col>
+          );
+        })}
       </Row>
     </div>
   );

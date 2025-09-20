@@ -76,10 +76,26 @@ const AdminImageManagement = () => {
     seoTitle: '',
     seoDescription: '',
     focusKeyword: '',
-    category: 'product',
+    category: 'rent',
     tags: '',
     isActive: true,
     displayOrder: 0,
+    // Product-related fields
+    price: '',
+    rentalPrice: '',
+    actualPrice: '',
+    securityDeposit: '',
+    fabric: '',
+    color: '',
+    colors: '',
+    style: '',
+    occasions: '',
+    inclusions: '',
+    care: '',
+    sizes: '',
+    type: 'newArrivals',
+    // productCategory is now handled by the category field
+    inStock: true,
     metadata: {
       fileSize: '',
       dimensions: { width: '', height: '' },
@@ -92,14 +108,12 @@ const AdminImageManagement = () => {
 
   const [formErrors, setFormErrors] = useState({});
 
-  // Categories for dropdown
+  // Categories for dropdown - Now using product categories
   const categories = [
-    { value: 'hero', label: 'Hero Images' },
-    { value: 'product', label: 'Product Images' },
-    { value: 'banner', label: 'Banner Images' },
-    { value: 'gallery', label: 'Gallery Images' },
-    { value: 'testimonial', label: 'Testimonial Images' },
-    { value: 'about', label: 'About Us Images' }
+    { value: 'buy', label: '🛒 Buy - Purchase Products' },
+    { value: 'rent', label: '🔄 Rent - Rental Products' },
+    { value: 'featured', label: '⭐ Featured - Featured Products' },
+    { value: 'trending', label: '📈 Trending - Trending Products' }
   ];
 
   // Load images on component mount and when filters change
@@ -315,6 +329,11 @@ const AdminImageManagement = () => {
       const submitData = {
         ...formData,
         displayOrder: parseInt(formData.displayOrder) || 0,
+        // Convert price fields to integers
+        price: formData.price ? parseInt(formData.price) : undefined,
+        rentalPrice: formData.rentalPrice ? parseInt(formData.rentalPrice) : undefined,
+        actualPrice: formData.actualPrice ? parseInt(formData.actualPrice) : undefined,
+        securityDeposit: formData.securityDeposit ? parseInt(formData.securityDeposit) : undefined,
         // Ensure SEO fields are properly formatted
         seoTitle: formData.seoTitle?.trim() || undefined,
         seoDescription: formData.seoDescription?.trim() || undefined,
@@ -355,14 +374,60 @@ const AdminImageManagement = () => {
         }
       }
 
-      // Clean up undefined values from main object
+      // Clean up undefined values from main object, but preserve important fields
       Object.keys(submitData).forEach(key => {
-        if (submitData[key] === undefined || submitData[key] === '') {
+        if (submitData[key] === undefined) {
           delete submitData[key];
         }
+        // Keep empty strings for product fields - don't convert to null
       });
 
+      console.log('Form data category:', formData.category);
+      console.log('Submit data category:', submitData.category);
+      console.log('Available categories:', categories);
+      console.log('📊 Admin Form Data - All fields:', {
+        title: formData.title,
+        description: formData.description,
+        price: formData.price,
+        rentalPrice: formData.rentalPrice,
+        actualPrice: formData.actualPrice,
+        securityDeposit: formData.securityDeposit,
+        fabric: formData.fabric,
+        color: formData.color,
+        colors: formData.colors,
+        style: formData.style,
+        occasions: formData.occasions,
+        inclusions: formData.inclusions,
+        care: formData.care,
+        sizes: formData.sizes,
+        type: formData.type,
+        category: formData.category
+      });
+      
+      console.log('📊 Submit Data - After processing:', {
+        title: submitData.title,
+        description: submitData.description,
+        price: submitData.price,
+        rentalPrice: submitData.rentalPrice,
+        actualPrice: submitData.actualPrice,
+        securityDeposit: submitData.securityDeposit,
+        fabric: submitData.fabric,
+        color: submitData.color,
+        colors: submitData.colors,
+        style: submitData.style,
+        occasions: submitData.occasions,
+        inclusions: submitData.inclusions,
+        care: submitData.care,
+        sizes: submitData.sizes,
+        type: submitData.type,
+        category: submitData.category
+      });
       console.log('Submitting form data:', JSON.stringify(submitData, null, 2));
+      console.log('📡 Final HTTP Request Data:', {
+        method: selectedImage ? 'PUT' : 'POST',
+        url: selectedImage ? `/images/${selectedImage._id}` : '/images',
+        body: submitData
+      });
 
       let response;
       if (selectedImage) {
@@ -436,10 +501,25 @@ const AdminImageManagement = () => {
       seoTitle: '',
       seoDescription: '',
       focusKeyword: '',
-      category: 'product',
+      category: 'rent',
       tags: '',
       isActive: true,
       displayOrder: 0,
+      // Product-related fields
+      price: '',
+      rentalPrice: '',
+      actualPrice: '',
+      securityDeposit: '',
+      fabric: '',
+      color: '',
+      colors: '',
+      style: '',
+      occasions: '',
+      inclusions: '',
+      care: '',
+      sizes: '',
+      type: 'newArrivals',
+      inStock: true,
       metadata: {
         fileSize: '',
         dimensions: { width: '', height: '' },
@@ -470,6 +550,21 @@ const AdminImageManagement = () => {
       tags: image.tags ? image.tags.join(', ') : '',
       isActive: image.isActive,
       displayOrder: image.displayOrder || 0,
+      // Product-related fields
+      price: image.price || '',
+      rentalPrice: image.rentalPrice || '',
+      actualPrice: image.actualPrice || '',
+      securityDeposit: image.securityDeposit || '',
+      fabric: image.fabric || '',
+      color: image.color || '',
+      colors: image.colors || '',
+      style: image.style || '',
+      occasions: image.occasions || '',
+      inclusions: image.inclusions || '',
+      care: image.care || '',
+      sizes: image.sizes || '',
+      type: image.type || 'newArrivals',
+      inStock: image.inStock !== false,
       metadata: {
         fileSize: image.metadata?.fileSize || '',
         dimensions: {
@@ -510,10 +605,25 @@ const AdminImageManagement = () => {
       seoTitle: '',
       seoDescription: '',
       focusKeyword: '',
-      category: 'product',
+      category: 'rent',
       tags: '',
       isActive: true,
       displayOrder: 0,
+      // Product-related fields
+      price: '',
+      rentalPrice: '',
+      actualPrice: '',
+      securityDeposit: '',
+      fabric: '',
+      color: '',
+      colors: '',
+      style: '',
+      occasions: '',
+      inclusions: '',
+      care: '',
+      sizes: '',
+      type: 'newArrivals',
+      inStock: true,
       metadata: {
         fileSize: '',
         dimensions: { width: '', height: '' },
@@ -562,6 +672,28 @@ const AdminImageManagement = () => {
     } catch (err) {
       console.error('Test image creation error:', err);
       setError(`Test creation failed: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Migrate existing categories to new category system
+   */
+  const handleMigrateCategories = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const response = await ImageService.migrateCategories();
+      
+      if (response.success) {
+        setSuccess(`Migration completed successfully! Updated ${response.data.totalUpdated} images.`);
+        loadImages(); // Refresh the list
+      }
+    } catch (err) {
+      console.error('Category migration error:', err);
+      setError(`Migration failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -783,8 +915,17 @@ const AdminImageManagement = () => {
                   onClick={handleTestImageCreation}
                   disabled={loading}
                   style={{ fontFamily: 'Poppins, sans-serif' }}
+                  className="me-2"
                 >
                   {loading ? 'Testing...' : 'Test Create'}
+                </Button>
+                <Button
+                  variant="outline-warning"
+                  onClick={handleMigrateCategories}
+                  disabled={loading}
+                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                >
+                  {loading ? 'Migrating...' : 'Migrate Categories'}
                 </Button>
                 <span className="ms-3 text-muted" style={{ fontFamily: 'Poppins, sans-serif' }}>
                   Total: {totalCount} images
@@ -1265,6 +1406,252 @@ const AdminImageManagement = () => {
                 checked={formData.isActive}
                 onChange={handleInputChange}
                 label="Active (visible on site)"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              />
+            </Form.Group>
+
+            {/* Product Information Section */}
+            <hr className="my-4" />
+            <h6 style={{ fontFamily: 'Century Gothic, sans-serif', fontWeight: '600', color: '#2c3e50' }}>
+              Product Information (Optional)
+            </h6>
+            <p className="text-muted small mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Fill these fields to make this image work better as a product in the catalog.
+            </p>
+
+
+            <Row>
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Rental Price (₹)
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="rentalPrice"
+                    value={formData.rentalPrice}
+                    onChange={handleInputChange}
+                    placeholder="800"
+                    min="0"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Purchase Price (₹)
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    placeholder="2500"
+                    min="0"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Actual Price (₹)
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="actualPrice"
+                    value={formData.actualPrice}
+                    onChange={handleInputChange}
+                    placeholder="13000"
+                    min="0"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={3}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Security Deposit (₹)
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="securityDeposit"
+                    value={formData.securityDeposit}
+                    onChange={handleInputChange}
+                    placeholder="5000"
+                    min="0"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Fabric
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="fabric"
+                    value={formData.fabric}
+                    onChange={handleInputChange}
+                    placeholder="Premium Wool Blend"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Color
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="color"
+                    value={formData.color}
+                    onChange={handleInputChange}
+                    placeholder="Black, Navy Blue, etc."
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Style
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="style"
+                    value={formData.style}
+                    onChange={handleInputChange}
+                    placeholder="Two-Piece, Modern Fit, etc."
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Care Instructions
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="care"
+                    value={formData.care}
+                    onChange={handleInputChange}
+                    placeholder="Dry Clean Only"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-3">
+              <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                Occasions
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="occasions"
+                value={formData.occasions}
+                onChange={handleInputChange}
+                placeholder="Wedding Guest, Corporate Events, Reception, Cocktail Party"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              />
+              <Form.Text className="text-muted">
+                Separate multiple occasions with commas
+              </Form.Text>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                Included Items
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="inclusions"
+                value={formData.inclusions}
+                onChange={handleInputChange}
+                placeholder="Blazer + Trousers, Shirt & Tie not included"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              />
+              <Form.Text className="text-muted">
+                List what's included in the outfit
+              </Form.Text>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                Available Sizes
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="sizes"
+                value={formData.sizes}
+                onChange={handleInputChange}
+                placeholder="S, M, L, XL, XXL"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              />
+              <Form.Text className="text-muted">
+                Separate sizes with commas
+              </Form.Text>
+            </Form.Group>
+
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Available Colors
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="colors"
+                    value={formData.colors}
+                    onChange={handleInputChange}
+                    placeholder="Black, Navy Blue, Charcoal, White"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  />
+                  <Form.Text className="text-muted">
+                    Separate colors with commas
+                  </Form.Text>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
+                    Product Type
+                  </Form.Label>
+                  <Form.Select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    <option value="newArrivals">New Arrivals</option>
+                    <option value="featured">Featured</option>
+                    <option value="popular">Popular</option>
+                    <option value="sale">Sale</option>
+                    <option value="bestseller">Bestseller</option>
+                    <option value="limited">Limited Edition</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                name="inStock"
+                checked={formData.inStock}
+                onChange={handleInputChange}
+                label="In Stock (Available for rent/purchase)"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               />
             </Form.Group>

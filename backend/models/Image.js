@@ -62,9 +62,10 @@ const imageSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Image category is required'],
     enum: {
-      values: ['hero', 'product', 'banner', 'gallery', 'testimonial', 'about'],
-      message: 'Category must be one of: hero, product, banner, gallery, testimonial, about'
-    }
+      values: ['buy', 'rent', 'featured', 'trending', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'], // Include all old values for migration
+      message: 'Category must be one of: buy, rent, featured, trending, product, hero, banner, gallery, testimonial, about'
+    },
+    default: 'rent'
   },
   tags: [{
     type: String,
@@ -78,6 +79,67 @@ const imageSchema = new mongoose.Schema({
   displayOrder: {
     type: Number,
     default: 0
+  },
+  // Product-related fields
+  price: {
+    type: Number,
+    min: [0, 'Price cannot be negative']
+  },
+  rentalPrice: {
+    type: Number,
+    min: [0, 'Rental price cannot be negative']
+  },
+  actualPrice: {
+    type: Number,
+    min: [0, 'Actual price cannot be negative']
+  },
+  securityDeposit: {
+    type: Number,
+    min: [0, 'Security deposit cannot be negative']
+  },
+  fabric: {
+    type: String,
+    trim: true
+  },
+  color: {
+    type: String,
+    trim: true
+  },
+  colors: {
+    type: String,
+    trim: true
+  },
+  style: {
+    type: String,
+    trim: true
+  },
+  occasions: {
+    type: String,
+    trim: true
+  },
+  inclusions: {
+    type: String,
+    trim: true
+  },
+  care: {
+    type: String,
+    trim: true
+  },
+  sizes: {
+    type: String,
+    trim: true
+  },
+  type: {
+    type: String,
+    enum: {
+      values: ['newArrivals', 'featured', 'popular', 'sale', 'bestseller', 'limited'],
+      message: 'Type must be one of: newArrivals, featured, popular, sale, bestseller, limited'
+    },
+    default: 'newArrivals'
+  },
+  inStock: {
+    type: Boolean,
+    default: true
   },
   metadata: {
     fileSize: {
@@ -269,6 +331,21 @@ imageSchema.index({ createdAt: -1 });
 
 // Pre-save middleware for SEO optimization and validation
 imageSchema.pre('save', function(next) {
+  // Handle category migration from old values to new ones
+  const categoryMapping = {
+    'hero': 'featured',
+    'banner': 'featured', 
+    'gallery': 'trending',
+    'testimonial': 'featured',
+    'about': 'featured',
+    'product': 'rent' // Default product to rent category
+  };
+  
+  if (categoryMapping[this.category]) {
+    console.log(`Migrating category from '${this.category}' to '${categoryMapping[this.category]}'`);
+    this.category = categoryMapping[this.category];
+  }
+  
   // Handle tags
   if (this.tags && this.tags.length > 0) {
     this.tags = this.tags.filter(tag => tag && tag.trim().length > 0);

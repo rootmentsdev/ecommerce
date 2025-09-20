@@ -74,6 +74,85 @@ const ProductListing = () => {
     });
   };
 
+  // Convert admin image to product format
+  const convertImageToProduct = (image) => {
+    console.log('💰 Converting image to product - Raw image data:', {
+      id: image._id,
+      title: image.title,
+      price: image.price,
+      rentalPrice: image.rentalPrice,
+      actualPrice: image.actualPrice,
+      securityDeposit: image.securityDeposit
+    });
+    
+    // Helper function to parse comma-separated values
+    const parseCommaSeparated = (value, defaultValue = []) => {
+      if (!value || value.trim() === '') return defaultValue;
+      return value.split(',').map(item => item.trim()).filter(item => item.length > 0);
+    };
+
+    const product = {
+      id: image._id,
+      name: image.title || 'Untitled Product',
+      price: image.price ? parseInt(image.price) : (image.rentalPrice ? parseInt(image.rentalPrice) : 1200), // Use purchase price, fallback to rental price, then default
+      rentalPrice: image.rentalPrice ? parseInt(image.rentalPrice) : (image.price ? parseInt(image.price) : 800), // Use rental price, fallback to purchase price, then default
+      actualPrice: image.actualPrice ? parseInt(image.actualPrice) : 13000, // Use provided actual price or default
+      securityDeposit: image.securityDeposit ? parseInt(image.securityDeposit) : 5000, // Use provided security deposit or default
+      image: image.imageUrl,
+      category: image.category || 'product',
+      occasion: parseCommaSeparated(image.occasions, ['Formal'])[0] || 'Formal', // Use first occasion from admin, fallback to default
+      size: parseCommaSeparated(image.sizes, ['L'])[0] || 'L', // Use first size from admin, fallback to default
+      type: image.type || 'newArrivals', // Use provided type or default
+      productCategory: image.category || 'rent', // Use category field for routing
+      description: image.description || 'No description available',
+      fabric: image.fabric || 'Premium Fabric', // Use provided fabric or default
+      color: image.color || 'Various', // Use provided color or default
+      style: image.style || 'Modern Fit', // Use provided style or default
+      occasions: parseCommaSeparated(image.occasions, ['Wedding Guest', 'Corporate Events', 'Reception', 'Cocktail Party']), // Parse occasions
+      inclusions: parseCommaSeparated(image.inclusions, ['Complete Outfit', 'Accessories included']), // Parse inclusions
+      care: image.care || 'Dry Clean Only', // Use provided care instructions or default
+      sizes: parseCommaSeparated(image.sizes, ['S', 'M', 'L', 'XL', 'XXL']), // Parse available sizes
+      colors: parseCommaSeparated(image.colors || image.color, ['Various']), // Parse colors from colors field, fallback to color field
+      inStock: image.inStock !== false && image.isActive !== false // Use both inStock and isActive status
+    };
+    
+    console.log('💰 Final converted product data:', {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      rentalPrice: product.rentalPrice,
+      actualPrice: product.actualPrice,
+      securityDeposit: product.securityDeposit
+    });
+    
+    return product;
+  };
+
+  const handleImageClick = (image) => {
+    console.log('Admin image clicked:', image);
+    const product = convertImageToProduct(image);
+    
+    // Determine enquiry type based on product category
+    let enquiryType = 'rent'; // default
+    if (product.productCategory === 'buy') {
+      enquiryType = 'buy';
+    } else if (product.productCategory === 'rent') {
+      enquiryType = 'rent';
+    } else if (product.productCategory === 'trending' || product.productCategory === 'featured') {
+      // For trending/featured, use the original enquiry type or default to rent
+      enquiryType = location.state?.enquiryType || 'rent';
+    }
+    
+    console.log('Product category:', product.productCategory, 'Enquiry type:', enquiryType);
+    
+    navigate('/product-details', { 
+      state: { 
+        product,
+        enquiryType: enquiryType
+      } 
+    });
+  };
+
   const handleAddToCart = (product) => {
     console.log('Add to cart:', product);
     // TODO: Implement add to cart functionality
@@ -168,36 +247,30 @@ const ProductListing = () => {
     </Container>
   );
 
-  const renderAdminImages = () => (
-    <Container className="py-4">
-      <Row>
-        <Col>
-          <h3 style={{
-            fontFamily: 'Century Gothic, sans-serif',
-            fontWeight: '600',
-            color: '#2c3e50',
-            marginBottom: '20px'
-          }}>
-            Featured Images {categoryParam && `(${categoryParam})`}
-          </h3>
+  const renderAdminImages = () => {
+    console.log('🎯 ProductListing renderAdminImages - enquiryType:', location.state?.enquiryType);
+    console.log('🎯 ProductListing renderAdminImages - categoryParam:', categoryParam);
+    
+    return (
+      <Container className="py-3">
+        <Row>
+          <Col>
           <ProductImageGallery
-            category="product"
+            category={location.state?.enquiryType || 'rent'}
             tags={categoryParam ? [categoryParam] : []}
             searchKeyword={searchQuery}
             limit={8}
-            columns={{ xs: 1, sm: 2, md: 3, lg: 4 }}
+            columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}
             showTitle={true}
             showDescription={true}
-            imageHeight="200px"
-            onImageClick={(image) => {
-              console.log('Image clicked:', image);
-              // You can add navigation or modal logic here
-            }}
+            imageHeight="240px"
+            onImageClick={handleImageClick}
           />
         </Col>
       </Row>
     </Container>
-  );
+    );
+  };
 
   const renderProductGrid = () => (
     <Container className="py-3">

@@ -27,6 +27,9 @@ const ProductDetails = () => {
     image: demo1
   };
 
+  // Debug: Log the received product data
+  console.log('🔍 ProductDetails - Received productData:', productData);
+
   // Get enquiry type from navigation state
   const enquiryType = location.state?.enquiryType || 'rent';
 
@@ -35,6 +38,7 @@ const ProductDetails = () => {
     id: productData.id || '507f1f77bcf86cd799439021',
     name: productData.name || 'Premium Black Tuxedo - Italian Fit',
     price: productData.price || 1200,
+    rentalPrice: productData.rentalPrice || productData.price || 1200, // Use rental price from admin
     actualPrice: productData.actualPrice || 13000,
     securityDeposit: productData.securityDeposit || 5000,
     image: productData.image || demo1,
@@ -48,17 +52,22 @@ const ProductDetails = () => {
     style: productData.style || 'Two-Piece (Blazer + Trousers)',
     occasions: productData.occasions || ['Wedding Guest', 'Corporate Events', 'Reception', 'Cocktail Party'],
     inclusions: productData.inclusions || ['Blazer + Trousers', 'Shirt & Tie not included'],
-    care: productData.care || 'Dry Clean Only'
+    care: productData.care || 'Dry Clean Only',
+    sizes: productData.sizes || ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: productData.colors || ['Black']
   };
 
-  const [selectedSize, setSelectedSize] = useState('L');
+  // Debug: Log the final product object
+  console.log('🔍 ProductDetails - Final product object:', product);
+
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'L');
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
 
-  // Available sizes
-  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+  // Available sizes - use admin data or fallback to defaults
+  const sizes = product.sizes || ['S', 'M', 'L', 'XL', 'XXL'];
 
   // Event handlers
   const handleBackClick = () => {
@@ -173,7 +182,7 @@ const ProductDetails = () => {
                   color: '#000'
                 }}
               >
-                ₹{product.price}
+                ₹{enquiryType === 'rent' ? (product.rentalPrice || product.price) : product.price}
               </div>
               <div 
                 className="text-muted text-decoration-line-through"

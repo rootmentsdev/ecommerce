@@ -18,13 +18,14 @@ class FrontendImageService {
   static async getImagesByCategory(category, options = {}) {
     const cacheKey = `category_${category}_${JSON.stringify(options)}`;
     
-    // Check cache first
-    const cached = cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      return cached.data;
-    }
+    // Check cache first - TEMPORARILY DISABLED FOR DEBUGGING
+    // const cached = cache.get(cacheKey);
+    // if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    //   return cached.data;
+    // }
 
     try {
+      console.log('🔍 FrontendImageService.getImagesByCategory - category:', category);
       const params = new URLSearchParams({
         category,
         isActive: 'true',
@@ -55,6 +56,18 @@ class FrontendImageService {
         data: images,
         timestamp: Date.now()
       });
+
+      console.log(`✅ Fetched ${images.length} images for category: ${category}`);
+      console.log('🔍 Fresh images data:', images.map(img => ({
+        id: img._id,
+        title: img.title,
+        price: img.price,
+        rentalPrice: img.rentalPrice,
+        actualPrice: img.actualPrice,
+        fabric: img.fabric,
+        color: img.color,
+        style: img.style
+      })));
 
       return images;
     } catch (error) {
@@ -108,6 +121,18 @@ class FrontendImageService {
         timestamp: Date.now()
       });
 
+      console.log(`✅ Fetched ${images.length} images for category: ${category}`);
+      console.log('🔍 Fresh images data:', images.map(img => ({
+        id: img._id,
+        title: img.title,
+        price: img.price,
+        rentalPrice: img.rentalPrice,
+        actualPrice: img.actualPrice,
+        fabric: img.fabric,
+        color: img.color,
+        style: img.style
+      })));
+
       return images;
     } catch (error) {
       console.error('Frontend image service error:', error);
@@ -146,6 +171,7 @@ class FrontendImageService {
   static async getGalleryImages() {
     return this.getImagesByCategory('gallery', { limit: '100' });
   }
+
 
   /**
    * Get images by tags

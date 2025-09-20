@@ -59,8 +59,8 @@ const imageValidation = [
   body('category')
     .notEmpty()
     .withMessage('Category is required')
-    .isIn(['hero', 'product', 'banner', 'gallery', 'testimonial', 'about'])
-    .withMessage('Category must be one of: hero, product, banner, gallery, testimonial, about'),
+    .isIn(['buy', 'rent', 'featured', 'trending', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'])
+    .withMessage('Category must be one of: buy, rent, featured, trending, product, hero, banner, gallery, testimonial, about'),
     
   body('tags')
     .optional()
@@ -76,6 +76,79 @@ const imageValidation = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Display order must be a non-negative integer'),
+    
+  // SEO field validations
+  body('seoTitle')
+    .optional({ nullable: true }),
+    
+  body('seoDescription')
+    .optional({ nullable: true }),
+    
+  body('focusKeyword')
+    .optional({ nullable: true }),
+    
+  // Product-related field validations - RELAXED FOR DEBUGGING
+  body('price')
+    .optional({ nullable: true })
+    .custom(value => {
+      if (value === '' || value === null || value === undefined) return true;
+      if (isNaN(value)) throw new Error('Price must be a number');
+      return true;
+    }),
+    
+  body('rentalPrice')
+    .optional({ nullable: true })
+    .custom(value => {
+      if (value === '' || value === null || value === undefined) return true;
+      if (isNaN(value)) throw new Error('Rental price must be a number');
+      return true;
+    }),
+    
+  body('actualPrice')
+    .optional({ nullable: true })
+    .custom(value => {
+      if (value === '' || value === null || value === undefined) return true;
+      if (isNaN(value)) throw new Error('Actual price must be a number');
+      return true;
+    }),
+    
+  body('securityDeposit')
+    .optional({ nullable: true })
+    .custom(value => {
+      if (value === '' || value === null || value === undefined) return true;
+      if (isNaN(value)) throw new Error('Security deposit must be a number');
+      return true;
+    }),
+    
+  body('fabric')
+    .optional({ nullable: true }),
+    
+  body('color')
+    .optional({ nullable: true }),
+    
+  body('colors')
+    .optional({ nullable: true }),
+    
+  body('style')
+    .optional({ nullable: true }),
+    
+  body('occasions')
+    .optional({ nullable: true }),
+    
+  body('inclusions')
+    .optional({ nullable: true }),
+    
+  body('care')
+    .optional({ nullable: true }),
+    
+  body('sizes')
+    .optional({ nullable: true }),
+    
+  body('type')
+    .optional({ nullable: true }),
+    
+  body('inStock')
+    .optional({ nullable: true }),
     
   body('metadata.fileSize')
     .optional()
@@ -140,7 +213,7 @@ const queryValidation = [
     
   query('category')
     .optional()
-    .isIn(['all', 'hero', 'product', 'banner', 'gallery', 'testimonial', 'about'])
+    .isIn(['all', 'buy', 'rent', 'featured', 'trending', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'])
     .withMessage('Invalid category filter'),
     
   query('isActive')
@@ -193,6 +266,17 @@ router.get(
   '/categories',
   adminAuth,
   ImageController.getImageCategories
+);
+
+/**
+ * @route   POST /api/images/migrate-categories
+ * @desc    Migrate existing categories to new category system
+ * @access  Admin
+ */
+router.post(
+  '/migrate-categories',
+  adminAuth,
+  ImageController.migrateCategories
 );
 
 /**
