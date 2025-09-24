@@ -175,9 +175,6 @@ const EnquireNow = () => {
     setIsSubmitting(true);
     
     try {
-      // Add 3-second delay to make submission feel more natural
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
       // Prepare enquiry data
       const enquiryData = {
         ...formData,

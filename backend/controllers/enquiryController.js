@@ -13,13 +13,9 @@ class EnquiryController {
    */
   static async createEnquiry(req, res) {
     try {
-      // Debug: Log the received data
-      console.log('Received enquiry data:', req.body);
-      
       // Check for validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        console.log('Validation errors:', errors.array());
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
@@ -54,21 +50,21 @@ class EnquiryController {
         });
       }
 
-      // Create new enquiry
+      // Create new enquiry with minimal processing
       const enquiry = new Enquiry({
-        fullName,
-        mobileNumber,
-        email,
+        fullName: fullName.trim(),
+        mobileNumber: mobileNumber.trim(),
+        email: email.trim().toLowerCase(),
         enquiryType: finalEnquiryType,
         preferredBookingDate: preferredBookingDate ? new Date(preferredBookingDate) : null,
-        selectedSize: selectedSize && selectedSize.trim() !== '' ? selectedSize : null,
+        selectedSize: selectedSize && selectedSize.trim() !== '' ? selectedSize.trim() : null,
         selectedQuantity: selectedQuantity || 1,
         pickupDate: pickupDate ? new Date(pickupDate) : null,
         returnDate: returnDate ? new Date(returnDate) : null,
-        city,
-        specialNotes,
+        city: city.trim(),
+        specialNotes: specialNotes ? specialNotes.trim() : null,
         productId: productId || null,
-        productName: productName || null
+        productName: productName ? productName.trim() : null
       });
 
       await enquiry.save();

@@ -13,11 +13,18 @@ class EnquiryService {
    */
   static async submitEnquiry(enquiryData) {
     try {
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.CREATE), {
         method: 'POST',
         headers: API_CONFIG.DEFAULT_HEADERS,
         body: JSON.stringify(enquiryData),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       const data = await response.json();
       
@@ -33,6 +40,9 @@ class EnquiryService {
       return data;
     } catch (error) {
       console.error('Submit enquiry error:', error);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout. Please try again.');
+      }
       throw error;
     }
   }

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const connectDB = require('./config/database');
 const { swaggerUi, specs } = require('./config/swagger');
 const config = require('./config/config');
@@ -15,6 +16,7 @@ const app = express();
 connectDB();
 
 // Middleware
+app.use(compression()); // Enable gzip compression
 app.use(cors({
   origin: function (origin, callback) {
     // Only log CORS issues, not every request

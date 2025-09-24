@@ -10,7 +10,7 @@ const adminAuth = require('../middleware/adminAuth');
  * All enquiry-related API endpoints following RESTful conventions
  */
 
-// Validation middleware
+// Simplified validation middleware for better performance
 const createEnquiryValidation = [
   body('fullName')
     .trim()
@@ -34,129 +34,16 @@ const createEnquiryValidation = [
     .withMessage('Please enter a valid email address')
     .normalizeEmail(),
   
-  body('enquiryType')
-    .optional()
-    .isIn(['rent', 'buy'])
-    .withMessage('Enquiry type must be either rent or buy'),
-  
-  body('preferredBookingDate')
-    .custom((value, { req }) => {
-      const enquiryType = req.body.enquiryType || 'rent';
-      
-      // Only required for rent enquiries
-      if (enquiryType === 'rent') {
-        if (!value) {
-          throw new Error('Preferred booking date is required for rent enquiries');
-        }
-        const date = new Date(value);
-        if (isNaN(date.getTime())) {
-          throw new Error('Please enter a valid date');
-        }
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (date < today) {
-          throw new Error('Preferred booking date must be in the future');
-        }
-      }
-      return true;
-    }),
-  
-  body('selectedSize')
-    .optional({ nullable: true })
-    .custom((value) => {
-      // If value is empty, null, or undefined, it's valid (optional field)
-      if (!value || value.trim() === '') {
-        return true;
-      }
-      // If value is provided, it must be a valid size
-      if (!['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(value.trim())) {
-        throw new Error('Please select a valid size');
-      }
-      return true;
-    }),
-  
-  body('selectedQuantity')
-    .optional()
-    .isInt({ min: 1 })
-    .withMessage('Quantity must be at least 1'),
-  
-  body('pickupDate')
-    .optional({ nullable: true })
-    .custom((value) => {
-      if (!value) return true; // Optional field
-      const date = new Date(value);
-      if (isNaN(date.getTime())) {
-        throw new Error('Please enter a valid pickup date');
-      }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (date < today) {
-        throw new Error('Pickup date must be in the future');
-      }
-      return true;
-    }),
-  
-  body('returnDate')
-    .optional({ nullable: true })
-    .custom((value) => {
-      if (!value) return true; // Optional field
-      const date = new Date(value);
-      if (isNaN(date.getTime())) {
-        throw new Error('Please enter a valid return date');
-      }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (date < today) {
-        throw new Error('Return date must be in the future');
-      }
-      return true;
-    }),
-  
   body('city')
     .trim()
     .notEmpty()
-    .withMessage('City is required')
-    .isIn([
-      'Thiruvananthapuram',
-      'Kollam',
-      'Pathanamthitta',
-      'Alappuzha',
-      'Kottayam',
-      'Idukki',
-      'Ernakulam',
-      'Thrissur',
-      'Palakkad',
-      'Malappuram',
-      'Kozhikode',
-      'Wayanad',
-      'Kannur',
-      'Kasaragod'
-    ])
-    .withMessage('Please select a valid district'),
+    .withMessage('City is required'),
   
   body('specialNotes')
     .optional()
     .trim()
     .isLength({ max: 500 })
-    .withMessage('Special notes cannot exceed 500 characters'),
-  
-  body('productId')
-    .optional({ nullable: true })
-    .custom((value) => {
-      // If value is not provided, it's valid
-      if (value === undefined || value === null || value === '') {
-        return true;
-      }
-      // If value is provided, validate MongoDB ObjectId format
-      return /^[0-9a-fA-F]{24}$/.test(value);
-    })
-    .withMessage('Invalid product ID format'),
-  
-  body('productName')
-    .optional({ nullable: true })
-    .trim()
-    .isLength({ max: 200 })
-    .withMessage('Product name cannot exceed 200 characters')
+    .withMessage('Special notes cannot exceed 500 characters')
 ];
 
 const updateEnquiryValidation = [

@@ -32,32 +32,12 @@ const enquirySchema = new mongoose.Schema({
   // Booking Information
   preferredBookingDate: {
     type: Date,
-    required: false, // Handle validation in controller instead
-    validate: {
-      validator: function(date) {
-        if (!date) return true; // Allow null values
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set to beginning of day for fair comparison
-        return date >= today;
-      },
-      message: 'Preferred booking date must be in the future'
-    }
+    required: false
   },
   selectedSize: {
     type: String,
-    required: false, // Make optional since product details page doesn't always have sizes
-    trim: true,
-    validate: {
-      validator: function(value) {
-        // Allow empty/null values (optional field)
-        if (!value || value.trim() === '') {
-          return true;
-        }
-        // If value is provided, it must be a valid size
-        return ['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(value);
-      },
-      message: 'Please select a valid size'
-    }
+    required: false,
+    trim: true
   },
   selectedQuantity: {
     type: Number,
@@ -67,29 +47,11 @@ const enquirySchema = new mongoose.Schema({
   },
   pickupDate: {
     type: Date,
-    required: false,
-    validate: {
-      validator: function(date) {
-        if (!date) return true; // Optional field
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date >= today;
-      },
-      message: 'Pickup date must be in the future'
-    }
+    required: false
   },
   returnDate: {
     type: Date,
-    required: false,
-    validate: {
-      validator: function(date) {
-        if (!date) return true; // Optional field
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date >= today;
-      },
-      message: 'Return date must be in the future'
-    }
+    required: false
   },
   city: {
     type: String,
