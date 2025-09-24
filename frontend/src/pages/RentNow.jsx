@@ -380,7 +380,7 @@ const RentNow = () => {
               <div 
                 className="position-absolute"
                 style={{
-                  bottom: '20px',
+                  bottom: '-2px',
                   left: '20px',
                   backgroundColor: 'transparent',
                   padding: '0',
@@ -388,12 +388,13 @@ const RentNow = () => {
                 }}
               >
                  <h2 
-                   className="h3 fw-bold mb-0"
+                   className="h3 fw-bold mb-0 mt-5"
                    style={{
                      fontFamily: 'Century Gothic',
                      fontWeight: 700,
                      fontSize: '2.5rem',
                      color: '#000',
+                  
                      textShadow: '2px 2px 4px rgba(255,255,255,0.8)'
                    }}
                  >
@@ -557,7 +558,7 @@ const RentNow = () => {
         `}
       </style>
       <Header onMenuClick={() => setShowSideMenu(true)} />
-      <SideMenu show={showSideMenu} onHide={() => setShowSideMenu(false)} />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <main className="flex-grow-1">
         <Container fluid className="px-0">

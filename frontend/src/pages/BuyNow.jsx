@@ -412,7 +412,7 @@ const BuyNow = () => {
         `}
       </style>
       <Header onMenuClick={() => setShowSideMenu(true)} />
-      <SideMenu show={showSideMenu} onHide={() => setShowSideMenu(false)} />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <main className="flex-grow-1">
         <Container fluid className="px-0">

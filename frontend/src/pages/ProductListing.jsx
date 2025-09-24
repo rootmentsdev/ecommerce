@@ -302,7 +302,7 @@ const ProductListing = () => {
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header onMenuClick={() => setShowSideMenu(true)} />
-      <SideMenu show={showSideMenu} onHide={() => setShowSideMenu(false)} />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <main className="flex-grow-1">
         {renderPageHeader()}
