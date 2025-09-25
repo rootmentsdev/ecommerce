@@ -23,9 +23,15 @@ const EnquireNow = () => {
   const enquiryType = location.state?.enquiryType || 'rent'; // 'rent' or 'buy'
   
   // Debug: Log the product object and additional data
-  console.log('Product object:', product);
-  console.log('Selected size:', selectedSize);
-  console.log('Selected quantity:', selectedQuantity);
+  console.log('🔍 EnquireNow - Product object:', product);
+  console.log('🔍 EnquireNow - Selected size:', selectedSize);
+  console.log('🔍 EnquireNow - Selected quantity:', selectedQuantity);
+  console.log('🔍 EnquireNow - Enquiry type:', enquiryType);
+  
+  // Validate that we have the necessary product data
+  if (!product || !product.id) {
+    console.warn('⚠️ EnquireNow - Missing product data:', product);
+  }
   
   // Form state
   const [formData, setFormData] = useState({
@@ -160,6 +166,11 @@ const EnquireNow = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('🚀 EnquireNow - Submit button clicked');
+    console.log('🚀 EnquireNow - Product object:', product);
+    console.log('🚀 EnquireNow - Form data:', formData);
+    console.log('🚀 EnquireNow - Enquiry type:', enquiryType);
+    
     // Clear previous errors and messages
     setErrors({});
     setSubmitMessage({ type: '', text: '' });
@@ -168,10 +179,12 @@ const EnquireNow = () => {
     const validation = EnquiryService.validateEnquiryForm(formData, enquiryType);
     
     if (!validation.isValid) {
+      console.log('❌ EnquireNow - Form validation failed:', validation.errors);
       setErrors(validation.errors);
       return;
     }
     
+    console.log('✅ EnquireNow - Form validation passed');
     setIsSubmitting(true);
     
     try {
@@ -186,18 +199,20 @@ const EnquireNow = () => {
         selectedQuantity: formData.selectedQuantity || 1
       };
       
-      // Only add productId if it's a valid MongoDB ObjectId format
-      if (product.id && /^[0-9a-fA-F]{24}$/.test(product.id)) {
+      // Add productId if it exists (relaxed validation for admin-created products)
+      if (product.id && product.id.trim() !== '') {
         enquiryData.productId = product.id;
       }
       
-      // Only add productName if product has a name
-      if (product.name) {
+      // Add productName if product has a name
+      if (product.name && product.name.trim() !== '') {
         enquiryData.productName = product.name;
       }
       
       // Debug: Log the data being sent
-      console.log('Enquiry data being sent:', enquiryData);
+      console.log('📤 EnquireNow - Enquiry data being sent:', enquiryData);
+      console.log('📤 EnquireNow - Product ID:', enquiryData.productId);
+      console.log('📤 EnquireNow - Product Name:', enquiryData.productName);
       
       // Submit enquiry
       const response = await EnquiryService.submitEnquiry(enquiryData);
@@ -218,7 +233,13 @@ const EnquireNow = () => {
         }, 2000);
       }
     } catch (error) {
-      console.error('Submit enquiry error:', error);
+      console.error('❌ EnquireNow - Submit enquiry error:', error);
+      console.error('❌ EnquireNow - Error details:', {
+        message: error.message,
+        product: product,
+        enquiryData: enquiryData
+      });
+      
       setSubmitMessage({
         type: 'danger',
         text: error.message || 'Failed to submit enquiry. Please try again.'

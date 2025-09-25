@@ -12,7 +12,8 @@ const AdminDashboard = () => {
     totalEnquiries: 0,
     newEnquiries: 0,
     contactedCustomers: 0,
-    convertedEnquiries: 0
+    convertedEnquiries: 0,
+    cancelledEnquiries: 0
   });
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,6 +25,8 @@ const AdminDashboard = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [selectedEnquiries, setSelectedEnquiries] = useState([]);
+  const [showBulkActions, setShowBulkActions] = useState(false);
 
   // Check admin authentication
   useEffect(() => {
@@ -78,12 +81,14 @@ const AdminDashboard = () => {
     const newCount = enquiriesData.filter(e => (e.status || 'new') === 'new').length;
     const contactedCount = enquiriesData.filter(e => (e.status || 'new') === 'contacted').length;
     const convertedCount = enquiriesData.filter(e => (e.status || 'new') === 'converted').length;
+    const cancelledCount = enquiriesData.filter(e => (e.status || 'new') === 'cancelled').length;
 
     setDashboardStats({
       totalEnquiries: total,
       newEnquiries: newCount,
       contactedCustomers: contactedCount,
-      convertedEnquiries: convertedCount
+      convertedEnquiries: convertedCount,
+      cancelledEnquiries: cancelledCount
     });
   };
 
@@ -166,6 +171,82 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error updating enquiry:', error);
       alert('Error updating enquiry. Please try again.');
+    }
+  };
+
+  const handleBulkCancel = async () => {
+    if (selectedEnquiries.length === 0) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel ${selectedEnquiries.length} enquiry(ies)? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      const updatePromises = selectedEnquiries.map(enquiryId => 
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.UPDATE(enquiryId)), {
+          method: 'PUT',
+          headers: API_CONFIG.DEFAULT_HEADERS,
+          body: JSON.stringify({ status: 'cancelled' })
+        })
+      );
+
+      const responses = await Promise.all(updatePromises);
+      const results = await Promise.all(responses.map(res => res.json()));
+
+      // Check if all updates were successful
+      const allSuccessful = results.every(result => result.success);
+      
+      if (allSuccessful) {
+        // Update local state
+        setEnquiries(prevEnquiries => 
+          prevEnquiries.map(enquiry => 
+            selectedEnquiries.includes(enquiry._id)
+              ? { ...enquiry, status: 'cancelled' }
+              : enquiry
+          )
+        );
+        
+        // Recalculate stats
+        calculateStats(enquiries);
+        
+        // Clear selection
+        setSelectedEnquiries([]);
+        setShowBulkActions(false);
+        
+        alert(`Successfully cancelled ${selectedEnquiries.length} enquiry(ies).`);
+      } else {
+        alert('Some enquiries could not be cancelled. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error cancelling enquiries:', error);
+      alert('Error cancelling enquiries. Please try again.');
+    }
+  };
+
+  const handleSelectEnquiry = (enquiryId) => {
+    setSelectedEnquiries(prev => {
+      if (prev.includes(enquiryId)) {
+        const newSelection = prev.filter(id => id !== enquiryId);
+        setShowBulkActions(newSelection.length > 0);
+        return newSelection;
+      } else {
+        const newSelection = [...prev, enquiryId];
+        setShowBulkActions(newSelection.length > 0);
+        return newSelection;
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedEnquiries.length === paginatedEnquiries.length) {
+      setSelectedEnquiries([]);
+      setShowBulkActions(false);
+    } else {
+      setSelectedEnquiries(paginatedEnquiries.map(enquiry => enquiry._id));
+      setShowBulkActions(true);
     }
   };
 
@@ -557,6 +638,39 @@ const AdminDashboard = () => {
                     </Card.Body>
                   </Card>
                 </Col>
+
+                <Col xs={12} sm={6} md={3} className="mb-3">
+                  <Card style={{ borderRadius: '8px', border: 'none', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <Card.Body style={{ padding: '20px', position: 'relative' }}>
+                      <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
+                        <ThreeDotsVertical size={16} style={{ color: '#6c757d' }} />
+                      </div>
+                      <h6 style={{ 
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '14px',
+                        color: '#6c757d',
+                        marginBottom: '8px'
+                      }}>
+                        Cancelled Enquiries
+                      </h6>
+                      <h3 style={{ 
+                        fontFamily: 'Playfair Display, serif',
+                        fontWeight: '700',
+                        color: '#2c3e50',
+                        marginBottom: '4px'
+                      }}>
+                        {dashboardStats.cancelledEnquiries}
+                      </h3>
+                      <small style={{ 
+                        fontFamily: 'Inter, sans-serif',
+                        color: '#dc3545',
+                        fontSize: '12px'
+                      }}>
+                        Cancelled by customer/admin
+                      </small>
+                    </Card.Body>
+                  </Card>
+                </Col>
               </Row>
 
               {/* Enquiry Details Section */}
@@ -574,7 +688,7 @@ const AdminDashboard = () => {
                   {/* Filter Buttons */}
                   <div className="d-flex flex-wrap gap-2 mb-3">
                     {/* Status Filters */}
-                    {['All', 'New', 'Contacted', 'Converted'].map((filter) => (
+                    {['All', 'New', 'Contacted', 'Converted', 'Cancelled'].map((filter) => (
                       <Button
                         key={filter}
                         variant={activeFilter === filter ? 'dark' : 'outline-secondary'}
@@ -586,6 +700,11 @@ const AdminDashboard = () => {
                         {filter === 'New' && dashboardStats.newEnquiries > 0 && (
                           <Badge bg="danger" className="ms-1" style={{ fontSize: '10px' }}>
                             {dashboardStats.newEnquiries}
+                          </Badge>
+                        )}
+                        {filter === 'Cancelled' && dashboardStats.cancelledEnquiries > 0 && (
+                          <Badge bg="secondary" className="ms-1" style={{ fontSize: '10px' }}>
+                            {dashboardStats.cancelledEnquiries}
                           </Badge>
                         )}
                       </Button>
@@ -611,6 +730,42 @@ const AdminDashboard = () => {
                       </Button>
                     </div>
                   </div>
+
+                  {/* Bulk Actions Bar */}
+                  {showBulkActions && (
+                    <div className="mb-3 p-3 bg-light rounded" style={{ border: '1px solid #dee2e6' }}>
+                      <Row className="align-items-center">
+                        <Col>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: '500' }}>
+                            {selectedEnquiries.length} enquiry(ies) selected
+                          </span>
+                        </Col>
+                        <Col className="text-end">
+                          <div className="d-flex gap-2">
+                            <Button 
+                              variant="outline-danger" 
+                              size="sm"
+                              onClick={handleBulkCancel}
+                              style={{ borderRadius: '8px' }}
+                            >
+                              Cancel Selected
+                            </Button>
+                            <Button 
+                              variant="outline-secondary" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedEnquiries([]);
+                                setShowBulkActions(false);
+                              }}
+                              style={{ borderRadius: '8px' }}
+                            >
+                              Clear Selection
+                            </Button>
+                          </div>
+                        </Col>
+                      </Row>
+                    </div>
+                  )}
 
                   {/* Search and Actions */}
                   <Row className="mb-3">
@@ -669,6 +824,14 @@ const AdminDashboard = () => {
                     <Table responsive hover>
                       <thead style={{ backgroundColor: '#f8f9fa' }}>
                         <tr>
+                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>
+                            <Form.Check
+                              type="checkbox"
+                              checked={selectedEnquiries.length === paginatedEnquiries.length && paginatedEnquiries.length > 0}
+                              onChange={handleSelectAll}
+                              style={{ margin: 0 }}
+                            />
+                          </th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>DATE</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>TYPE</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>PRODUCT NAME</th>
@@ -683,6 +846,14 @@ const AdminDashboard = () => {
                         {paginatedEnquiries.length > 0 ? (
                           paginatedEnquiries.map((enquiry, index) => (
                             <tr key={enquiry._id || index}>
+                              <td style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px' }}>
+                                <Form.Check
+                                  type="checkbox"
+                                  checked={selectedEnquiries.includes(enquiry._id)}
+                                  onChange={() => handleSelectEnquiry(enquiry._id)}
+                                  style={{ margin: 0 }}
+                                />
+                              </td>
                               <td style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px' }}>
                                 {formatDate(enquiry.createdAt)}
                               </td>
@@ -824,7 +995,7 @@ const AdminDashboard = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="8" className="text-center" style={{ 
+                            <td colSpan="9" className="text-center" style={{ 
                               fontFamily: 'Inter, sans-serif', 
                               fontSize: '14px', 
                               color: '#6c757d',

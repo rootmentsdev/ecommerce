@@ -228,6 +228,9 @@ class EnquiryService {
    * @returns {Object} - Validation result with errors
    */
   static validateEnquiryForm(formData, enquiryType = 'rent') {
+    console.log('🔍 EnquiryService - Validating form data:', formData);
+    console.log('🔍 EnquiryService - Enquiry type:', enquiryType);
+    
     const errors = {};
 
     // Full Name validation
@@ -266,8 +269,11 @@ class EnquiryService {
     }
 
     // Size validation - optional since product details page doesn't always have sizes
-    if (formData.selectedSize && !['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(formData.selectedSize)) {
-      errors.selectedSize = 'Please select a valid size';
+    if (formData.selectedSize) {
+      const normalizedSize = formData.selectedSize.toUpperCase();
+      if (!['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(normalizedSize)) {
+        errors.selectedSize = 'Please select a valid size';
+      }
     }
 
     // Pickup Date validation - only for rent enquiries
@@ -299,6 +305,11 @@ class EnquiryService {
     if (formData.specialNotes && formData.specialNotes.trim().length > 500) {
       errors.specialNotes = 'Special notes cannot exceed 500 characters';
     }
+
+    console.log('🔍 EnquiryService - Validation result:', {
+      isValid: Object.keys(errors).length === 0,
+      errors: errors
+    });
 
     return {
       isValid: Object.keys(errors).length === 0,

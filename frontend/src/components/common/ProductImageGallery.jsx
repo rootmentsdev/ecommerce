@@ -63,6 +63,10 @@ const ProductImageGallery = ({
   };
 
   const handleImageClick = (image) => {
+    console.log('🖼️ ProductImageGallery - Image clicked:', image);
+    const product = convertImageToProduct(image);
+    console.log('🖼️ ProductImageGallery - Converted product:', product);
+    
     if (onImageClick) {
       onImageClick(image);
     }

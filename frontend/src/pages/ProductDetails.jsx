@@ -96,9 +96,21 @@ const ProductDetails = () => {
   };
 
   const handleEnquireNow = () => {
-    console.log('Enquire now clicked');
+    console.log('🔍 ProductDetails - Enquire now clicked');
+    console.log('🔍 ProductDetails - Product data:', product);
+    console.log('🔍 ProductDetails - Selected size:', selectedSize);
+    console.log('🔍 ProductDetails - Selected quantity:', selectedQuantity);
+    
     // Get enquiry type from navigation state
     const enquiryType = location.state?.enquiryType || 'rent';
+    console.log('🔍 ProductDetails - Enquiry type:', enquiryType);
+    
+    // Validate product data before navigation
+    if (!product || !product.id) {
+      console.error('❌ ProductDetails - Missing product data:', product);
+      alert('Product information is missing. Please try again.');
+      return;
+    }
     
     navigate('/enquire', { 
       state: { 
