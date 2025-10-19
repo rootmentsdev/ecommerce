@@ -39,6 +39,60 @@ class ImageService {
   }
 
   /**
+   * Get images by category for public display
+   * @param {string} category - Category to filter by
+   * @returns {Promise<Object>} API response with images
+   */
+  static async getImagesByCategory(category) {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/images/public?category=${category}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch images by category');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get images by category error:', error);
+      throw new Error(error.message || 'Failed to fetch images by category');
+    }
+  }
+
+  /**
+   * Get user's favorite images
+   * @returns {Promise<Object>} API response with favorite images
+   */
+  static async getFavorites() {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/images/favorites`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch favorites');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get favorites error:', error);
+      throw new Error(error.message || 'Failed to fetch favorites');
+    }
+  }
+
+  /**
    * Get single image by ID
    * @param {string} imageId - Image ID
    * @returns {Promise<Object>} API response with image data

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { List, Search, Bag, ArrowClockwise, Lock } from 'react-bootstrap-icons';
+import SEOService from '../services/seoService';
 import Header from '../components/Header';
 import SideMenu from '../components/SideMenu';
 import Footer from '../components/Footer';
@@ -11,6 +12,11 @@ import Aboutus4 from '../assets/Aboutus4.png';
 
 const AboutUs = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
+
+  // Initialize SEO for about page
+  useEffect(() => {
+    SEOService.initializeAboutPageSEO();
+  }, []);
 
   const handleShowSideMenu = () => setShowSideMenu(true);
   const handleCloseSideMenu = () => setShowSideMenu(false);

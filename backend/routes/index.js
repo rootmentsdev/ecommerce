@@ -6,6 +6,7 @@ const router = express.Router();
 const authRoutes = require('./authRoutes');
 const enquiryRoutes = require('./enquiryRoutes');
 const imageRoutes = require('./imageRoutes');
+const newsletterRoutes = require('./newsletterRoutes');
 // const productRoutes = require('./products');
 // const userRoutes = require('./users');
 // const orderRoutes = require('./orders');
@@ -14,6 +15,7 @@ const imageRoutes = require('./imageRoutes');
 router.use('/auth', authRoutes);
 router.use('/enquiries', enquiryRoutes);
 router.use('/images', imageRoutes);
+router.use('/newsletter', newsletterRoutes);
 // router.use('/products', productRoutes);
 // router.use('/users', userRoutes);
 // router.use('/orders', orderRoutes);
@@ -24,15 +26,16 @@ router.get('/', (req, res) => {
     message: 'E-commerce API',
     version: '1.0.0',
     status: 'active',
-    endpoints: {
-      health: '/health',
-      auth: '/api/auth',
-      enquiries: '/api/enquiries',
-      images: '/api/images',
-      products: '/api/products',
-      users: '/api/users',
-      orders: '/api/orders'
-    }
+      endpoints: {
+        health: '/health',
+        auth: '/api/auth',
+        enquiries: '/api/enquiries',
+        images: '/api/images',
+        newsletter: '/api/newsletter',
+        products: '/api/products',
+        users: '/api/users',
+        orders: '/api/orders'
+      }
   });
 });
 

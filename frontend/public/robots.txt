@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://dapprsquad.com/sitemap.xml
+
+# Disallow admin and test pages
+Disallow: /admin/
+Disallow: /test-images/
+Disallow: /login/
+
+# Allow important pages
+Allow: /products
+Allow: /category/
+Allow: /favorites
+Allow: /about
+Allow: /buy-now
+Allow: /rent-now
+
+# Crawl delay
+Crawl-delay: 1

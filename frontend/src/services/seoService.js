@@ -1,331 +1,541 @@
 /**
- * SEO Service
- * Utilities for SEO optimization and analysis
+ * SEO Service - Comprehensive SEO optimization for e-commerce site
+ * Implements modern SEO algorithms and best practices
  */
+
 class SEOService {
+  // SEO Configuration
+  static SITE_CONFIG = {
+    title: 'dappr SQUAD - Premium Men\'s Fashion & Suit Rental',
+    description: 'Premium men\'s fashion for every celebration. Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.',
+    keywords: 'mens fashion, suit rental, wedding suits, party wear, men\'s clothing, formal wear, tuxedo rental, designer suits',
+    url: 'https://dapprsquad.com',
+    logo: '/assets/Logo.png',
+    socialImage: '/assets/HomePage.png'
+  };
+
   /**
-   * Analyze image SEO score
-   * @param {Object} imageData - Image data object
-   * @returns {Object} SEO analysis results
+   * Set page title with SEO optimization
+   * @param {string} title - Page title
+   * @param {string} category - Product category (optional)
    */
-  static analyzeImageSEO(imageData) {
-    const analysis = {
-      score: 0,
-      maxScore: 100,
-      recommendations: [],
-      strengths: [],
-      issues: []
+  static setPageTitle(title, category = '') {
+    const baseTitle = this.SITE_CONFIG.title;
+    const optimizedTitle = category 
+      ? `${title} - ${category} | ${baseTitle}`
+      : `${title} | ${baseTitle}`;
+    
+    document.title = optimizedTitle;
+    
+    // Update meta title
+    this.updateMetaTag('title', optimizedTitle);
+    this.updateMetaTag('og:title', optimizedTitle);
+    this.updateMetaTag('twitter:title', optimizedTitle);
+  }
+
+  /**
+   * Set page description with SEO optimization
+   * @param {string} description - Page description
+   * @param {string} category - Product category (optional)
+   */
+  static setPageDescription(description, category = '') {
+    const baseDescription = this.SITE_CONFIG.description;
+    const optimizedDescription = category 
+      ? `${description} - ${baseDescription}`
+      : `${baseDescription} - ${description}`;
+    
+    // Limit description to 160 characters for SEO
+    const finalDescription = optimizedDescription.length > 160 
+      ? optimizedDescription.substring(0, 157) + '...'
+      : optimizedDescription;
+    
+    this.updateMetaTag('description', finalDescription);
+    this.updateMetaTag('og:description', finalDescription);
+    this.updateMetaTag('twitter:description', finalDescription);
+  }
+
+  /**
+   * Set page keywords
+   * @param {string} keywords - Additional keywords
+   */
+  static setPageKeywords(keywords) {
+    const baseKeywords = this.SITE_CONFIG.keywords;
+    const finalKeywords = keywords 
+      ? `${baseKeywords}, ${keywords}`
+      : baseKeywords;
+    
+    this.updateMetaTag('keywords', finalKeywords);
+  }
+
+  /**
+   * Set canonical URL
+   * @param {string} path - Page path
+   */
+  static setCanonicalUrl(path) {
+    const canonicalUrl = `${this.SITE_CONFIG.url}${path}`;
+    
+    // Remove existing canonical
+    const existingCanonical = document.querySelector('link[rel="canonical"]');
+    if (existingCanonical) {
+      existingCanonical.remove();
+    }
+    
+    // Add new canonical
+    const canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    canonical.href = canonicalUrl;
+    document.head.appendChild(canonical);
+    
+    // Update Open Graph URL
+    this.updateMetaTag('og:url', canonicalUrl);
+  }
+
+  /**
+   * Set page image for social sharing
+   * @param {string} imageUrl - Image URL
+   * @param {string} alt - Image alt text
+   */
+  static setPageImage(imageUrl, alt = '') {
+    const fullImageUrl = imageUrl.startsWith('http') 
+      ? imageUrl 
+      : `${this.SITE_CONFIG.url}${imageUrl}`;
+    
+    this.updateMetaTag('og:image', fullImageUrl);
+    this.updateMetaTag('twitter:image', fullImageUrl);
+    this.updateMetaTag('og:image:alt', alt);
+  }
+
+  /**
+   * Generate structured data for products
+   * @param {Array} products - Array of product objects
+   */
+  static generateProductStructuredData(products) {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Men's Fashion Products",
+      "description": "Premium men's fashion and suit rental collection",
+      "itemListElement": products.map((product, index) => ({
+        "@type": "Product",
+        "position": index + 1,
+        "name": product.name || product.title,
+        "description": product.description || `${product.name || product.title} - Premium men's fashion`,
+        "image": product.image || product.imageUrl,
+        "offers": {
+          "@type": "Offer",
+          "price": product.price || product.rentalPrice,
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock",
+          "url": `${this.SITE_CONFIG.url}/product/${product.id || product._id}`
+        },
+        "brand": {
+          "@type": "Brand",
+          "name": "dappr SQUAD"
+        },
+        "category": product.category || "Fashion"
+      }))
     };
 
-    // Alt text analysis (25 points)
-    if (imageData.altText) {
-      if (imageData.altText.length >= 10 && imageData.altText.length <= 125) {
-        analysis.score += 25;
-        analysis.strengths.push('Alt text length is optimal (10-125 characters)');
-      } else if (imageData.altText.length > 0 && imageData.altText.length < 10) {
-        analysis.score += 10;
-        analysis.issues.push('Alt text is too short (less than 10 characters)');
-        analysis.recommendations.push('Expand alt text to at least 10 characters for better SEO');
-      } else if (imageData.altText.length > 125) {
-        analysis.score += 15;
-        analysis.issues.push('Alt text is too long (over 125 characters)');
-        analysis.recommendations.push('Shorten alt text to under 125 characters');
-      }
-    } else {
-      analysis.issues.push('Missing alt text');
-      analysis.recommendations.push('Add descriptive alt text for accessibility and SEO');
-    }
-
-    // Title analysis (20 points)
-    if (imageData.title) {
-      if (imageData.title.length >= 10 && imageData.title.length <= 60) {
-        analysis.score += 20;
-        analysis.strengths.push('Title length is optimal (10-60 characters)');
-      } else if (imageData.title.length > 0 && imageData.title.length < 10) {
-        analysis.score += 10;
-        analysis.issues.push('Title is too short');
-        analysis.recommendations.push('Expand title to at least 10 characters');
-      } else if (imageData.title.length > 60) {
-        analysis.score += 15;
-        analysis.issues.push('Title is too long');
-        analysis.recommendations.push('Shorten title to under 60 characters');
-      }
-    } else {
-      analysis.issues.push('Missing title');
-      analysis.recommendations.push('Add a descriptive title');
-    }
-
-    // SEO title analysis (15 points)
-    if (imageData.seoTitle) {
-      if (imageData.seoTitle.length >= 10 && imageData.seoTitle.length <= 60) {
-        analysis.score += 15;
-        analysis.strengths.push('SEO title is well-optimized');
-      } else {
-        analysis.score += 8;
-        analysis.recommendations.push('Optimize SEO title length (10-60 characters)');
-      }
-    } else {
-      analysis.recommendations.push('Add SEO title for better search visibility');
-    }
-
-    // SEO description analysis (15 points)
-    if (imageData.seoDescription) {
-      if (imageData.seoDescription.length >= 120 && imageData.seoDescription.length <= 160) {
-        analysis.score += 15;
-        analysis.strengths.push('SEO description is perfectly sized');
-      } else if (imageData.seoDescription.length >= 50) {
-        analysis.score += 10;
-        analysis.recommendations.push('Optimize SEO description to 120-160 characters');
-      } else {
-        analysis.score += 5;
-        analysis.issues.push('SEO description is too short');
-      }
-    } else {
-      analysis.recommendations.push('Add SEO description (120-160 characters)');
-    }
-
-    // Focus keyword analysis (10 points)
-    if (imageData.focusKeyword) {
-      analysis.score += 5;
-      const keyword = imageData.focusKeyword.toLowerCase();
-      const titleMatch = imageData.title?.toLowerCase().includes(keyword);
-      const altMatch = imageData.altText?.toLowerCase().includes(keyword);
-      
-      if (titleMatch || altMatch) {
-        analysis.score += 5;
-        analysis.strengths.push('Focus keyword appears in title or alt text');
-      } else {
-        analysis.recommendations.push('Include focus keyword in title or alt text');
-      }
-    } else {
-      analysis.recommendations.push('Add focus keyword for targeted SEO');
-    }
-
-    // Format analysis (10 points)
-    const format = imageData.metadata?.format || 'unknown';
-    if (format === 'webp') {
-      analysis.score += 10;
-      analysis.strengths.push('Using WebP format for optimal performance');
-    } else if (['jpg', 'jpeg', 'png'].includes(format)) {
-      analysis.score += 5;
-      analysis.recommendations.push('Convert to WebP format for better performance');
-    } else {
-      analysis.recommendations.push('Use WebP format for optimal SEO and performance');
-    }
-
-    // Optimization analysis (5 points)
-    if (imageData.metadata?.isOptimized) {
-      analysis.score += 5;
-      analysis.strengths.push('Image is optimized for web');
-    } else {
-      analysis.recommendations.push('Optimize image for faster loading');
-    }
-
-    // File size analysis
-    if (imageData.metadata?.fileSize) {
-      const sizeInKB = imageData.metadata.fileSize / 1024;
-      if (sizeInKB < 100) {
-        analysis.strengths.push('Excellent file size (under 100KB)');
-      } else if (sizeInKB < 500) {
-        analysis.strengths.push('Good file size (under 500KB)');
-      } else {
-        analysis.issues.push('Large file size may affect page speed');
-        analysis.recommendations.push('Consider further compression');
-      }
-    }
-
-    // Dimension analysis
-    if (imageData.metadata?.dimensions) {
-      const { width, height } = imageData.metadata.dimensions;
-      if (width >= 800 && height >= 600) {
-        analysis.strengths.push('Good image dimensions for web display');
-      } else {
-        analysis.recommendations.push('Consider higher resolution (min 800x600px)');
-      }
-    }
-
-    return analysis;
+    this.addStructuredData(structuredData);
   }
 
   /**
-   * Generate SEO-friendly alt text
+   * Generate structured data for organization
+   */
+  static generateOrganizationStructuredData() {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "dappr SQUAD",
+      "url": this.SITE_CONFIG.url,
+      "logo": `${this.SITE_CONFIG.url}${this.SITE_CONFIG.logo}`,
+      "description": this.SITE_CONFIG.description,
+      "foundingDate": "2024",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "availableLanguage": "English"
+      },
+      "sameAs": [
+        "https://www.facebook.com/dapprsquad",
+        "https://www.instagram.com/dapprsquad",
+        "https://www.twitter.com/dapprsquad"
+      ]
+    };
+
+    this.addStructuredData(structuredData);
+  }
+
+  /**
+   * Generate breadcrumb structured data
+   * @param {Array} breadcrumbs - Array of breadcrumb objects
+   */
+  static generateBreadcrumbStructuredData(breadcrumbs) {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": breadcrumbs.map((breadcrumb, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": breadcrumb.name,
+        "item": `${this.SITE_CONFIG.url}${breadcrumb.url}`
+      }))
+    };
+
+    this.addStructuredData(structuredData);
+  }
+
+  /**
+   * Add structured data to page
+   * @param {Object} data - Structured data object
+   */
+  static addStructuredData(data) {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(data);
+    document.head.appendChild(script);
+  }
+
+  /**
+   * Update meta tag
+   * @param {string} name - Meta tag name
+   * @param {string} content - Meta tag content
+   */
+  static updateMetaTag(name, content) {
+    let meta = document.querySelector(`meta[name="${name}"]`) || 
+               document.querySelector(`meta[property="${name}"]`);
+    
+    if (!meta) {
+      meta = document.createElement('meta');
+      if (name.startsWith('og:') || name.startsWith('twitter:')) {
+        meta.setAttribute('property', name);
+      } else {
+        meta.setAttribute('name', name);
+      }
+      document.head.appendChild(meta);
+    }
+    
+    meta.setAttribute('content', content);
+  }
+
+  /**
+   * Initialize SEO for homepage
+   */
+  static initializeHomepageSEO() {
+    this.setPageTitle('Buy Men\'s Suits in Kerala - dappr SQUAD Formalwear');
+    this.setPageDescription('Shop premium men\'s suits in Kerala at dappr SQUAD. Explore formal, wedding, and office wear suits with free delivery across Kerala. Elevate your style today!');
+    this.setPageKeywords('mens suits kerala, buy suits kochi, wedding suits kerala, formal wear kerala, designer suits kochi, mens fashion kerala, suit rental kerala, premium suits india');
+    this.setCanonicalUrl('/');
+    this.setPageImage('/assets/HomePage.png', 'Buy Men\'s Suits in Kerala - dappr SQUAD');
+    
+    // Add additional meta tags for better SEO
+    this.updateMetaTag('author', 'dappr SQUAD');
+    this.updateMetaTag('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+    this.updateMetaTag('googlebot', 'index, follow');
+    this.updateMetaTag('bingbot', 'index, follow');
+    
+    // Add language and locale
+    this.updateMetaTag('language', 'en');
+    this.updateMetaTag('geo.region', 'IN-KL');
+    this.updateMetaTag('geo.placename', 'Kerala');
+    this.updateMetaTag('geo.position', '9.9312;76.2673');
+    
+    // Add business hours and contact info
+    this.updateMetaTag('business:contact_data:street_address', 'Kochi, Kerala');
+    this.updateMetaTag('business:contact_data:locality', 'Kochi');
+    this.updateMetaTag('business:contact_data:region', 'Kerala');
+    this.updateMetaTag('business:contact_data:country_name', 'India');
+    
+    this.generateOrganizationStructuredData();
+  }
+
+  /**
+   * Initialize SEO for product page
+   * @param {Object} product - Product object
+   */
+  static initializeProductSEO(product) {
+    const productName = product.name || product.title || 'Premium Suit';
+    const category = product.category || 'formal wear';
+    const title = `${productName} - ${category} Kerala | dappr SQUAD`;
+    const description = `Buy ${productName} in Kerala. Premium ${category} from dappr SQUAD with free delivery. Perfect for weddings and special occasions. Shop now!`;
+    
+    this.setPageTitle(title);
+    this.setPageDescription(description);
+    this.setPageKeywords(`${productName}, ${category}, mens suits kerala, buy suits kochi, formal wear kerala`);
+    this.setCanonicalUrl(`/product/${product.id || product._id}`);
+    this.setPageImage(product.image || product.imageUrl, productName);
+  }
+
+  /**
+   * Initialize SEO for category page
+   * @param {string} category - Category name
+   */
+  static initializeCategorySEO(category) {
+    const title = `${category} Suits for Men in Kerala - dappr SQUAD`;
+    const description = `Shop ${category.toLowerCase()} suits for men in Kerala at dappr SQUAD. Premium quality with free delivery. Perfect for weddings and special occasions.`;
+    
+    this.setPageTitle(title);
+    this.setPageDescription(description);
+    this.setPageKeywords(`${category}, mens suits kerala, ${category.toLowerCase()} suits kochi, formal wear kerala, wedding suits kerala`);
+    this.setCanonicalUrl(`/category/${category.toLowerCase()}`);
+    this.setPageImage('/assets/CategoryPage.png', `${category} Suits Kerala`);
+  }
+
+  /**
+   * Initialize SEO for rent page
+   */
+  static initializeRentPageSEO() {
+    this.setPageTitle('Rent Men\'s Suits in Kerala - dappr SQUAD');
+    this.setPageDescription('Rent premium men\'s suits in Kerala at dappr SQUAD. Affordable formal wear for weddings, parties, and special occasions. Free delivery across Kerala.');
+    this.setPageKeywords('rent suits kerala, suit rental kochi, wedding suit rental kerala, formal wear rental kerala, mens suit rental india');
+    this.setCanonicalUrl('/rent-now');
+    this.setPageImage('/assets/Rent.png', 'Rent Men\'s Suits Kerala');
+  }
+
+  /**
+   * Initialize SEO for buy page
+   */
+  static initializeBuyPageSEO() {
+    this.setPageTitle('Buy Men\'s Suits Online Kerala - dappr SQUAD');
+    this.setPageDescription('Buy premium men\'s suits online in Kerala at dappr SQUAD. Designer formal wear with free delivery. Perfect for weddings and special occasions.');
+    this.setPageKeywords('buy suits kerala, mens suits online kochi, wedding suits kerala, designer suits kerala, formal wear online india');
+    this.setCanonicalUrl('/buy-now');
+    this.setPageImage('/assets/Product1.png', 'Buy Men\'s Suits Kerala');
+  }
+
+  /**
+   * Initialize SEO for about page
+   */
+  static initializeAboutPageSEO() {
+    this.setPageTitle('About dappr SQUAD - Kerala\'s Premium Men\'s Fashion');
+    this.setPageDescription('Learn about dappr SQUAD, Kerala\'s premier men\'s fashion brand. Premium suits, formal wear, and wedding attire with exceptional service.');
+    this.setPageKeywords('about dappr squad, mens fashion brand kerala, premium suits kochi, wedding attire kerala, formal wear brand india');
+    this.setCanonicalUrl('/about');
+    this.setPageImage('/assets/Aboutus1.png', 'About dappr SQUAD Kerala');
+  }
+
+  /**
+   * Optimize images for SEO
+   * @param {string} src - Image source
+   * @param {string} alt - Alt text
    * @param {string} title - Image title
-   * @param {string} category - Image category
-   * @param {string} focusKeyword - Focus keyword
-   * @returns {string} Generated alt text
    */
-  static generateAltText(title, category, focusKeyword) {
-    const parts = [];
-    
-    if (focusKeyword) {
-      parts.push(focusKeyword);
-    }
-    
-    if (title && !parts.includes(title.toLowerCase())) {
-      parts.push(title);
-    }
-    
-    if (category && category !== 'product') {
-      parts.push(category);
-    }
-    
-    parts.push('image');
-    
-    return parts.join(' - ').substring(0, 125);
-  }
-
-  /**
-   * Generate SEO-friendly filename
-   * @param {string} title - Image title
-   * @param {string} focusKeyword - Focus keyword
-   * @returns {string} SEO-friendly filename
-   */
-  static generateSEOFilename(title, focusKeyword) {
-    const text = focusKeyword || title || 'image';
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '')
-      .replace(/\s+/g, '-')
-      .substring(0, 50) + '.webp';
-  }
-
-  /**
-   * Validate SEO fields
-   * @param {Object} data - Form data to validate
-   * @returns {Object} Validation results
-   */
-  static validateSEOFields(data) {
-    const errors = {};
-
-    // Alt text validation
-    if (!data.altText || data.altText.length < 10) {
-      errors.altText = 'Alt text must be at least 10 characters for good SEO';
-    } else if (data.altText.length > 125) {
-      errors.altText = 'Alt text should be under 125 characters';
-    }
-
-    // SEO title validation
-    if (data.seoTitle && data.seoTitle.length > 60) {
-      errors.seoTitle = 'SEO title should be under 60 characters';
-    }
-
-    // SEO description validation
-    if (data.seoDescription) {
-      if (data.seoDescription.length > 160) {
-        errors.seoDescription = 'SEO description should be under 160 characters';
-      } else if (data.seoDescription.length < 120) {
-        errors.seoDescription = 'SEO description should be at least 120 characters for best results';
-      }
-    }
-
-    // Focus keyword validation
-    if (data.focusKeyword && data.focusKeyword.length > 50) {
-      errors.focusKeyword = 'Focus keyword should be under 50 characters';
-    }
-
+  static optimizeImage(src, alt, title = '') {
     return {
-      isValid: Object.keys(errors).length === 0,
-      errors
+      src,
+      alt: alt || 'dappr SQUAD - Premium Men\'s Fashion',
+      title: title || alt,
+      loading: 'lazy',
+      decoding: 'async'
     };
   }
 
   /**
-   * Get SEO recommendations based on image data
-   * @param {Object} imageData - Image data
-   * @returns {Array} Array of recommendation objects
+   * Generate sitemap data
+   * @param {Array} routes - Array of route objects
    */
-  static getSEORecommendations(imageData) {
-    const recommendations = [];
+  static generateSitemapData(routes) {
+    const sitemapData = routes.map(route => ({
+      url: `${this.SITE_CONFIG.url}${route.path}`,
+      lastmod: new Date().toISOString().split('T')[0],
+      changefreq: route.changefreq || 'weekly',
+      priority: route.priority || '0.8'
+    }));
 
-    // Critical issues (high priority)
-    if (!imageData.altText) {
-      recommendations.push({
-        type: 'critical',
-        title: 'Missing Alt Text',
-        description: 'Alt text is required for accessibility and SEO',
-        action: 'Add descriptive alt text'
-      });
-    }
-
-    if (imageData.metadata?.format !== 'webp') {
-      recommendations.push({
-        type: 'high',
-        title: 'Format Optimization',
-        description: 'WebP format provides better compression and SEO benefits',
-        action: 'Convert to WebP format'
-      });
-    }
-
-    // Medium priority
-    if (!imageData.seoTitle) {
-      recommendations.push({
-        type: 'medium',
-        title: 'SEO Title Missing',
-        description: 'SEO title helps with search engine visibility',
-        action: 'Add SEO-optimized title'
-      });
-    }
-
-    if (!imageData.focusKeyword) {
-      recommendations.push({
-        type: 'medium',
-        title: 'Focus Keyword',
-        description: 'Target specific search terms with a focus keyword',
-        action: 'Add relevant focus keyword'
-      });
-    }
-
-    // Low priority
-    if (!imageData.seoDescription) {
-      recommendations.push({
-        type: 'low',
-        title: 'SEO Description',
-        description: 'Meta description can improve click-through rates',
-        action: 'Add 120-160 character description'
-      });
-    }
-
-    return recommendations;
+    return sitemapData;
   }
 
   /**
-   * Calculate page speed impact
-   * @param {Object} imageData - Image data
-   * @returns {Object} Performance analysis
+   * Add performance optimization meta tags
    */
-  static analyzePerformanceImpact(imageData) {
-    const analysis = {
-      score: 'good',
-      issues: [],
-      recommendations: []
+  static addPerformanceMetaTags() {
+    // Preconnect to external domains
+    const preconnectDomains = [
+      'https://fonts.googleapis.com',
+      'https://fonts.gstatic.com'
+    ];
+
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      document.head.appendChild(link);
+    });
+
+    // Add viewport meta tag for mobile optimization
+    this.updateMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+    
+    // Add theme color for mobile browsers
+    this.updateMetaTag('theme-color', '#000000');
+    
+    // Add apple mobile web app meta tags
+    this.updateMetaTag('apple-mobile-web-app-capable', 'yes');
+    this.updateMetaTag('apple-mobile-web-app-status-bar-style', 'black-translucent');
+    this.updateMetaTag('apple-mobile-web-app-title', 'dappr SQUAD');
+  }
+
+  /**
+   * Generate FAQ structured data
+   * @param {Array} faqs - Array of FAQ objects
+   */
+  static generateFAQStructuredData(faqs) {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
     };
 
-    const fileSize = imageData.metadata?.fileSize || 0;
-    const format = imageData.metadata?.format;
+    this.addStructuredData(structuredData);
+  }
 
-    // File size impact
-    if (fileSize > 1000000) { // 1MB
-      analysis.score = 'poor';
-      analysis.issues.push('Large file size (>1MB) will significantly slow page loading');
-      analysis.recommendations.push('Compress image or reduce dimensions');
-    } else if (fileSize > 500000) { // 500KB
-      analysis.score = 'fair';
-      analysis.issues.push('File size could be optimized for better performance');
-      analysis.recommendations.push('Consider further compression');
+  /**
+   * Generate Local Business structured data
+   */
+  static generateLocalBusinessStructuredData() {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "dappr SQUAD",
+      "description": this.SITE_CONFIG.description,
+      "url": this.SITE_CONFIG.url,
+      "telephone": "+91-XXXXXXXXXX",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN",
+        "addressRegion": "Kerala",
+        "addressLocality": "Kochi"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "9.9312",
+        "longitude": "76.2673"
+      },
+      "openingHours": "Mo-Su 09:00-21:00",
+      "priceRange": "₹₹",
+      "paymentAccepted": "Cash, Credit Card, UPI, Net Banking",
+      "currenciesAccepted": "INR"
+    };
+
+    this.addStructuredData(structuredData);
+  }
+
+  /**
+   * Add schema markup for breadcrumbs
+   * @param {Array} breadcrumbs - Breadcrumb items
+   */
+  static addBreadcrumbSchema(breadcrumbs) {
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": breadcrumbs.map((item, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": item.name,
+        "item": `${this.SITE_CONFIG.url}${item.url}`
+      }))
+    };
+
+    this.addStructuredData(breadcrumbSchema);
+  }
+
+  /**
+   * Optimize page loading with critical resource hints
+   */
+  static addCriticalResourceHints() {
+    // DNS prefetch for external resources
+    const dnsPrefetchDomains = [
+      'https://fonts.googleapis.com',
+      'https://fonts.gstatic.com'
+    ];
+
+    dnsPrefetchDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'dns-prefetch';
+      link.href = domain;
+      document.head.appendChild(link);
+    });
+  }
+
+  /**
+   * Generate review structured data
+   * @param {Array} reviews - Array of review objects
+   */
+  static generateReviewStructuredData(reviews) {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "dappr SQUAD",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.4",
+        "reviewCount": reviews.length,
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "review": reviews.map(review => ({
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": review.rating,
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "author": {
+          "@type": "Person",
+          "name": review.name
+        },
+        "reviewBody": review.text,
+        "datePublished": review.date || new Date().toISOString().split('T')[0]
+      }))
+    };
+
+    this.addStructuredData(structuredData);
+  }
+
+  /**
+   * Initialize comprehensive SEO
+   * @param {Object} options - SEO options
+   */
+  static initializeSEO(options = {}) {
+    const {
+      title,
+      description,
+      keywords,
+      category,
+      image,
+      breadcrumbs,
+      products,
+      type = 'website'
+    } = options;
+
+    // Set basic meta tags
+    if (title) this.setPageTitle(title, category);
+    if (description) this.setPageDescription(description, category);
+    if (keywords) this.setPageKeywords(keywords);
+    if (image) this.setPageImage(image);
+
+    // Add performance optimizations
+    this.addPerformanceMetaTags();
+
+    // Generate structured data
+    if (products && products.length > 0) {
+      this.generateProductStructuredData(products);
     }
 
-    // Format impact
-    if (format !== 'webp') {
-      analysis.recommendations.push('Use WebP format for up to 30% smaller file sizes');
+    if (breadcrumbs && breadcrumbs.length > 0) {
+      this.generateBreadcrumbStructuredData(breadcrumbs);
     }
 
-    // Dimension impact
-    const width = imageData.metadata?.dimensions?.width;
-    if (width > 1920) {
-      analysis.recommendations.push('Consider reducing width to 1920px max for web display');
-    }
-
-    return analysis;
+    // Set Open Graph type
+    this.updateMetaTag('og:type', type);
+    this.updateMetaTag('twitter:card', 'summary_large_image');
   }
 }
 

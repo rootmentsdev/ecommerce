@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form, Card, Nav, Tab, Modal } from 'react-bootstrap';
 import { ArrowLeft, Heart, Share, ChevronDown, GeoAlt } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
+import SEOService from '../services/seoService';
 
 // Import images
 import demo1 from '../assets/demo1.png';
@@ -18,6 +19,16 @@ import { APP_CONFIG } from '../constants';
 const ProductDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Initialize SEO for product page
+  useEffect(() => {
+    const productData = location.state?.product || {
+      name: 'Premium Suit',
+      category: 'formal wear',
+      image: demo1
+    };
+    SEOService.initializeProductSEO(productData);
+  }, [location.state]);
   
   // Get product data from navigation state with fallback defaults
   const productData = location.state?.product || {

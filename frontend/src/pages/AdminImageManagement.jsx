@@ -77,6 +77,7 @@ const AdminImageManagement = () => {
     seoDescription: '',
     focusKeyword: '',
     category: 'rent',
+    categories: ['rent'], // New field for multiple categories
     tags: '',
     isActive: true,
     displayOrder: 0,
@@ -113,7 +114,13 @@ const AdminImageManagement = () => {
     { value: 'buy', label: '🛒 Buy - Purchase Products' },
     { value: 'rent', label: '🔄 Rent - Rental Products' },
     { value: 'featured', label: '⭐ Featured - Featured Products' },
-    { value: 'trending', label: '📈 Trending - Trending Products' }
+    { value: 'trending', label: '📈 Trending - Trending Products' },
+    { value: 'topCategories', label: '🏷️ Top Categories - Category Showcase' },
+    { value: 'suits', label: '👔 Suits - Formal Suits Collection' },
+    { value: 'kurtas', label: '👕 Kurtas - Traditional Kurtas Collection' },
+    { value: 'bandhgalas', label: '🎩 Bandhgalas - Bandhgala Collection' },
+    { value: 'formal', label: '👨‍💼 Formal Wear - Business Formal Collection' },
+    { value: 'traditional', label: '🏛️ Traditional - Traditional Wear Collection' }
   ];
 
   // Load images on component mount and when filters change
@@ -192,6 +199,46 @@ const AdminImageManagement = () => {
   };
 
   /**
+   * Handle category selection (multi-select with proper primary category management)
+   */
+  const handleCategoryChange = (categoryValue, isChecked) => {
+    setFormData(prev => {
+      let newCategories;
+      if (isChecked) {
+        // Add category if not already present
+        newCategories = prev.categories.includes(categoryValue) 
+          ? prev.categories 
+          : [...prev.categories, categoryValue];
+      } else {
+        // Remove category
+        newCategories = prev.categories.filter(cat => cat !== categoryValue);
+      }
+      
+      // Ensure at least one category is selected
+      if (newCategories.length === 0) {
+        newCategories = ['rent']; // Default to rent
+      }
+      
+      // Set primary category to the first selected category
+      const primaryCategory = newCategories[0];
+      
+      return {
+        ...prev,
+        categories: newCategories,
+        category: primaryCategory // Primary category for backend filtering
+      };
+    });
+    
+    // Clear category error when user makes selection
+    if (formErrors.categories) {
+      setFormErrors(prev => ({
+        ...prev,
+        categories: ''
+      }));
+    }
+  };
+
+  /**
    * Validate form data
    */
   const validateForm = () => {
@@ -229,6 +276,10 @@ const AdminImageManagement = () => {
 
     if (!formData.category) {
       errors.category = 'Category is required';
+    }
+
+    if (!formData.categories || formData.categories.length === 0) {
+      errors.categories = 'At least one category must be selected';
     }
 
     // SEO field validation
@@ -337,7 +388,9 @@ const AdminImageManagement = () => {
         // Ensure SEO fields are properly formatted
         seoTitle: formData.seoTitle?.trim() || undefined,
         seoDescription: formData.seoDescription?.trim() || undefined,
-        focusKeyword: formData.focusKeyword?.trim()?.toLowerCase() || undefined
+        focusKeyword: formData.focusKeyword?.trim()?.toLowerCase() || undefined,
+        // Include categories array for multi-select
+        categories: formData.categories || [formData.category]
       };
 
       // Only include metadata if we have actual metadata to send
@@ -502,6 +555,7 @@ const AdminImageManagement = () => {
       seoDescription: '',
       focusKeyword: '',
       category: 'rent',
+      categories: ['rent'],
       tags: '',
       isActive: true,
       displayOrder: 0,
@@ -547,6 +601,7 @@ const AdminImageManagement = () => {
       seoDescription: image.seoDescription || '',
       focusKeyword: image.focusKeyword || '',
       category: image.category,
+      categories: image.categories || [image.category],
       tags: image.tags ? image.tags.join(', ') : '',
       isActive: image.isActive,
       displayOrder: image.displayOrder || 0,
@@ -606,6 +661,7 @@ const AdminImageManagement = () => {
       seoDescription: '',
       focusKeyword: '',
       category: 'rent',
+      categories: ['rent'],
       tags: '',
       isActive: true,
       displayOrder: 0,
@@ -1277,24 +1333,34 @@ const AdminImageManagement = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
-                    Category *
+                    Categories *
                   </Form.Label>
-                  <Form.Select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    isInvalid={!!formErrors.category}
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
-                  >
+                  <div style={{ 
+                    border: '1px solid #ced4da', 
+                    borderRadius: '0.375rem', 
+                    padding: '0.5rem',
+                    backgroundColor: '#fff',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}>
                     {categories.map(cat => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
+                      <Form.Check
+                        key={cat.value}
+                        type="checkbox"
+                        id={`category-create-${cat.value}`}
+                        label={cat.label}
+                        checked={formData.categories.includes(cat.value)}
+                        onChange={(e) => handleCategoryChange(cat.value, e.target.checked)}
+                        style={{ fontFamily: 'Poppins, sans-serif', marginBottom: '0.25rem' }}
+                      />
                     ))}
-                  </Form.Select>
+                  </div>
                   <Form.Control.Feedback type="invalid">
-                    {formErrors.category}
+                    {formErrors.categories}
                   </Form.Control.Feedback>
+                  <Form.Text className="text-muted">
+                    Select one or more categories where this image should appear
+                  </Form.Text>
                 </Form.Group>
               </Col>
             </Row>
@@ -1731,24 +1797,34 @@ const AdminImageManagement = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
-                    Category *
+                    Categories *
                   </Form.Label>
-                  <Form.Select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    isInvalid={!!formErrors.category}
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
-                  >
+                  <div style={{ 
+                    border: '1px solid #ced4da', 
+                    borderRadius: '0.375rem', 
+                    padding: '0.5rem',
+                    backgroundColor: '#fff',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}>
                     {categories.map(cat => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
+                      <Form.Check
+                        key={cat.value}
+                        type="checkbox"
+                        id={`category-create-${cat.value}`}
+                        label={cat.label}
+                        checked={formData.categories.includes(cat.value)}
+                        onChange={(e) => handleCategoryChange(cat.value, e.target.checked)}
+                        style={{ fontFamily: 'Poppins, sans-serif', marginBottom: '0.25rem' }}
+                      />
                     ))}
-                  </Form.Select>
+                  </div>
                   <Form.Control.Feedback type="invalid">
-                    {formErrors.category}
+                    {formErrors.categories}
                   </Form.Control.Feedback>
+                  <Form.Text className="text-muted">
+                    Select one or more categories where this image should appear
+                  </Form.Text>
                 </Form.Group>
               </Col>
             </Row>

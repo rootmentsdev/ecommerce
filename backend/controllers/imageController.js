@@ -25,20 +25,26 @@ class ImageController {
 
       // Build filter object - only active images for public
       const filter = { isActive: true };
+      const orConditions = [];
       
       if (category && category !== 'all') {
         console.log('🎯 Backend getPublicImages filtering by category:', category);
+        // Filter by primary category to prevent duplication
+        // Products will appear in the section matching their primary category
         filter.category = category;
       }
       
-      
       if (search && search.trim()) {
-        filter.$or = [
+        orConditions.push(
           { title: { $regex: search.trim(), $options: 'i' } },
           { description: { $regex: search.trim(), $options: 'i' } },
           { altText: { $regex: search.trim(), $options: 'i' } },
           { tags: { $in: [new RegExp(search.trim(), 'i')] } }
-        ];
+        );
+      }
+
+      if (orConditions.length > 0) {
+        filter.$or = orConditions;
       }
 
       if (tags && tags.trim()) {

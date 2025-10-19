@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Carousel, Card, Image } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { Search, Cart, Truck, ArrowClockwise, ChevronRight } from 'react-bootstrap-icons';
+import { Search, Cart, Truck, ArrowClockwise, ChevronRight, Heart, HeartFill } from 'react-bootstrap-icons';
 
 // Import images
-import Home1 from '../assets/Home1.png';
-import Home2 from '../assets/Home2.png';
-import Home3 from '../assets/Home3.png';
+import Home from '../assets/Home.jpg';
+import Home1 from '../assets/Home1.jpg';
+import Home2 from '../assets/Home2.jpg';
+import Home3 from '../assets/Home3.jpg';
 import Aboutus4 from '../assets/Aboutus4.png';
-import Who from '../assets/Who.png';
-import How from '../assets/How.png';
-import What from '../assets/What.png';
 import Product1 from '../assets/Product1.png';
 import Product2 from '../assets/Product2.png';
 import Product3 from '../assets/Product3.png';
@@ -24,9 +22,26 @@ import HorizontalScroll from './common/HorizontalScroll';
 
 // Import constants and utilities
 import { APP_CONFIG } from '../constants';
+import { PRODUCTS_DATA } from '../data/products';
+import ImageService from '../services/imageService';
+import FavoritesService from '../services/favoritesService';
+import SEOService from '../services/seoService';
+import NewsletterService from '../services/newsletterService';
 
 const HomePageContent = () => {
   const navigate = useNavigate();
+
+  // State for admin images
+  const [topCategoriesImages, setTopCategoriesImages] = useState([]);
+  const [featuredImages, setFeaturedImages] = useState([]);
+  const [trendingImages, setTrendingImages] = useState([]);
+  const [loadingImages, setLoadingImages] = useState(true);
+  const [adminImageFavorites, setAdminImageFavorites] = useState(new Set());
+
+  // State for e-commerce features
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
 
   // Data constants following clean code principles
   const FEATURES = [
@@ -34,6 +49,42 @@ const HomePageContent = () => {
     { icon: Cart, title: 'Choose Rentals' },
     { icon: Truck, title: 'Book With Deposit' },
     { icon: ArrowClockwise, title: 'Return & Refund' }
+  ];
+
+  // E-commerce data
+  const TESTIMONIALS = [
+    {
+      id: 1,
+      name: 'Rajesh Kumar',
+      location: 'Mumbai',
+      rating: 5,
+      text: 'Perfect fit and excellent quality. Made my wedding day even more special!',
+      image: 'https://via.placeholder.com/80x80/8B4513/FFFFFF?text=RK'
+    },
+    {
+      id: 2,
+      name: 'Amit Singh',
+      location: 'Delhi',
+      rating: 5,
+      text: 'Great service and fast delivery. The suit was exactly as shown in the picture.',
+      image: 'https://via.placeholder.com/80x80/8B4513/FFFFFF?text=AS'
+    },
+    {
+      id: 3,
+      name: 'Vikram Patel',
+      location: 'Bangalore',
+      rating: 5,
+      text: 'Professional service and premium quality. Highly recommended for special occasions.',
+      image: 'https://via.placeholder.com/80x80/8B4513/FFFFFF?text=VP'
+    }
+  ];
+
+
+  const STATS = [
+    { number: '500+', label: 'Happy Customers' },
+    { number: '1000+', label: 'Suits Delivered' },
+    { number: '15+', label: 'Cities Covered' },
+    { number: '99%', label: 'Customer Satisfaction' }
   ];
 
   const TOP_CATEGORIES = [
@@ -44,33 +95,91 @@ const HomePageContent = () => {
     { id: 5, name: 'Traditional', image: Product5, category: 'traditional' }
   ];
 
-  const SERVICES = [
-    { 
-      icon: '👕', 
-      title: 'Buy & Rent Option', 
-      description: 'Own it forever or wear it for the moment.' 
-    },
-    { 
-      icon: '🎨', 
-      title: 'Theme Setting', 
-      description: 'Coordinated looks for your big day.' 
-    },
-    { 
-      icon: '✂️', 
-      title: 'Dress Code Consultation', 
-      description: 'Professional styling services.' 
-    },
-    { 
-      icon: '📏', 
-      title: 'Size Customization', 
-      description: 'Outfits tailored just for you.' 
-    },
-    { 
-      icon: '⚙️', 
-      title: 'Product Customization', 
-      description: 'Personalized looks for unique events.' 
-    }
-  ];
+  // Featured products - showcasing best products from each category
+  const FEATURED_PRODUCTS = [
+    PRODUCTS_DATA.find(p => p.id === 1), // Classic Navy Suit
+    PRODUCTS_DATA.find(p => p.id === 4), // Traditional White Kurta
+    PRODUCTS_DATA.find(p => p.id === 7), // Classic Bandhgala
+    PRODUCTS_DATA.find(p => p.id === 10), // Business Blazer
+    PRODUCTS_DATA.find(p => p.id === 13), // Sherwani Set
+    PRODUCTS_DATA.find(p => p.id === 2), // Charcoal Business Suit
+  ].filter(Boolean);
+
+    // Initialize SEO for homepage
+    useEffect(() => {
+      SEOService.initializeHomepageSEO();
+
+      // Generate product structured data if we have products
+      const allProducts = [...PRODUCTS_DATA];
+      if (allProducts.length > 0) {
+        SEOService.generateProductStructuredData(allProducts);
+      }
+
+      // Generate local business structured data
+      SEOService.generateLocalBusinessStructuredData();
+
+      // Generate FAQ structured data
+      const faqs = [
+        {
+          question: "What types of men's fashion do you offer?",
+          answer: "We offer premium men's fashion including suits, kurtas, bandhgalas, formal wear, and traditional clothing for all occasions."
+        },
+        {
+          question: "Do you offer rental services?",
+          answer: "Yes, we provide both rental and purchase options for all our premium men's fashion items."
+        },
+        {
+          question: "What is your delivery area?",
+          answer: "We deliver across all Kerala with free shipping above ₹10,000."
+        },
+        {
+          question: "How can I book in bulk?",
+          answer: "Contact us directly to discuss bulk booking options for events, weddings, and special occasions."
+        }
+      ];
+      SEOService.generateFAQStructuredData(faqs);
+
+      // Generate review structured data
+      SEOService.generateReviewStructuredData(TESTIMONIALS);
+    }, []);
+
+  // Fetch images from admin system based on categories
+  useEffect(() => {
+    const fetchImagesByCategory = async () => {
+      try {
+        setLoadingImages(true);
+        
+        // Load saved admin image favorites from localStorage
+        const savedAdminFavorites = FavoritesService.getAdminFavorites();
+        setAdminImageFavorites(new Set(savedAdminFavorites));
+        
+        // Fetch images for different categories
+        const [topCategoriesResponse, featuredResponse, trendingResponse] = await Promise.all([
+          ImageService.getImagesByCategory('topCategories'),
+          ImageService.getImagesByCategory('featured'),
+          ImageService.getImagesByCategory('trending')
+        ]);
+
+        if (topCategoriesResponse.success) {
+          setTopCategoriesImages(topCategoriesResponse.data.images || []);
+        }
+        
+        if (featuredResponse.success) {
+          setFeaturedImages(featuredResponse.data.images || []);
+        }
+        
+        if (trendingResponse.success) {
+          setTrendingImages(trendingResponse.data.images || []);
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      } finally {
+        setLoadingImages(false);
+      }
+    };
+
+    fetchImagesByCategory();
+  }, []);
 
   // Event handlers
   const handleRentNowClick = () => {
@@ -98,25 +207,192 @@ const HomePageContent = () => {
     navigate('/products');
   };
 
+  const handleViewAllProductsClick = () => {
+    console.log('View all products clicked');
+    navigate('/products');
+  };
+
+  const handleProductClick = (product) => {
+    console.log('Product clicked:', product);
+    navigate('/product-details', { state: { product } });
+  };
+
+  // Handle admin image favorite toggle
+  const handleAdminImageFavorite = (imageId, e) => {
+    e.stopPropagation();
+    
+    // Find the image object to toggle
+    const allImages = [...topCategoriesImages, ...featuredImages, ...trendingImages];
+    const image = allImages.find(img => img._id === imageId);
+    
+    if (image) {
+      // Use centralized favorites service
+      const newFavoriteStatus = FavoritesService.toggleFavorite(image);
+      
+      // Update component state
+      setAdminImageFavorites(prev => {
+        const newFavorites = new Set(prev);
+        if (newFavoriteStatus) {
+          newFavorites.add(imageId);
+        } else {
+          newFavorites.delete(imageId);
+        }
+        return newFavorites;
+      });
+    }
+  };
+
+  // Newsletter handler
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    setNewsletterLoading(true);
+    
+    try {
+      // Validate email
+      if (!NewsletterService.validateEmail(newsletterEmail)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Subscribe to newsletter via API
+      const response = await NewsletterService.subscribe(
+        NewsletterService.formatEmail(newsletterEmail),
+        {
+          fashionUpdates: true,
+          exclusiveOffers: true,
+          newProducts: true,
+          styleTips: true
+        },
+        'homepage'
+      );
+
+      if (response.success) {
+        setNewsletterSuccess(true);
+        setNewsletterEmail('');
+        
+        // Reset success message after 5 seconds
+        setTimeout(() => setNewsletterSuccess(false), 5000);
+        
+        console.log('✅ Newsletter subscription successful:', response.message);
+      }
+    } catch (error) {
+      console.error('❌ Newsletter subscription error:', error);
+      // You could add error state handling here if needed
+      alert(error.message || 'Failed to subscribe to newsletter. Please try again.');
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
+
+
   // Render methods
   const renderHeroSection = () => {
-    const heroImages = [Home1, Home2, Home3];
+    const heroImages = [Home, Home1, Home2, Home3];
     const [activeIndex, setActiveIndex] = useState(0);
     
-    const handleNextImage = () => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    };
-    
     return (
-      <div className="py-2">
+      <div className="py-0">
+        <style>
+          {`
+            /* Desktop styling - make text and images same size */
+            @media (min-width: 992px) {
+              .hero-carousel-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 400px !important;
+                margin: 0 auto !important;
+              }
+              .hero-carousel {
+                width: 100% !important;
+                height: 400px !important;
+                border-radius: 15px !important;
+              }
+              .hero-image {
+                width: 100% !important;
+                height: 400px !important;
+                border-radius: 15px !important;
+              }
+              .hero-text-container {
+                margin-top: 0px !important;
+                padding-top: 0px !important;
+                position: relative !important;
+                z-index: 10 !important;
+              }
+              .hero-title {
+                font-size: 2.5rem !important;
+                margin-bottom: 1rem !important;
+                margin-top: 0 !important;
+                position: relative !important;
+                z-index: 10 !important;
+              }
+              .hero-description {
+                font-size: 1.1rem !important;
+                margin-bottom: 2rem !important;
+                position: relative !important;
+                z-index: 10 !important;
+              }
+              
+              /* Desktop section titles */
+              .section-title {
+                font-size: 2.5rem !important;
+                margin-bottom: 2rem !important;
+              }
+              
+              /* Desktop product/category cards */
+              .desktop-card {
+                width: 280px !important;
+                height: 350px !important;
+                margin: 0 15px !important;
+              }
+              
+              .desktop-card img {
+                width: 100% !important;
+                height: 240px !important;
+                object-fit: cover !important;
+              }
+              
+              .desktop-card-title {
+                font-size: 1.1rem !important;
+                margin-bottom: 0.5rem !important;
+              }
+              
+              .desktop-card-price {
+                font-size: 1.2rem !important;
+                font-weight: 700 !important;
+              }
+            }
+            
+            /* Mobile styling */
+            @media (max-width: 768px) {
+              .hero-carousel-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+              }
+              .hero-carousel {
+                width: 100% !important;
+                height: 150vw !important;
+                border-radius: 0 !important;
+              }
+              .hero-image {
+                width: 100% !important;
+                height: 150vw !important;
+                border-radius: 0 !important;
+              }
+            }
+          `}
+        </style>
         <Container>
           {/* Image Carousel Section */}
-          <div className="text-center mb-5 position-relative d-flex justify-content-center">
+          <div className="text-center mb-0 position-relative">
              <div 
+               className="hero-carousel-container"
                style={{
-                 width: '380px',
-                 height: '480px',
-                 position: 'relative'
+                 width: '100%',
+                 maxWidth: '500px',
+                 height: '800px',
+                 position: 'relative',
+                 margin: '0 auto'
                }}
              >
               <Carousel 
@@ -124,67 +400,48 @@ const HomePageContent = () => {
                 onSelect={setActiveIndex}
                 indicators={false}
                 controls={false}
-                interval={null}
+                interval={3000}
+                className="hero-carousel"
                 style={{
-                  borderRadius: '36.73px',
-                  overflow: 'hidden'
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  width: '100%',
+                  height: '100%'
                 }}
               >
                 {heroImages.map((image, index) => (
                   <Carousel.Item key={index}>
                     <Image 
                       src={image} 
-                      alt={`Hero ${index + 1}`}
+                      alt={`dappr SQUAD Premium Men's Fashion - Hero Image ${index + 1}`}
                       fluid
+                      className="hero-image"
                       style={{
-                        width: '380px',
-                        height: '480px',
+                        width: '100%',
+                        height: '800px',
                         objectFit: 'cover',
-                        borderRadius: '36.73px',
+                        borderRadius: '20px',
                         opacity: 1
                       }}
                     />
                   </Carousel.Item>
                 ))}
               </Carousel>
-              
-              {/* Navigation Icon */}
-              <div 
-                className="position-absolute"
-                onClick={handleNextImage}
-                style={{
-                  bottom: '15px',
-                  right: '-5px',
-                  width: '35px',
-                  height: '35px',
-                  backgroundColor: '#000',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer'
-                }}
-              >
-                <ChevronRight 
-                  size={16} 
-                  color="white"
-                />
-              </div>
             </div>
           </div>
           
           {/* Text and Button Section */}
-          <div className="text-center">
+          <div className="text-center hero-text-container" style={{ marginTop: '3px' }}>
             <h1 
-              className="fw-bold mb-3"
+              className="fw-bold mb-3 hero-title"
                 style={{
                 width: 'auto',
-                minWidth: '343px',
+                minWidth: '320px',
                 height: '29px',
                 fontFamily: 'Century Gothic',
                 fontWeight: 700,
-                fontStyle: 'Bold',
-                fontSize: '24px',
+                fontStyle: 'ExtraBold',
+                fontSize: '28px',
                 lineHeight: '120%',
                 letterSpacing: '0%',
                 textAlign: 'center',
@@ -193,13 +450,15 @@ const HomePageContent = () => {
                 color: '#000',
                 margin: '0 auto',
                 whiteSpace: 'nowrap',
-                overflow: 'visible'
+                overflow: 'visible',
+                marginTop: '-140px',
+
               }}
             >
-              Style Together, Shine Together
+              Style Together, Shine Together - Premium Men's Fashion
               </h1>
               <p 
-              className="fs-5 mb-4"
+              className="fs-5 mb-4 hero-description"
                 style={{
                 fontFamily: 'Century Gothic',
                 fontWeight: 400,
@@ -283,56 +542,500 @@ const HomePageContent = () => {
 
   const renderFeatureIconsSection = () => null;
 
-  const renderTopCategoriesSection = () => (
+  // Render testimonials section
+  const renderTestimonialsSection = () => (
     <Container className="py-5">
-      <Row className="align-items-center mb-4">
+      <Row className="text-center mb-5">
         <Col>
           <h2 
-            className="h3 fw-bold mb-0"
             style={{
               fontFamily: 'Century Gothic',
               fontWeight: 700,
+              fontSize: '2rem',
+              color: '#000',
+              marginBottom: '1rem'
+            }}
+          >
+            What Our Customers Say
+          </h2>
+          <p 
+            style={{ 
+              fontFamily: 'Century Gothic',
+              fontWeight: 400,
+              fontSize: '1.1rem',
+              color: '#666',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}
+          >
+            Don't just take our word for it - hear from our satisfied customers
+          </p>
+        </Col>
+      </Row>
+      
+      <Row className="g-4">
+        {TESTIMONIALS.map((testimonial) => (
+          <Col key={testimonial.id} md={4}>
+            <Card 
+              className="h-100 border-0 shadow-sm"
+              style={{ borderRadius: '15px' }}
+            >
+              <Card.Body className="p-4 text-center">
+                <div className="mb-3">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <span key={i} style={{ color: '#ffc107', fontSize: '1.2rem' }}>★</span>
+                  ))}
+                </div>
+                <Card.Text 
+                style={{
+                    fontFamily: 'Century Gothic',
+                    fontWeight: 400,
+                    fontSize: '1rem',
+                    color: '#333',
+                    fontStyle: 'italic',
+                    marginBottom: '1.5rem',
+                    lineHeight: '1.6'
+                  }}
+                >
+                  "{testimonial.text}"
+                </Card.Text>
+                <div className="d-flex align-items-center justify-content-center">
+                  <Image 
+                    src={testimonial.image}
+                    roundedCircle
+                    style={{ width: '50px', height: '50px', marginRight: '1rem' }}
+                  />
+                  <div>
+                    <h6 
+                style={{
+                        fontFamily: 'Century Gothic',
+                        fontWeight: 600,
+                        fontSize: '1rem',
+                        color: '#000',
+                        margin: 0
+                      }}
+                    >
+                      {testimonial.name}
+                    </h6>
+                    <small 
+                      style={{
+                        fontFamily: 'Century Gothic',
+                        fontWeight: 400,
+                        color: '#666'
+                      }}
+                    >
+                      {testimonial.location}
+                    </small>
+              </div>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
+
+  // Render stats section
+  const renderStatsSection = () => (
+    <Container className="py-5" style={{ backgroundColor: '#f8f9fa' }}>
+      <Row className="text-center">
+        {STATS.map((stat, index) => (
+          <Col key={index} xs={6} md={3} className="mb-4">
+            <div>
+              <h3 
+                style={{
+                  fontFamily: 'Century Gothic',
+                  fontWeight: 700,
+                  fontSize: '2.5rem',
+                  color: '#000',
+                  marginBottom: '0.5rem'
+                }}
+              >
+                {stat.number}
+              </h3>
+              <p 
+                  style={{
+                    fontFamily: 'Century Gothic',
+                  fontWeight: 400,
+                  fontSize: '1rem',
+                  color: '#666',
+                  margin: 0
+                  }}
+                >
+                {stat.label}
+              </p>
+              </div>
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
+
+
+  // Render newsletter section
+  const renderNewsletterSection = () => (
+    <Container className="py-5" style={{ 
+      backgroundColor: '#000000',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Background Pattern */}
+      <div 
+                 style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(255,255,255,0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.01) 0%, transparent 50%)',
+          pointerEvents: 'none'
+        }}
+      />
+      
+      <Row className="text-center position-relative">
+        <Col md={8} className="mx-auto">
+          {/* Icon */}
+          <div className="mb-4">
+            <div 
+                style={{
+                width: '80px',
+                height: '80px',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                margin: '0 auto',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.2)'
+                }}
+              >
+              <span style={{ fontSize: '2rem', color: '#fff' }}>📧</span>
+            </div>
+          </div>
+
+                <h3 
+                  style={{
+                    fontFamily: 'Century Gothic',
+                    fontWeight: 700,
+              fontSize: '2.5rem',
+              color: '#fff',
+              marginBottom: '1rem',
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+            }}
+          >
+            Stay in the Loop
+                </h3>
+            <p 
+              style={{
+                fontFamily: 'Century Gothic',
+                fontWeight: 400,
+              fontSize: '1.2rem',
+              color: '#e0e0e0',
+              marginBottom: '2rem',
+              lineHeight: '1.6',
+              maxWidth: '600px',
+              margin: '0 auto 2rem auto'
+            }}
+          >
+            Get exclusive access to the latest fashion trends, special offers, and style tips delivered straight to your inbox
+          </p>
+          
+          <form onSubmit={handleNewsletterSubmit}>
+            <div 
+              className="d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center"
+              style={{ maxWidth: '500px', margin: '0 auto' }}
+            >
+              <div style={{ flex: 1, minWidth: '300px' }}>
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  required
+                  disabled={newsletterLoading}
+                  style={{
+                    fontFamily: 'Century Gothic',
+                    padding: '16px 24px',
+                    borderRadius: '50px',
+                    border: '2px solid rgba(255,255,255,0.2)',
+                    fontSize: '1rem',
+                    width: '100%',
+                    outline: 'none',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    backdropFilter: 'blur(10px)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#fff';
+                    e.target.style.backgroundColor = 'rgba(255,255,255,0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                    e.target.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                  }}
+                />
+                <style>
+                  {`
+                    input::placeholder {
+                      color: rgba(255,255,255,0.7) !important;
+                    }
+                  `}
+                </style>
+    </div>
+              
+              <Button
+                type="submit"
+                disabled={newsletterLoading || !newsletterEmail.trim()}
+            style={{
+            fontFamily: 'Century Gothic',
+                  fontWeight: 600,
+                  padding: '16px 32px',
+                  borderRadius: '50px',
+                  backgroundColor: newsletterLoading ? 'rgba(255,255,255,0.3)' : '#fff',
+                  color: '#000',
+                  border: 'none',
+                  fontSize: '1rem',
+                  minWidth: '140px',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 15px rgba(255,255,255,0.2)',
+                  cursor: newsletterLoading ? 'not-allowed' : 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  if (!newsletterLoading && newsletterEmail.trim()) {
+                    e.target.style.backgroundColor = '#f0f0f0';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 20px rgba(255,255,255,0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!newsletterLoading) {
+                    e.target.style.backgroundColor = '#fff';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 15px rgba(255,255,255,0.2)';
+                  }
+                }}
+              >
+                {newsletterLoading ? (
+                  <span>
+                    <span 
+                  style={{
+                        display: 'inline-block',
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid #000',
+                        borderTop: '2px solid transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        marginRight: '8px'
+                      }}
+                    />
+                    Subscribing...
+                  </span>
+                ) : (
+                  'Subscribe Now'
+                )}
+              </Button>
+            </div>
+            
+            {newsletterSuccess && (
+              <div 
+                className="mt-4"
+                      style={{
+                  color: '#4CAF50',
+                        fontFamily: 'Century Gothic',
+                  fontWeight: 500,
+                  fontSize: '1.1rem',
+                  backgroundColor: 'rgba(76,175,80,0.1)',
+                  padding: '12px 24px',
+                  borderRadius: '25px',
+                  border: '1px solid rgba(76,175,80,0.3)',
+                  display: 'inline-block'
+                }}
+              >
+                ✓ Successfully subscribed! Welcome to the dappr SQUAD family!
+              </div>
+            )}
+
+            {/* Benefits */}
+            <div className="mt-4">
+              <p 
+                      style={{
+                        fontFamily: 'Century Gothic',
+                        fontWeight: 400,
+                  fontSize: '0.9rem',
+                  color: '#bbb',
+                  marginBottom: '0.5rem'
+                }}
+              >
+                What you'll get:
+              </p>
+              <div className="d-flex flex-wrap justify-content-center gap-3">
+                {[
+                  '🎯 Exclusive Offers',
+                  '👔 Style Tips',
+                  '🆕 New Arrivals',
+                  '📧 Weekly Updates'
+                ].map((benefit, index) => (
+                  <span 
+                    key={index}
+                    style={{
+                      fontFamily: 'Century Gothic',
+                      fontWeight: 400,
+                      fontSize: '0.85rem',
+                      color: '#ccc',
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      padding: '4px 12px',
+                      borderRadius: '15px',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                  >
+                    {benefit}
+                  </span>
+              ))}
+            </div>
+            </div>
+          </form>
+        </Col>
+      </Row>
+
+      {/* CSS Animation */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+      </Container>
+  );
+
+  const renderFeaturedProductsSection = () => {
+    // Use admin images if available, otherwise fallback to static products
+    const productsToShow = featuredImages.length > 0 
+      ? featuredImages.slice(0, 6) // Limit to 6 products
+      : FEATURED_PRODUCTS;
+
+    return (
+    <Container className="py-5">
+      <Row className="align-items-center mb-4">
+        <Col>
+          <h3 
+            className="h3 fw-bold mb-0"
+                  style={{
+                    fontFamily: 'Century Gothic',
+                    fontWeight: 700,
               letterSpacing: '-0.02em'
             }}
           >
-            Top Categories
-          </h2>
-        </Col>
+            Featured Products
+                </h3>
+          </Col>
         <Col xs="auto">
           <Button 
             variant="link" 
             className="p-0 text-decoration-none text-muted"
-            style={{ 
-              fontFamily: 'Century Gothic',
-              fontWeight: 400,
+              style={{
+                fontFamily: 'Century Gothic',
+                fontWeight: 400,
               fontSize: '14px'
             }}
-            onClick={handleExploreMoreClick}
+              onClick={handleViewAllProductsClick}
           >
-            Explore more
+              View all products
           </Button>
-        </Col>
+          </Col>
       </Row>
       
       <HorizontalScroll>
-        {TOP_CATEGORIES.map((category) => (
-          <div key={category.id} style={{ width: '200px', flexShrink: 0 }}>
+          {productsToShow.map((product) => {
+            // Handle both admin images and static products
+            const isAdminImage = product.imageUrl;
+            const imageSrc = isAdminImage ? product.imageUrl : product.image;
+            const title = isAdminImage ? product.title : product.name;
+            const price = isAdminImage ? (product.price || product.rentalPrice) : product.price;
+            
+            return (
+              <div key={isAdminImage ? product._id : product.id} style={{ width: '200px', flexShrink: 0 }}>
             <div 
               className="position-relative"
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleCategoryClick(category)}
+                  style={{ 
+                    cursor: 'pointer',
+                    borderRadius: '15px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                  }}
+                  onClick={() => {
+                    if (isAdminImage) {
+                      handleProductClick({
+                        id: product._id,
+                        name: product.title,
+                        image: product.imageUrl,
+                        price: product.price || 0,
+                        rentalPrice: product.rentalPrice || 0
+                      });
+                    } else {
+                      handleProductClick(product);
+                    }
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  }}
             >
-              <Image 
-                src={category.image} 
-                alt={category.name}
-                fluid
-                style={{
-                  width: '100%',
+               <Image 
+                    src={imageSrc} 
+                    alt={title}
+                 fluid
+                 style={{
+                   width: '100%',
                   height: '250px',
-                  objectFit: 'cover',
-                  borderRadius: '15px'
-                }}
-              />
+                      objectFit: 'cover'
+                 }}
+               />
+                  
+                  {/* Love Button */}
+                  {isAdminImage && (
+              <div 
+                      className="position-absolute"
+                style={{
+                        top: '10px',
+                        right: '10px',
+                        width: '35px',
+                        height: '35px',
+                        backgroundColor: adminImageFavorites.has(product._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)',
+                        borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={(e) => handleAdminImageFavorite(product._id, e)}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = adminImageFavorites.has(product._id) ? 'rgba(220, 53, 69, 0.2)' : 'rgba(255, 255, 255, 1)';
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = adminImageFavorites.has(product._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    >
+                      {adminImageFavorites.has(product._id) ? (
+                        <HeartFill size={18} color="#dc3545" />
+                      ) : (
+                        <Heart size={18} color="#000" />
+                      )}
+                    </div>
+                  )}
               
               {/* Navigation Arrow */}
               <div 
@@ -347,7 +1050,8 @@ const HomePageContent = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}
               >
                 <ChevronRight 
@@ -356,368 +1060,262 @@ const HomePageContent = () => {
                 />
               </div>
               
-              {/* Category Name Overlay */}
+                  {/* Product Name and Price Overlay */}
               <div 
                 className="position-absolute bottom-0 start-0 end-0 text-center p-3"
                 style={{
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                      background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
                   borderBottomLeftRadius: '15px',
                   borderBottomRightRadius: '15px'
                 }}
               >
                 <h6 
-                  className="text-white mb-0 fw-medium"
+                      className="text-white mb-1 fw-bold"
                   style={{
                     fontFamily: 'Century Gothic',
-                    fontWeight: 400
+                    fontWeight: 700,
+                        fontSize: '14px',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                   }}
                 >
-                  {category.name}
+                      {title}
                 </h6>
+                    <p 
+                      className="text-white mb-0"
+                      style={{
+                        fontFamily: 'Century Gothic',
+                        fontWeight: 600,
+                        fontSize: '12px',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                      }}
+                    >
+                      ₹{price}
+                    </p>
               </div>
             </div>
           </div>
-        ))}
-      </HorizontalScroll>
-    </Container>
-  );
+            );
+          })}
+        </HorizontalScroll>
+        
+        {/* View All Products Button */}
+        <div className="text-center mt-4">
+          <Button 
+            variant="outline-dark" 
+            size="lg"
+            className="px-4 py-3"
+            style={{
+                fontFamily: 'Century Gothic',
+              fontWeight: 600,
+              borderRadius: '20px',
+              border: '2px solid #000',
+                  backgroundColor: 'transparent',
+              fontSize: '1rem',
+              color: '#000'
+            }}
+            onClick={handleViewAllProductsClick}
+          >
+            View All Products
+          </Button>
+    </div>
+      </Container>
+    );
+  };
 
-  const renderWhoWeAreSection = () => (
-    <div className="py-5">
-      <Container>
-        <Row className="align-items-center">
-          <Col lg={6}>
-            <div className="position-relative">
+  const renderTopCategoriesSection = () => {
+    // Use admin images if available, otherwise fallback to static categories
+    const categoriesToShow = topCategoriesImages.length > 0 
+      ? topCategoriesImages.slice(0, 5) // Limit to 5 categories
+      : TOP_CATEGORIES;
+
+    return (
+    <Container className="py-5">
+      <Row className="align-items-center mb-4">
+        <Col>
+          <h3 
+            className="h3 fw-bold mb-0"
+                  style={{
+                    fontFamily: 'Century Gothic',
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em'
+                  }}
+                >
+                  Top Categories
+                </h3>
+          </Col>
+        <Col xs="auto">
+          <Button 
+            variant="link" 
+            className="p-0 text-decoration-none text-muted"
+              style={{
+                fontFamily: 'Century Gothic',
+                fontWeight: 400,
+              fontSize: '14px'
+              }}
+            onClick={handleExploreMoreClick}
+            >
+            Explore more
+          </Button>
+          </Col>
+      </Row>
+      
+      <HorizontalScroll>
+        {categoriesToShow.map((item, index) => {
+          // Handle both admin images and static categories
+          const isAdminImage = item.imageUrl;
+          const imageSrc = isAdminImage ? item.imageUrl : item.image;
+          const title = isAdminImage ? item.title : item.name;
+          const category = isAdminImage ? item.category : item.category;
+          
+          return (
+            <div key={isAdminImage ? item._id : item.id} style={{ width: '200px', flexShrink: 0 }}>
+            <div 
+              className="position-relative"
+                  style={{
+                    cursor: 'pointer',
+                    borderRadius: '15px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                  }}
+                  onClick={() => {
+                    if (isAdminImage) {
+                      handleProductClick({
+                        id: item._id,
+                        name: item.title,
+                        image: item.imageUrl,
+                        price: item.price || 0,
+                        rentalPrice: item.rentalPrice || 0
+                      });
+                    } else {
+                      handleCategoryClick(item);
+                    }
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  }}
+            >
                <Image 
-                 src={Who} 
-                 alt="Who we are"
+                    src={imageSrc} 
+                    alt={title}
                  fluid
-                 rounded
                  style={{
                    width: '100%',
-                   height: '300px',
-                   objectFit: 'cover',
-                   borderRadius: '15px'
+                  height: '250px',
+                      objectFit: 'cover'
                  }}
                />
+              
+              {/* Love Button */}
+              {isAdminImage && (
+              <div 
+                  className="position-absolute"
+                style={{
+                    top: '10px',
+                    right: '10px',
+                    width: '35px',
+                    height: '35px',
+                    backgroundColor: adminImageFavorites.has(item._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)',
+                    borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onClick={(e) => handleAdminImageFavorite(item._id, e)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = adminImageFavorites.has(item._id) ? 'rgba(220, 53, 69, 0.2)' : 'rgba(255, 255, 255, 1)';
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = adminImageFavorites.has(item._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  {adminImageFavorites.has(item._id) ? (
+                    <HeartFill size={18} color="#dc3545" />
+                  ) : (
+                    <Heart size={18} color="#000" />
+                  )}
+              </div>
+              )}
+              
+              {/* Navigation Arrow */}
               <div 
                 className="position-absolute"
-                style={{
-                  backgroundColor: 'transparent',
-                  width: '180px',
-                  height: '35px',
+                 style={{
+                  bottom: '15px',
+                  right: '15px',
+                  width: '30px',
+                  height: '30px',
+                  backgroundColor: '#000',
+                  borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bottom: '10px',
-                  left: '10px'
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}
               >
-                <h3 
-                  className="mb-0"
-                  style={{
-                    fontFamily: 'Century Gothic',
-                    fontWeight: 700,
-                    fontSize: '22px',
-                    lineHeight: '120%',
-                    letterSpacing: '0%',
-                    textAlign: 'center',
-                    color: 'black',
-                    opacity: 1,
-                    margin: 0
-                  }}
-                >
-                  Who we are.
-                </h3>
-              </div>
-            </div>
-          </Col>
-          <Col lg={6} className="ps-lg-5">
-            <p 
-              className="fs-5 lh-lg"
-              style={{
-                fontFamily: 'Century Gothic',
-                fontWeight: 400,
-                color: '#666'
-              }}
-            >
-              At Dapper Squad, we believe style is within all men's reach. We are a premium men's fashion platform, that helps individuals and squads look their best at weddings, parties, and celebrations, whether you want to buy, rent, or book for your entire squad, we make fashion simple, stylish and convenient.
-            </p>
-          </Col>
-        </Row>
-      </Container>
+                <ChevronRight 
+                  size={14} 
+                  color="white"
+                />
     </div>
-  );
-
-  const renderOurServicesSection = () => (
-    <div className="py-5 bg-white">
-      <Container>
-        <h2 
-          className="h2 fw-bold mb-5 text-center"
-            style={{
-            fontFamily: 'Century Gothic',
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-            fontSize: '24px',
-            color: '#000'
-          }}
-        >
-          Our Services
-          </h2>
-        <Row className="justify-content-center">
-          <Col lg={8} xl={6}>
-            <div className="d-flex flex-column align-items-center" style={{ gap: '10px' }}>
-              {SERVICES.map((service, index) => (
-                <div 
-                  key={index}
-                  className="bg-white d-flex align-items-center"
-                  style={{
-                    width: '300px',
-                    height: '60px',
-                    paddingTop: '10px',
-                    paddingRight: '20px',
-                    paddingBottom: '10px',
-                    paddingLeft: '20px',
-                    borderRadius: '20px',
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    borderColor: '#e9ecef',
-                    opacity: 1,
-                    position: 'relative'
-                  }}
-                >
-                  <div className="flex-grow-1">
-                    <h5 
-                      className="fw-bold mb-1"
-                      style={{
-                        fontFamily: 'Century Gothic',
-                        fontWeight: 700,
-                        fontSize: '14px',
-                        color: '#000',
-                        marginBottom: '2px',
-                        lineHeight: '1.2'
-                      }}
-                    >
-                      {service.title}
-                    </h5>
-                    <p 
-                      className="text-muted mb-0"
-                      style={{
-                        fontFamily: 'Century Gothic',
-                        fontWeight: 400,
-                        fontSize: '11px',
-                        color: '#666',
-                        lineHeight: '1.3'
-                      }}
-                    >
-                      {service.description}
-                    </p>
-                  </div>
-                  <div 
-                    className="rounded-circle bg-dark d-flex align-items-center justify-content-center position-absolute"
-                    style={{
-                      width: '35px',
-                      height: '35px',
-                      right: '-17px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      zIndex: 10
-                    }}
-                  >
-                    <span className="text-white fs-6">{service.icon}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-        </Col>
-      </Row>
-      </Container>
-    </div>
-  );
-
-  const renderWhatWeDoSection = () => (
-    <div className="py-5">
-      <Container>
-        <Row className="align-items-center">
-          <Col lg={6}>
-            <div className="position-relative">
-               <Image 
-                 src={What} 
-                 alt="What we do"
-                 fluid
-                 rounded
-                 style={{
-                   width: '100%',
-                   height: '300px',
-                   objectFit: 'cover',
-                   borderRadius: '15px'
-                 }}
-               />
+              
+              {/* Category Name Overlay */}
               <div 
-                className="position-absolute bottom-0 end-0 m-3"
+                className="position-absolute bottom-0 start-0 end-0 text-center p-3"
                 style={{
-                  backgroundColor: 'transparent',
-                  width: '142px',
-                  height: '26px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                      background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
+                  borderBottomLeftRadius: '15px',
+                  borderBottomRightRadius: '15px'
                 }}
               >
-                <h3 
-                  className="mb-0"
-                  style={{
-                    fontFamily: 'Century Gothic',
-                    fontWeight: 700,
-                    fontSize: '22px',
-                    lineHeight: '120%',
-                    letterSpacing: '0%',
-                    textAlign: 'center',
-                    color: 'black',
-                    opacity: 1,
-                    margin: 0
-                  }}
-                >
-                  What we do.
-                </h3>
-              </div>
-            </div>
-          </Col>
-          <Col lg={6} className="ps-lg-5 ">
-            <ul 
-              className="list-unstyled"
-              style={{
-                fontFamily: 'Century Gothic',
-                fontWeight: 400,
-                color: '#666',
-                lineHeight: '1.6',
-                fontSize: '14px',
-                marginTop:'7px'
-                
-              }}
-            >
-              <li className="mb-2">• Stylish outfits, wear for buy & rent.</li>
-              <li className="mb-2">• Bulk booking solutions for seasons, friends, and teams with customized options.</li>
-              <li className="mb-2">• Dress code consultation to help you plan your event looks.</li>
-              <li className="mb-2">• Customization services to ensure the perfect fit and personalized style.</li>
-            </ul>
-          </Col>
-      </Row>
-    </Container>
-    </div>
-  );
-
-  const renderHowWeDoItSection = () => (
-    <div className="py-5 bg-light">
-      <Container>
-        <Row className="align-items-center">
-          <Col lg={6}>
-            <div className="position-relative">
-               <Image 
-                 src={How} 
-                 alt="How We Do It"
-                 fluid
-                 rounded
-                 style={{
-                   width: '100%',
-                   height: '300px',
-                   objectFit: 'cover',
-                   borderRadius: '15px'
-                 }}
-               />
-              <div 
-                className="position-absolute bottom-0 start-0 m-3"
-                style={{
-                  backgroundColor: 'transparent',
-                  width: '142px',
-                  height: '26px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <h3 
-                  className="mb-0"
-                  style={{
-                    fontFamily: 'Century Gothic',
-                    fontWeight: 700,
-                    fontSize: '22px',
-                    lineHeight: '120%',
-                    letterSpacing: '0%',
-                    textAlign: 'center',
-                    color: 'black',
-                    opacity: 1,
-                    margin: 0
-                  }}
-                >
-                  How we do.
-                </h3>
-              </div>
-            </div>
-          </Col>
-          <Col lg={6} className="ps-lg-5">
-            <ul 
-              className="list-unstyled"
-            style={{
-                fontFamily: 'Century Gothic',
-                fontWeight: 400,
-                color: '#666',
-                lineHeight: '1.6',
-                fontSize: '14px',
-                marginTop:'7px'
-                
-              }}
-            >
-              <li className="mb-2">• Easy online ordering and booking.</li>
-              <li className="mb-2">• Buy or rent based on your need.</li>
-              <li className="mb-2">• Date & location-based availability check.</li>
-              <li className="mb-2">• Bulk booking for squads with just a few clicks.</li>
-              <li className="mb-2">• Theme setting and consultation from fashion experts.</li>
-              <li className="mb-2">• Customization in size and style for a perfect fit.</li>
-            </ul>
-        </Col>
-      </Row>
-      </Container>
-    </div>
-  );
-
-  const renderWhyChooseUsSection = () => (
-    <div className="py-5">
-      <Container>
-        <h2 
-          className="h2 fw-bold mb-4"
+                <h6 
+                      className="text-white mb-0 fw-bold"
           style={{
             fontFamily: 'Century Gothic',
             fontWeight: 700,
-            letterSpacing: '-0.02em',
-            textAlign: 'left'
-          }}
-        >
-          Why Choose Us
-        </h2>
-        <Row>
-          <Col lg={8}>
-            <ul 
-              className="list-unstyled"
+                        fontSize: '14px',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                      }}
+                    >
+                      {title}
+                    </h6>
+                    {isAdminImage && item.price && (
+                    <p 
+                        className="text-white mb-0"
               style={{
                 fontFamily: 'Century Gothic',
-                fontWeight: 400,
-                fontSize: '16px',
-                lineHeight: '1.6',
-                textAlign: 'left'
-              }}
-            >
-              <li className="mb-2">• Buy or Rent! Your choice, your budget.</li>
-              <li className="mb-2">• Perfect for individuals & groups.</li>
-              <li className="mb-2">• Expert-driven styling consultations.</li>
-              <li className="mb-2">• Hassle-free online booking & availability check.</li>
-              <li className="mb-2">• Premium quality with customization options.</li>
-            </ul>
-          </Col>
-      </Row>
-    </Container>
+                          fontWeight: 600,
+                          fontSize: '12px',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        ₹{item.price}
+                      </p>
+                    )}
+                  </div>
+                </div>
     </div>
   );
+          })}
+        </HorizontalScroll>
+      </Container>
+    );
+  };
+
+
+
+
+
 
   const renderFinalCTASection = () => (
     <div className="py-5">
@@ -741,7 +1339,7 @@ const HomePageContent = () => {
         
         {/* Text and Button Section */}
         <div className="text-center">
-          <h2 
+          <h3 
             className="display-4 fw-bold mb-4"
             style={{
               fontFamily: 'Century Gothic',
@@ -752,7 +1350,7 @@ const HomePageContent = () => {
             }}
           >
             Your Celebration, Your Style The Dapper Way.
-          </h2>
+          </h3>
           <p 
             className="fs-4 mb-4"
             style={{
@@ -825,12 +1423,10 @@ const HomePageContent = () => {
       {renderHeroSection()}
       {renderFeatureIconsSection()}
       {renderTopCategoriesSection()}
-      {renderWhoWeAreSection()}
-      {renderOurServicesSection()}
-      {renderWhatWeDoSection()}
-      {renderHowWeDoItSection()}
-      {renderWhyChooseUsSection()}
+      {renderFeaturedProductsSection()}
+      {renderStatsSection()}
       {renderFinalCTASection()}
+      {renderNewsletterSection()}
     </div>
   );
 };

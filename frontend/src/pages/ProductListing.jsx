@@ -15,6 +15,9 @@ import FilterSidebar from '../components/common/FilterSidebar';
 import ModernSearchBar from '../components/common/ModernSearchBar';
 import ProductImageGallery from '../components/common/ProductImageGallery';
 
+// Import services
+import ImageService from '../services/imageService';
+
 // Import constants and utilities
 import { APP_CONFIG } from '../constants';
 
@@ -30,6 +33,10 @@ const ProductListing = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentCategory, setCurrentCategory] = useState(categoryParam || 'all');
   const [categoryTitle, setCategoryTitle] = useState('All Products');
+  
+  // State for admin images
+  const [adminImages, setAdminImages] = useState([]);
+  const [loadingAdminImages, setLoadingAdminImages] = useState(false);
 
   // Filter products based on category
   useEffect(() => {
@@ -43,6 +50,48 @@ const ProductListing = () => {
       const category = CATEGORIES.find(cat => cat.id === currentCategory);
       setCategoryTitle(category ? category.name : 'Products');
     }
+  }, [currentCategory]);
+
+  // Load admin images for the current category
+  useEffect(() => {
+    const loadAdminImages = async () => {
+      if (currentCategory === 'all') {
+        setAdminImages([]);
+        return;
+      }
+
+      try {
+        setLoadingAdminImages(true);
+        
+        // Map category IDs to backend category names
+        const categoryMapping = {
+          'suits': 'suits',
+          'kurtas': 'kurtas', 
+          'bandhgalas': 'bandhgalas',
+          'formal': 'formal',
+          'traditional': 'traditional'
+        };
+
+        const backendCategory = categoryMapping[currentCategory];
+        if (backendCategory) {
+          const response = await ImageService.getImagesByCategory(backendCategory);
+          if (response.success) {
+            setAdminImages(response.data.images || []);
+          } else {
+            setAdminImages([]);
+          }
+        } else {
+          setAdminImages([]);
+        }
+      } catch (error) {
+        console.error('Error loading admin images for category:', currentCategory, error);
+        setAdminImages([]);
+      } finally {
+        setLoadingAdminImages(false);
+      }
+    };
+
+    loadAdminImages();
   }, [currentCategory]);
 
   // State management
@@ -250,14 +299,44 @@ const ProductListing = () => {
   const renderAdminImages = () => {
     console.log('🎯 ProductListing renderAdminImages - enquiryType:', location.state?.enquiryType);
     console.log('🎯 ProductListing renderAdminImages - categoryParam:', categoryParam);
+    console.log('🎯 ProductListing renderAdminImages - currentCategory:', currentCategory);
+    console.log('🎯 ProductListing renderAdminImages - adminImages:', adminImages.length);
+    
+    // Map frontend category to backend category
+    const categoryMapping = {
+      'suits': 'suits',
+      'kurtas': 'kurtas', 
+      'bandhgalas': 'bandhgalas',
+      'formal': 'formal',
+      'traditional': 'traditional'
+    };
+
+    const backendCategory = categoryMapping[currentCategory] || currentCategory;
     
     return (
       <Container className="py-3">
+        {/* Show loading state */}
+        {loadingAdminImages && (
+          <div className="text-center py-4">
+            <p style={{ fontFamily: 'Century Gothic' }}>Loading {categoryTitle} images...</p>
+          </div>
+        )}
+        
+        {/* Show admin images count */}
+        {!loadingAdminImages && adminImages.length > 0 && (
+          <div className="mb-3">
+            <p style={{ fontFamily: 'Century Gothic', color: '#666' }}>
+              Found {adminImages.length} admin image{adminImages.length !== 1 ? 's' : ''} in {categoryTitle}
+            </p>
+          </div>
+        )}
+        
+        {/* Show ProductImageGallery */}
         <Row>
           <Col>
           <ProductImageGallery
-            category={location.state?.enquiryType || 'rent'}
-            tags={categoryParam ? [categoryParam] : []}
+            category={backendCategory}
+            tags={[]}
             searchKeyword={searchQuery}
             limit={8}
             columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}

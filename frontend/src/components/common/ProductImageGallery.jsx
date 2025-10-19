@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Spinner, Alert, Button } from 'react-bootstrap';
-import { Heart } from 'react-bootstrap-icons';
+import { Heart, HeartFill } from 'react-bootstrap-icons';
 import FrontendImageService from '../../services/frontendImageService';
 import AdminImage from './AdminImage';
+import FavoritesService from '../../services/favoritesService';
 import { APP_CONFIG } from '../../constants';
 
 /**
@@ -24,10 +25,17 @@ const ProductImageGallery = ({
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [favoriteImages, setFavoriteImages] = useState(new Set());
 
   useEffect(() => {
     loadImages();
   }, [category, tags, searchKeyword, limit]);
+
+  // Load saved favorites from localStorage
+  useEffect(() => {
+    const savedFavorites = FavoritesService.getAdminFavorites();
+    setFavoriteImages(new Set(savedFavorites));
+  }, []);
 
   const loadImages = async () => {
     try {
@@ -53,6 +61,22 @@ const ProductImageGallery = ({
       }
 
       console.log('✅ ProductImageGallery loaded images:', fetchedImages.length, fetchedImages);
+      console.log('🎯 ProductImageGallery - Category:', category, 'Tags:', tags, 'SearchKeyword:', searchKeyword);
+      
+      // Debug: Check each image data structure
+      fetchedImages.forEach((image, index) => {
+        console.log(`🔍 Image ${index + 1} data:`, {
+          _id: image._id,
+          title: image.title,
+          imageUrl: image.imageUrl,
+          category: image.category,
+          categories: image.categories,
+          price: image.price,
+          rentalPrice: image.rentalPrice,
+          isActive: image.isActive
+        });
+      });
+      
       setImages(fetchedImages);
     } catch (err) {
       console.error('❌ Error loading images:', err);
@@ -158,8 +182,20 @@ const ProductImageGallery = ({
 
   const handleHeartClick = (e, image) => {
     e.stopPropagation();
-    console.log('Add to wishlist:', image);
-    // TODO: Add to wishlist functionality
+    
+    // Use centralized favorites service
+    const newFavoriteStatus = FavoritesService.toggleFavorite(image);
+    
+    // Update local state
+    setFavoriteImages(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavoriteStatus) {
+        newFavorites.add(image._id);
+      } else {
+        newFavorites.delete(image._id);
+      }
+      return newFavorites;
+    });
   };
 
   const cardStyles = {
@@ -212,6 +248,78 @@ const ProductImageGallery = ({
     color: '#000000'
   };
 
+  // Handle loading state
+  if (loading) {
+    return (
+      <div className={className}>
+        <Row className="g-3">
+          <Col xs={12}>
+            <div className="text-center py-4">
+              <Spinner animation="border" variant="primary" />
+              <p className="mt-2" style={{ fontFamily: 'Century Gothic' }}>
+                Loading images...
+              </p>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className={className}>
+        <Row className="g-3">
+          <Col xs={12}>
+            <Alert variant="warning" className="text-center">
+              <p style={{ fontFamily: 'Century Gothic', margin: 0 }}>
+                {error}
+              </p>
+            </Alert>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  // Handle no images state
+  if (images.length === 0) {
+    return (
+      <div className={className}>
+        <Row className="g-3">
+          <Col xs={12}>
+            <div className="text-center py-5">
+              <h3 
+                style={{
+                  fontFamily: 'Century Gothic',
+                  fontWeight: 700,
+                  fontSize: '1.5rem',
+                  color: '#666',
+                  marginBottom: '1rem'
+                }}
+              >
+                No images found for this category
+              </h3>
+              <p 
+                style={{
+                  fontFamily: 'Century Gothic',
+                  fontWeight: 400,
+                  fontSize: '1rem',
+                  color: '#999'
+                }}
+              >
+                Try uploading images with this category in the admin dashboard
+              </p>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  console.log('🎨 ProductImageGallery rendering - images.length:', images.length, 'loading:', loading, 'error:', error);
+  
   return (
     <div className={className}>
       <Row className="g-3">
@@ -261,10 +369,18 @@ const ProductImageGallery = ({
                   />
                   <Button 
                     variant="light"
-                    style={heartButtonStyles}
+                    style={{
+                      ...heartButtonStyles,
+                      backgroundColor: favoriteImages.has(image._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)',
+                      transition: 'all 0.2s ease'
+                    }}
                     onClick={(e) => handleHeartClick(e, image)}
                   >
-                    <Heart size={16} className="text-dark" />
+                    {favoriteImages.has(image._id) ? (
+                      <HeartFill size={16} className="text-danger" />
+                    ) : (
+                      <Heart size={16} className="text-dark" />
+                    )}
                   </Button>
                 </div>
                 

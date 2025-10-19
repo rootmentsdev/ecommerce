@@ -62,11 +62,18 @@ const imageSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Image category is required'],
     enum: {
-      values: ['buy', 'rent', 'featured', 'trending', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'], // Include all old values for migration
-      message: 'Category must be one of: buy, rent, featured, trending, product, hero, banner, gallery, testimonial, about'
+      values: ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'], // Include all old values for migration
+      message: 'Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional, product, hero, banner, gallery, testimonial, about'
     },
     default: 'rent'
   },
+  categories: [{
+    type: String,
+    enum: {
+      values: ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional'],
+      message: 'Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional'
+    }
+  }],
   tags: [{
     type: String,
     trim: true,
@@ -344,6 +351,36 @@ imageSchema.pre('save', function(next) {
   if (categoryMapping[this.category]) {
     console.log(`Migrating category from '${this.category}' to '${categoryMapping[this.category]}'`);
     this.category = categoryMapping[this.category];
+  }
+
+  // Handle categories array - allow multi-select but ensure primary category is included
+  if (this.isModified('category') || this.isNew) {
+    // When primary category changes, ensure it's included in categories array
+    if (!this.categories || this.categories.length === 0) {
+      this.categories = [this.category];
+    } else if (!this.categories.includes(this.category)) {
+      // Add primary category to categories array if not already present
+      this.categories.unshift(this.category); // Add as first element (primary)
+    }
+    console.log(`Updated categories array to include primary category: ${this.category}`);
+  } else if (!this.categories || this.categories.length === 0) {
+    // If no categories array, create one from the primary category
+    this.categories = [this.category];
+  } else {
+    // Ensure all categories in the array are valid
+    this.categories = this.categories.filter(cat => 
+      ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional'].includes(cat)
+    );
+    
+    // Ensure primary category is included in categories array
+    if (!this.categories.includes(this.category)) {
+      this.categories.unshift(this.category); // Add as first element
+    }
+    
+    // If categories array is empty after filtering, use primary category
+    if (this.categories.length === 0) {
+      this.categories = [this.category];
+    }
   }
   
   // Handle tags

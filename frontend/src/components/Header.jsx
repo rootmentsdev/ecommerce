@@ -1,9 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar, Container } from 'react-bootstrap';
-import { List, Search, Bag } from 'react-bootstrap-icons';
+import { List, Search, Heart } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../constants';
+import FavoritesService from '../services/favoritesService';
 
 const Header = ({ onMenuClick }) => {
+  const [favoritesCount, setFavoritesCount] = useState(0);
+
+  // Update favorites count when component mounts
+  useEffect(() => {
+    const updateFavoritesCount = () => {
+      const count = FavoritesService.getTotalFavoritesCount();
+      setFavoritesCount(count);
+    };
+
+    updateFavoritesCount();
+
+    // Listen for storage changes to update count in real-time
+    const handleStorageChange = () => {
+      updateFavoritesCount();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events when favorites are updated
+    window.addEventListener('favoritesUpdated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('favoritesUpdated', handleStorageChange);
+    };
+  }, []);
+
   // Event handlers following clean code principles
   const handleMenuClick = () => {
     if (onMenuClick) {
@@ -16,9 +44,9 @@ const Header = ({ onMenuClick }) => {
     // TODO: Open search modal or navigate to search page
   };
 
-  const handleCartClick = () => {
-    console.log('Cart clicked');
-    // TODO: Navigate to cart page
+
+  const handleFavoritesClick = () => {
+    window.location.href = '/favorites';
   };
 
   const handleLogoClick = () => {
@@ -98,28 +126,40 @@ const Header = ({ onMenuClick }) => {
     </button>
   );
 
-  const renderCartButton = () => (
+
+  const renderFavoritesButton = () => (
     <button
-      onClick={handleCartClick}
+      onClick={handleFavoritesClick}
       className="btn btn-link header-btn position-relative"
       style={buttonStyles}
-      aria-label="Shopping cart"
+      aria-label="Favorites"
     >
-      <Bag size={24} />
-      <span 
-        className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge"
-        style={badgeStyles}
-        aria-label="2 items in cart"
-      >
-        2
-      </span>
+      <Heart size={24} />
+      {favoritesCount > 0 && (
+        <span 
+          className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          style={{
+            fontSize: '10px',
+            minWidth: '20px',
+            height: '20px',
+            lineHeight: '20px',
+            marginTop: '-10px',
+            marginLeft: '-10px',
+            border: '2px solid white',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}
+          aria-label={`${favoritesCount} favorites`}
+        >
+          {favoritesCount}
+        </span>
+      )}
     </button>
   );
 
   const renderRightIcons = () => (
     <div className="d-flex align-items-center">
       {renderSearchButton()}
-      {renderCartButton()}
+      {renderFavoritesButton()}
     </div>
   );
 
@@ -135,6 +175,11 @@ const Header = ({ onMenuClick }) => {
             border-radius: 8px;
             padding: 8px 12px;
             -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            min-height: 44px;
           }
           
           .header-btn:hover,
@@ -173,20 +218,73 @@ const Header = ({ onMenuClick }) => {
             font-weight: 600;
           }
           
+          /* Desktop header optimizations */
+          @media (min-width: 992px) {
+            .navbar {
+              padding: 12px 0;
+            }
+            
+            .navbar .container-fluid {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: nowrap;
+              min-height: 70px;
+              padding: 0 24px;
+            }
+            
+            .navbar .container-fluid > * {
+              flex-shrink: 0;
+            }
+            
+            .navbar .container-fluid > div {
+              display: flex;
+              align-items: center;
+            }
+            
+            .header-btn {
+              padding: 12px 16px;
+              min-width: 48px;
+              min-height: 48px;
+              margin: 0 8px;
+            }
+            
+            .header-logo {
+              padding: 12px 20px;
+              min-height: 48px;
+            }
+            
+            .header-logo div:first-child {
+              font-size: 1.6rem;
+            }
+            
+            .header-logo div:last-child {
+              font-size: 1.1rem;
+            }
+          }
+
           /* Mobile header optimizations */
-          .navbar {
-            padding: 8px 0;
-          }
-          
-          .navbar .container-fluid {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-          }
-          
-          .navbar .container-fluid > * {
-            flex-shrink: 0;
+          @media (max-width: 991px) {
+            .navbar {
+              padding: 8px 0;
+            }
+            
+            .navbar .container-fluid {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: nowrap;
+              min-height: 60px;
+            }
+            
+            .navbar .container-fluid > * {
+              flex-shrink: 0;
+            }
+            
+            .navbar .container-fluid > div {
+              display: flex;
+              align-items: center;
+            }
           }
           
           /* iPhone 13 specific optimizations */
@@ -260,13 +358,24 @@ const Header = ({ onMenuClick }) => {
         bg="white" 
         expand="lg" 
         className="shadow-sm border-bottom"
-        style={navbarStyles}
+        style={{
+          ...navbarStyles,
+          position: 'sticky',
+          top: 0,
+          zIndex: 1000
+        }}
       >
         <Container fluid className="px-3">
-          <div className="d-flex align-items-center w-100 justify-content-between">
-            {renderMenuButton()}
-            {renderLogo()}
-            {renderRightIcons()}
+          <div className="d-flex align-items-center w-100 justify-content-between" style={{ minHeight: '60px' }}>
+            <div className="d-flex align-items-center">
+              {renderMenuButton()}
+            </div>
+            <div className="d-flex align-items-center flex-grow-1 justify-content-center">
+              {renderLogo()}
+            </div>
+            <div className="d-flex align-items-center">
+              {renderRightIcons()}
+            </div>
           </div>
         </Container>
       </Navbar>

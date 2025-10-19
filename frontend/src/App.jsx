@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AuthCheck from './components/AuthCheck';
 import ScrollToTop from './components/ScrollToTop';
 import PageTransition from './components/PageTransition';
+import TopBanner from './components/TopBanner';
+import SEOService from './services/seoService';
 import FloatingWhatsAppButton from './components/FloatingWhatsAppButton';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -15,14 +17,27 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminImageManagement from './pages/AdminImageManagement';
 import AboutUs from './pages/AboutUs';
 import ImageTestPage from './components/ImageTestPage';
+import Favorites from './pages/Favorites';
+import CategoryPage from './pages/CategoryPage';
 import BuyNow from './pages/BuyNow';
 import RentNow from './pages/RentNow';
 import './App.css';
 import './fonts.css';
 
 function App() {
+  // Initialize global SEO
+  useEffect(() => {
+    SEOService.initializeSEO({
+      title: 'dappr SQUAD - Premium Men\'s Fashion & Suit Rental',
+      description: 'Premium men\'s fashion for every celebration. Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.',
+      keywords: 'mens fashion, suit rental, wedding suits, party wear, men\'s clothing, formal wear, tuxedo rental, designer suits',
+      type: 'website'
+    });
+  }, []);
+
   return (
     <div className="app">
+      <TopBanner />
       <ScrollToTop />
       <FloatingWhatsAppButton />
       <Routes>
@@ -66,6 +81,16 @@ function App() {
         <Route path="/about" element={
           <PageTransition>
             <AboutUs />
+          </PageTransition>
+        } />
+        <Route path="/favorites" element={
+          <PageTransition>
+            <Favorites />
+          </PageTransition>
+        } />
+        <Route path="/category/:category" element={
+          <PageTransition>
+            <CategoryPage />
           </PageTransition>
         } />
         <Route path="/buy-now" element={

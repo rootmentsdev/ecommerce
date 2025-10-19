@@ -19,29 +19,6 @@ import { APP_CONFIG } from '../constants';
 const SideMenu = ({ show, handleClose }) => {
   const navigate = useNavigate();
   const [isDesktop, setIsDesktop] = useState(false);
-  const [userProfile, setUserProfile] = useState({
-    name: 'User',
-    phone: '',
-    avatar: 'https://via.placeholder.com/60x60/8B4513/FFFFFF?text=U'
-  });
-
-  // Load user data from localStorage
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        const userName = user.fullName || user.name || 'User';
-        setUserProfile({
-          name: userName.charAt(0).toUpperCase() + userName.slice(1).toLowerCase(),
-          phone: user.phone || user.mobileNumber || '',
-          avatar: `https://via.placeholder.com/60x60/8B4513/FFFFFF?text=${userName.charAt(0).toUpperCase()}`
-        });
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
-    }
-  }, []);
 
   // Constants following clean code principles
   const MENU_ITEMS = [
@@ -49,7 +26,7 @@ const SideMenu = ({ show, handleClose }) => {
     { icon: Person, label: 'Profile', href: '/profile' },
     { icon: ListUl, label: 'Categories', href: '/categories' },
     { icon: Box, label: 'My Orders', href: '/orders' },
-    { icon: Heart, label: 'Wishlist', href: '/wishlist' },
+    { icon: Heart, label: 'Favorites', href: '/favorites' },
     { icon: ArrowClockwise, label: 'How it Works', href: '/how-it-works' },
     { icon: GeoAlt, label: 'Store Near Me', href: '/store-locator' },
     { icon: ChatDots, label: 'About Us', href: '/about' }
@@ -101,22 +78,6 @@ const SideMenu = ({ show, handleClose }) => {
     width: isDesktop ? '350px' : '85%'
   };
 
-  const avatarStyles = {
-    width: '60px',
-    height: '60px'
-  };
-
-  const nameStyles = {
-    fontFamily: APP_CONFIG.FONTS.PRIMARY,
-    fontWeight: '600',
-    letterSpacing: '-0.02em'
-  };
-
-  const phoneStyles = {
-    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-    fontWeight: '400',
-    letterSpacing: '-0.01em'
-  };
 
   const menuItemStyles = {
     fontSize: '1rem'
@@ -135,28 +96,33 @@ const SideMenu = ({ show, handleClose }) => {
     </Button>
   );
 
-  const renderUserProfile = () => (
-    <div className="d-flex align-items-center mb-4 profile-section">
-      <Image 
-        src={userProfile.avatar}
-        roundedCircle 
-        className="me-3"
-        style={avatarStyles}
-        alt="User avatar"
-      />
-      <div>
-        <h5 
-          className="mb-1 fw-bold text-dark"
-          style={nameStyles}
+  const renderLogo = () => (
+    <div className="d-flex justify-content-center mb-4 logo-section">
+      <div className="text-center">
+        <div 
+          className="fw-bold"
+          style={{
+            fontFamily: 'Century Gothic',
+            fontWeight: 700,
+            fontSize: '1.8rem',
+            color: '#000',
+            lineHeight: '1.1',
+            marginBottom: '0.25rem'
+          }}
         >
-          {userProfile.name}
-        </h5>
-        <p 
-          className="mb-0 text-muted small"
-          style={phoneStyles}
+          dappr
+        </div>
+        <div 
+          style={{
+            fontFamily: 'Century Gothic',
+            fontWeight: 400,
+            fontSize: '1.2rem',
+            color: '#000',
+            lineHeight: '1.1'
+          }}
         >
-          {userProfile.phone}
-        </p>
+          SQUAD
+        </div>
       </div>
     </div>
   );
@@ -245,19 +211,11 @@ const SideMenu = ({ show, handleClose }) => {
             transform: scale(1.1);
           }
           
-          .side-menu .profile-section {
+          .side-menu .logo-section {
             transition: all 0.3s ease;
             padding: 10px;
             border-radius: 8px;
-            cursor: pointer;
             -webkit-tap-highlight-color: transparent;
-          }
-          
-          .side-menu .profile-section:hover,
-          .side-menu .profile-section:active,
-          .side-menu .profile-section:focus {
-            background-color: #f8f9fa;
-            transform: translateX(3px);
           }
           
           @media (hover: none) and (pointer: coarse) {
@@ -276,11 +234,6 @@ const SideMenu = ({ show, handleClose }) => {
               color: white !important;
               transform: scale(1.1);
             }
-            
-            .side-menu .profile-section:active {
-              background-color: #f8f9fa;
-              transform: translateX(3px);
-            }
           }
         `}
       </style>
@@ -298,7 +251,7 @@ const SideMenu = ({ show, handleClose }) => {
       </Offcanvas.Header>
       
       <Offcanvas.Body className="pt-0">
-          {renderUserProfile()}
+          {renderLogo()}
         <hr className="my-3" />
           {renderMenuItems()}
         <hr className="my-3" />

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Headphones } from 'react-bootstrap-icons';
+import SEOService from '../services/seoService';
 
 // Import images
-import Home1 from '../assets/Home1.png';
-import Home2 from '../assets/Home2.png';
-import Home3 from '../assets/Home3.png';
+import Home1 from '../assets/Home1.jpg';
+import Home2 from '../assets/Home2.jpg';
+import Home3 from '../assets/Home3.jpg';
 import Product1 from '../assets/Product1.png';
 import Product2 from '../assets/Product2.png';
 import Product3 from '../assets/Product3.png';
@@ -24,6 +25,11 @@ import HorizontalScroll from '../components/common/HorizontalScroll';
 const RentNow = () => {
   const navigate = useNavigate();
   const [showSideMenu, setShowSideMenu] = useState(false);
+
+  // Initialize SEO for rent page
+  useEffect(() => {
+    SEOService.initializeRentPageSEO();
+  }, []);
 
   // Data constants following clean code principles
   const TOP_CATEGORIES = [

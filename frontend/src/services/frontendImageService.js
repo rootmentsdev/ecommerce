@@ -34,6 +34,9 @@ class FrontendImageService {
         limit: options.limit || '50',
         ...options
       });
+      
+      console.log('🔍 FrontendImageService.getImagesByCategory - params:', params.toString());
+      console.log('🔍 FrontendImageService.getImagesByCategory - URL:', `${API_CONFIG.BASE_URL}/images/public?${params}`);
 
       const response = await fetch(`${API_CONFIG.BASE_URL}/images/public?${params}`, {
         method: 'GET',

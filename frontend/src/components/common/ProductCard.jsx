@@ -1,9 +1,10 @@
 // Reusable ProductCard component following clean code principles
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Button } from 'react-bootstrap';
-import { Heart, Cart } from 'react-bootstrap-icons';
+import { Heart, HeartFill, Cart } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_CONFIG } from '../../constants';
+import FavoritesService from '../../services/favoritesService';
 
 const ProductCard = ({ 
   product, 
@@ -11,9 +12,16 @@ const ProductCard = ({
   onAddToCart,
   className = '', 
   showPrice = true,
-  showAddToCart = false
+  showAddToCart = false,
+  showLoveButton = true
 }) => {
   const navigate = useNavigate();
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  // Check if product is in favorites on component mount
+  React.useEffect(() => {
+    setIsFavorited(FavoritesService.isFavorited(product));
+  }, [product]);
 
   const handleCardClick = () => {
     // Navigate to product details page with product data
@@ -36,8 +44,9 @@ const ProductCard = ({
 
   const handleHeartClick = (e) => {
     e.stopPropagation(); // Prevent card click when heart is clicked
-    console.log('Add to wishlist:', product);
-    // TODO: Add to wishlist functionality
+    
+    const newFavoriteStatus = FavoritesService.toggleFavorite(product);
+    setIsFavorited(newFavoriteStatus);
   };
 
   const cardStyles = {
@@ -114,13 +123,23 @@ const ProductCard = ({
             alt={product.name}
             style={imageStyles}
           />
-          <Button 
-            variant="light"
-            style={heartButtonStyles}
-            onClick={handleHeartClick}
-          >
-            <Heart size={16} className="text-dark" />
-          </Button>
+          {showLoveButton && (
+            <Button 
+              variant="light"
+              style={{
+                ...heartButtonStyles,
+                backgroundColor: isFavorited ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={handleHeartClick}
+            >
+              {isFavorited ? (
+                <HeartFill size={16} className="text-danger" />
+              ) : (
+                <Heart size={16} className="text-dark" />
+              )}
+            </Button>
+          )}
         </div>
         
         <Card.Body className="p-3">
