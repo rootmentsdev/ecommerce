@@ -46,6 +46,7 @@ const ProductListing = () => {
     sizes: []
   });
 
+  
   // Filter products based on category
   useEffect(() => {
     const products = getProductsByCategory(currentCategory === 'all' ? null : currentCategory);
@@ -383,8 +384,8 @@ const ProductListing = () => {
     let backendCategory = currentCategory;
     
     try {
-      console.log('🎯 ProductListing renderAdminImages - enquiryType:', location.state?.enquiryType);
-      console.log('🎯 ProductListing renderAdminImages - categoryParam:', categoryParam);
+    console.log('🎯 ProductListing renderAdminImages - enquiryType:', location.state?.enquiryType);
+    console.log('🎯 ProductListing renderAdminImages - categoryParam:', categoryParam);
       console.log('🎯 ProductListing renderAdminImages - currentCategory:', currentCategory);
       console.log('🎯 ProductListing renderAdminImages - adminImages:', adminImages?.length || 0);
       
@@ -545,8 +546,8 @@ const ProductListing = () => {
                 </Row>
               );
             })()}
-          </Col>
-        </Row>
+        </Col>
+      </Row>
     </Container>
     );
     } catch (error) {
@@ -591,27 +592,27 @@ const ProductListing = () => {
   );
 
   try {
-    return (
-      <div className="d-flex flex-column min-vh-100">
-        <Header onMenuClick={() => setShowSideMenu(true)} />
-        <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
-        
-        <main className="flex-grow-1">
-          {renderPageHeader()}
-          {renderAdminImages()}
-          {renderProductGrid()}
-        </main>
-        
-          <FilterSidebar 
-            show={showFilterSidebar} 
-            handleClose={() => setShowFilterSidebar(false)}
-            onApplyFilters={handleApplyFilters}
+  return (
+    <div className="d-flex flex-column min-vh-100">
+      <Header onMenuClick={() => setShowSideMenu(true)} />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
+      
+      <main className="flex-grow-1">
+        {renderPageHeader()}
+        {renderAdminImages()}
+        {renderProductGrid()}
+      </main>
+      
+      <FilterSidebar 
+        show={showFilterSidebar} 
+        handleClose={() => setShowFilterSidebar(false)}
+        onApplyFilters={handleApplyFilters}
             initialFilters={appliedFilters}
-          />
-        
-        <Footer />
-      </div>
-    );
+      />
+      
+      <Footer />
+    </div>
+  );
   } catch (error) {
     console.error('Error in ProductListing component:', error);
     return (
