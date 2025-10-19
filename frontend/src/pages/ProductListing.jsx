@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
-import { ArrowLeft, Search, Funnel } from 'react-bootstrap-icons';
+import { ArrowLeft, Search, Funnel, Heart } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // Import product data
@@ -37,6 +37,14 @@ const ProductListing = () => {
   // State for admin images
   const [adminImages, setAdminImages] = useState([]);
   const [loadingAdminImages, setLoadingAdminImages] = useState(false);
+  
+  // State for filters
+  const [appliedFilters, setAppliedFilters] = useState({
+    priceRange: [1000, 10000],
+    categories: [],
+    occasions: [],
+    sizes: []
+  });
 
   // Filter products based on category
   useEffect(() => {
@@ -55,28 +63,52 @@ const ProductListing = () => {
   // Load admin images for the current category
   useEffect(() => {
     const loadAdminImages = async () => {
-      if (currentCategory === 'all') {
-        setAdminImages([]);
-        return;
-      }
-
       try {
         setLoadingAdminImages(true);
         
-        // Map category IDs to backend category names
-        const categoryMapping = {
-          'suits': 'suits',
-          'kurtas': 'kurtas', 
-          'bandhgalas': 'bandhgalas',
-          'formal': 'formal',
-          'traditional': 'traditional'
-        };
+        // Determine which category to fetch based on enquiry type and current category
+        let fetchCategory;
+        
+        // If coming from rent-now or buy-now page, filter by enquiry type
+        if (location.state?.enquiryType) {
+          fetchCategory = location.state.enquiryType;
+          console.log('🎯 ProductListing - Filtering by enquiry type:', location.state.enquiryType);
+        } else if (currentCategory === 'all') {
+          // If no specific category and no enquiry type, fetch all active images
+          fetchCategory = null; // Will fetch all active images
+          console.log('🎯 ProductListing - Fetching all active images');
+        } else {
+          // Map category IDs to backend category names
+          const categoryMapping = {
+            'suits': 'suits',
+            'kurtas': 'kurtas', 
+            'bandhgalas': 'bandhgalas',
+            'formal': 'formal',
+            'traditional': 'traditional'
+          };
+          fetchCategory = categoryMapping[currentCategory];
+        }
 
-        const backendCategory = categoryMapping[currentCategory];
-        if (backendCategory) {
-          const response = await ImageService.getImagesByCategory(backendCategory);
+        if (fetchCategory) {
+          const response = await ImageService.getImagesByCategory(fetchCategory);
           if (response.success) {
             setAdminImages(response.data.images || []);
+            console.log('🎯 ProductListing - Loaded admin images for category:', fetchCategory, 'Count:', response.data.images?.length || 0);
+            console.log('🎯 ProductListing - Images data:', response.data.images?.map(img => ({
+              id: img._id,
+              title: img.title,
+              category: img.category,
+              categories: img.categories
+            })));
+          } else {
+            setAdminImages([]);
+          }
+        } else if (fetchCategory === null) {
+          // Fetch all active images
+          const response = await ImageService.getImagesByCategory('all');
+          if (response.success) {
+            setAdminImages(response.data.images || []);
+            console.log('🎯 ProductListing - Loaded all active images:', response.data.images?.length || 0);
           } else {
             setAdminImages([]);
           }
@@ -92,21 +124,13 @@ const ProductListing = () => {
     };
 
     loadAdminImages();
-  }, [currentCategory]);
+  }, [currentCategory, location.state?.enquiryType]);
 
   // State management
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('name');
-  const [priceRange, setPriceRange] = useState([0, 5000]);
-
-  const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [1000, 3500],
-    categories: [],
-    occasions: [],
-    sizes: []
-  });
 
   // Event handlers following clean code principles
   const handleBackClick = () => {
@@ -216,9 +240,66 @@ const ProductListing = () => {
   };
 
   const handleApplyFilters = (filters) => {
-    console.log('Applying filters:', filters);
+    console.log('🎯 ProductListing - Received filters from FilterSidebar:', filters);
     setAppliedFilters(filters);
-    setPriceRange(filters.priceRange);
+    setShowFilterSidebar(false);
+  };
+
+  // Filter images based on applied filters
+  const getFilteredImages = () => {
+    let filtered = [...adminImages];
+    
+    console.log('🎯 ProductListing - Filtering images with filters:', appliedFilters);
+    console.log('🎯 ProductListing - Total images before filtering:', adminImages.length);
+    
+    // Debug: Log all image prices to see what we're working with
+    console.log('🎯 ProductListing - All image prices:', adminImages.map(img => ({
+      title: img.title,
+      price: img.price,
+      rentalPrice: img.rentalPrice,
+      actualPrice: img.actualPrice,
+      finalPrice: img.price || img.rentalPrice || img.actualPrice || 0
+    })));
+
+    // Filter by price range
+    if (appliedFilters.priceRange && appliedFilters.priceRange.length === 2) {
+      const [minPrice, maxPrice] = appliedFilters.priceRange;
+      console.log('🎯 ProductListing - Filtering by price range:', minPrice, '-', maxPrice);
+      console.log('🎯 ProductListing - Price filter is ACTIVE');
+      
+      filtered = filtered.filter(image => {
+        // Convert price to number and handle string prices
+        let price = image.price || image.rentalPrice || image.actualPrice || 0;
+        
+        // Convert string to number if needed
+        if (typeof price === 'string') {
+          // Remove currency symbols and commas, then convert to number
+          price = parseFloat(price.replace(/[₹,]/g, '')) || 0;
+        } else if (typeof price !== 'number') {
+          price = parseFloat(price) || 0;
+        }
+        
+        const matches = price >= minPrice && price <= maxPrice;
+        
+        console.log('🎯 ProductListing - Price filter check:', {
+          imageTitle: image.title,
+          originalPrice: image.price || image.rentalPrice || image.actualPrice,
+          convertedPrice: price,
+          priceType: typeof (image.price || image.rentalPrice || image.actualPrice),
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          matches: matches
+        });
+        
+        return matches;
+      });
+      console.log('🎯 ProductListing - Images after price filtering:', filtered.length);
+    } else {
+      console.log('🎯 ProductListing - No price filter applied');
+    }
+
+    console.log('🎯 ProductListing - Images after filtering:', filtered.length);
+    return filtered;
   };
 
   const handleCloseSideMenu = () => {
@@ -297,58 +378,189 @@ const ProductListing = () => {
   );
 
   const renderAdminImages = () => {
-    console.log('🎯 ProductListing renderAdminImages - enquiryType:', location.state?.enquiryType);
-    console.log('🎯 ProductListing renderAdminImages - categoryParam:', categoryParam);
-    console.log('🎯 ProductListing renderAdminImages - currentCategory:', currentCategory);
-    console.log('🎯 ProductListing renderAdminImages - adminImages:', adminImages.length);
+    // Declare variables outside try block to avoid scope issues
+    let displayTitle = 'Products';
+    let backendCategory = currentCategory;
     
-    // Map frontend category to backend category
-    const categoryMapping = {
-      'suits': 'suits',
-      'kurtas': 'kurtas', 
-      'bandhgalas': 'bandhgalas',
-      'formal': 'formal',
-      'traditional': 'traditional'
-    };
-
-    const backendCategory = categoryMapping[currentCategory] || currentCategory;
+    try {
+      console.log('🎯 ProductListing renderAdminImages - enquiryType:', location.state?.enquiryType);
+      console.log('🎯 ProductListing renderAdminImages - categoryParam:', categoryParam);
+      console.log('🎯 ProductListing renderAdminImages - currentCategory:', currentCategory);
+      console.log('🎯 ProductListing renderAdminImages - adminImages:', adminImages?.length || 0);
+      
+      // Determine display title based on enquiry type
+      if (location.state?.enquiryType === 'rent') {
+        displayTitle = 'Rent Products';
+      } else if (location.state?.enquiryType === 'buy') {
+        displayTitle = 'Buy Products';
+      } else if (currentCategory === 'all') {
+        displayTitle = 'All Products';
+      } else {
+        // Map frontend category to backend category
+        const categoryMapping = {
+          'suits': 'suits',
+          'kurtas': 'kurtas', 
+          'bandhgalas': 'bandhgalas',
+          'formal': 'formal',
+          'traditional': 'traditional'
+        };
+        backendCategory = categoryMapping[currentCategory] || currentCategory;
+        displayTitle = backendCategory ? `${backendCategory.charAt(0).toUpperCase() + backendCategory.slice(1)} Products` : 'Products';
+      }
     
     return (
       <Container className="py-3">
         {/* Show loading state */}
         {loadingAdminImages && (
           <div className="text-center py-4">
-            <p style={{ fontFamily: 'Century Gothic' }}>Loading {categoryTitle} images...</p>
+            <p style={{ fontFamily: 'Century Gothic' }}>Loading {displayTitle} images...</p>
           </div>
         )}
         
-        {/* Show admin images count */}
-        {!loadingAdminImages && adminImages.length > 0 && (
-          <div className="mb-3">
-            <p style={{ fontFamily: 'Century Gothic', color: '#666' }}>
-              Found {adminImages.length} admin image{adminImages.length !== 1 ? 's' : ''} in {categoryTitle}
-            </p>
-          </div>
-        )}
         
-        {/* Show ProductImageGallery */}
+        {/* Show filtered images */}
         <Row>
           <Col>
-          <ProductImageGallery
-            category={backendCategory}
-            tags={[]}
-            searchKeyword={searchQuery}
-            limit={8}
-            columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}
-            showTitle={true}
-            showDescription={true}
-            imageHeight="240px"
-            onImageClick={handleImageClick}
-          />
-        </Col>
-      </Row>
+            {(() => {
+              const filteredImages = getFilteredImages();
+              
+              console.log('🎯 ProductListing - Displaying filtered images:', filteredImages.length);
+              console.log('🎯 ProductListing - Current applied filters:', appliedFilters);
+              
+              // Apply search filter
+              const searchFiltered = searchQuery 
+                ? filteredImages.filter(image => 
+                    image.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    image.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    image.altText?.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                : filteredImages;
+
+              if (searchFiltered.length === 0) {
+                return (
+                  <div className="text-center py-5">
+                    <p style={{ fontFamily: 'Century Gothic', color: '#6c757d' }}>
+                      No products found matching your criteria.
+                    </p>
+                    <p style={{ fontFamily: 'Century Gothic', color: '#6c757d' }}>
+                      Try adjusting your search or filters.
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <Row className="g-3">
+                  {searchFiltered.map((image, index) => {
+                    const displayPrice = image.rentalPrice || image.price || image.actualPrice || 0;
+                    console.log('🎯 ProductListing - Displaying image:', {
+                      title: image.title,
+                      price: displayPrice,
+                      index: index
+                    });
+                    
+                    return (
+                    <Col key={image._id || index} xs={6} sm={6} md={4} lg={3}>
+                      <div 
+                        className="product-card"
+                        onClick={() => handleImageClick(image)}
+                        style={{
+                          cursor: 'pointer',
+                          border: '1px solid #e9ecef',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          transition: 'all 0.3s ease',
+                          backgroundColor: '#fff'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <div 
+                          style={{
+                            width: '100%',
+                            height: '240px',
+                            backgroundImage: `url(${image.imageUrl})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            position: 'relative'
+                          }}
+                        >
+                          <div 
+                            style={{
+                              position: 'absolute',
+                              top: '10px',
+                              right: '10px',
+                              backgroundColor: 'rgba(255,255,255,0.9)',
+                              borderRadius: '50%',
+                              width: '36px',
+                              height: '36px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Handle favorite toggle here if needed
+                            }}
+                          >
+                            <Heart size={18} color="#dc3545" />
+                          </div>
+                        </div>
+                        <div style={{ padding: '12px' }}>
+                          <h6 
+                            style={{ 
+                              fontFamily: 'Century Gothic', 
+                              fontWeight: '600',
+                              marginBottom: '8px',
+                              fontSize: '14px',
+                              lineHeight: '1.3'
+                            }}
+                          >
+                            {image.title || 'Product'}
+                          </h6>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span 
+                              style={{ 
+                                fontFamily: 'Century Gothic', 
+                                fontWeight: '700',
+                                color: '#000',
+                                fontSize: '16px'
+                              }}
+                            >
+                              ₹{(image.rentalPrice || image.price || image.actualPrice || 0).toLocaleString('en-IN')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                    );
+                  })}
+                </Row>
+              );
+            })()}
+          </Col>
+        </Row>
     </Container>
     );
+    } catch (error) {
+      console.error('Error in renderAdminImages:', error);
+      return (
+        <Container className="py-3">
+          <div className="text-center py-4">
+            <p style={{ fontFamily: 'Century Gothic', color: '#dc3545' }}>
+              Error loading images. Please try again.
+            </p>
+          </div>
+        </Container>
+      );
+    }
   };
 
   const renderProductGrid = () => (
@@ -378,26 +590,49 @@ const ProductListing = () => {
     </Container>
   );
 
-  return (
-    <div className="d-flex flex-column min-vh-100">
-      <Header onMenuClick={() => setShowSideMenu(true)} />
-      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
-      
-      <main className="flex-grow-1">
-        {renderPageHeader()}
-        {renderAdminImages()}
-        {renderProductGrid()}
-      </main>
-      
-      <FilterSidebar 
-        show={showFilterSidebar} 
-        handleClose={() => setShowFilterSidebar(false)}
-        onApplyFilters={handleApplyFilters}
-      />
-      
-      <Footer />
-    </div>
-  );
+  try {
+    return (
+      <div className="d-flex flex-column min-vh-100">
+        <Header onMenuClick={() => setShowSideMenu(true)} />
+        <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
+        
+        <main className="flex-grow-1">
+          {renderPageHeader()}
+          {renderAdminImages()}
+          {renderProductGrid()}
+        </main>
+        
+          <FilterSidebar 
+            show={showFilterSidebar} 
+            handleClose={() => setShowFilterSidebar(false)}
+            onApplyFilters={handleApplyFilters}
+            initialFilters={appliedFilters}
+          />
+        
+        <Footer />
+      </div>
+    );
+  } catch (error) {
+    console.error('Error in ProductListing component:', error);
+    return (
+      <div className="d-flex flex-column min-vh-100">
+        <Header onMenuClick={() => setShowSideMenu(true)} />
+        <main className="flex-grow-1">
+          <Container className="py-5">
+            <div className="text-center">
+              <h2 style={{ fontFamily: 'Century Gothic', color: '#dc3545' }}>
+                Something went wrong
+              </h2>
+              <p style={{ fontFamily: 'Century Gothic' }}>
+                Please refresh the page or try again later.
+              </p>
+            </div>
+          </Container>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 };
 
 export default ProductListing;

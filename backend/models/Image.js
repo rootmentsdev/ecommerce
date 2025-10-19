@@ -355,6 +355,8 @@ imageSchema.pre('save', function(next) {
 
   // Handle categories array - allow multi-select but ensure primary category is included
   if (this.isModified('category') || this.isNew) {
+    console.log(`🎯 Image Model - Processing category: ${this.category}, categories: ${JSON.stringify(this.categories)}`);
+    
     // When primary category changes, ensure it's included in categories array
     if (!this.categories || this.categories.length === 0) {
       this.categories = [this.category];
@@ -362,10 +364,11 @@ imageSchema.pre('save', function(next) {
       // Add primary category to categories array if not already present
       this.categories.unshift(this.category); // Add as first element (primary)
     }
-    console.log(`Updated categories array to include primary category: ${this.category}`);
+    console.log(`🎯 Image Model - Updated categories array to include primary category: ${this.category}, final categories: ${JSON.stringify(this.categories)}`);
   } else if (!this.categories || this.categories.length === 0) {
     // If no categories array, create one from the primary category
     this.categories = [this.category];
+    console.log(`🎯 Image Model - Created categories array from primary category: ${this.category}`);
   } else {
     // Ensure all categories in the array are valid
     this.categories = this.categories.filter(cat => 
@@ -381,6 +384,7 @@ imageSchema.pre('save', function(next) {
     if (this.categories.length === 0) {
       this.categories = [this.category];
     }
+    console.log(`🎯 Image Model - Final categories after processing: ${JSON.stringify(this.categories)}`);
   }
   
   // Handle tags

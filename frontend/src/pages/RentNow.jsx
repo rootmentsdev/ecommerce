@@ -3,6 +3,7 @@ import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Headphones } from 'react-bootstrap-icons';
 import SEOService from '../services/seoService';
+import ImageService from '../services/imageService';
 
 // Import images
 import Home1 from '../assets/Home1.jpg';
@@ -14,7 +15,7 @@ import Product3 from '../assets/Product3.png';
 import Product4 from '../assets/Product4.png';
 import Product5 from '../assets/Product5.png';
 import Aboutus4 from '../assets/Aboutus4.png';
-import Rent from '../assets/Rent.png';
+import Rent from '../assets/Rent.jpg';
 
 // Import reusable components
 import Header from '../components/Header';
@@ -25,13 +26,36 @@ import HorizontalScroll from '../components/common/HorizontalScroll';
 const RentNow = () => {
   const navigate = useNavigate();
   const [showSideMenu, setShowSideMenu] = useState(false);
+  const [rentImages, setRentImages] = useState([]);
+  const [loadingImages, setLoadingImages] = useState(true);
 
   // Initialize SEO for rent page
   useEffect(() => {
     SEOService.initializeRentPageSEO();
   }, []);
 
-  // Data constants following clean code principles
+  // Fetch rent-specific images
+  useEffect(() => {
+    const fetchRentImages = async () => {
+      try {
+        setLoadingImages(true);
+        const response = await ImageService.getImagesByCategory('rent');
+        if (response.success) {
+          setRentImages(response.data.images || []);
+          console.log('🎯 RentNow - Fetched rent images:', response.data.images?.length || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching rent images:', error);
+        setRentImages([]);
+      } finally {
+        setLoadingImages(false);
+      }
+    };
+
+    fetchRentImages();
+  }, []);
+
+  // Always use static category images to show available categories
   const TOP_CATEGORIES = [
     { id: 1, name: 'Suits', image: Product1, category: 'suits' },
     { id: 2, name: 'Kurtas', image: Product2, category: 'kurtas' },
@@ -89,15 +113,11 @@ const RentNow = () => {
 
   const handleExploreMoreClick = () => {
     console.log('Explore more clicked');
-    navigate('/products', {
-      state: { enquiryType: 'rent' }
-    });
+    navigate('/rent-products');
   };
 
   const handleBrowseDeals = () => {
-    navigate('/products', {
-      state: { enquiryType: 'rent' }
-    });
+    navigate('/rent-products');
   };
 
   const handleEnquireNow = () => {
@@ -111,20 +131,81 @@ const RentNow = () => {
     const heroImages = [Home1, Home2, Home3];
     const [activeIndex, setActiveIndex] = useState(0);
     
-    const handleNextImage = () => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    };
-    
     return (
-      <div className="py-2">
+      <div className="py-0">
+        <style>
+          {`
+            /* Desktop styling - make text and images same size */
+            @media (min-width: 992px) {
+              .hero-carousel-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 400px !important;
+                margin: 0 auto !important;
+              }
+              .hero-carousel {
+                width: 100% !important;
+                height: 400px !important;
+                border-radius: 15px !important;
+              }
+              .hero-image {
+                width: 100% !important;
+                height: 400px !important;
+                border-radius: 15px !important;
+              }
+              .hero-text-container {
+                margin-top: 0px !important;
+                padding-top: 0px !important;
+                position: relative !important;
+                z-index: 10 !important;
+              }
+              .hero-title {
+                font-size: 2.5rem !important;
+                margin-bottom: 1rem !important;
+                margin-top: 0 !important;
+                position: relative !important;
+                z-index: 10 !important;
+              }
+              .hero-description {
+                font-size: 1.1rem !important;
+                margin-bottom: 2rem !important;
+                position: relative !important;
+                z-index: 10 !important;
+              }
+            }
+            
+            /* Mobile styling */
+            @media (max-width: 768px) {
+              .hero-carousel-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+              }
+              .hero-carousel {
+                width: 100% !important;
+                height: 150vw !important;
+                border-radius: 0 !important;
+              }
+              .hero-image {
+                width: 100% !important;
+                height: 150vw !important;
+                border-radius: 0 !important;
+              }
+            }
+          `}
+        </style>
         <Container>
           {/* Image Carousel Section */}
-          <div className="text-center mb-5 position-relative d-flex justify-content-center">
+          <div className="text-center mb-0 position-relative">
              <div 
+               className="hero-carousel-container"
                style={{
-                 width: '380px',
-                 height: '480px',
-                 position: 'relative'
+                 width: '100%',
+                 maxWidth: '500px',
+                 height: '800px',
+                 position: 'relative',
+                 margin: '0 auto'
                }}
              >
               <Carousel 
@@ -132,53 +213,75 @@ const RentNow = () => {
                 onSelect={setActiveIndex}
                 indicators={false}
                 controls={false}
-                interval={null}
+                interval={3000}
+                className="hero-carousel"
                 style={{
-                  borderRadius: '36.73px',
-                  overflow: 'hidden'
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  width: '100%',
+                  height: '100%'
                 }}
               >
                 {heroImages.map((image, index) => (
                   <Carousel.Item key={index}>
                     <img 
                       src={image} 
-                      alt={`Hero ${index + 1}`}
+                      alt={`dappr SQUAD Premium Men's Fashion - Hero Image ${index + 1}`}
+                      className="hero-image"
                       style={{
-                        width: '380px',
-                        height: '480px',
+                        width: '100%',
+                        height: '800px',
                         objectFit: 'cover',
-                        borderRadius: '36.73px',
+                        borderRadius: '20px',
                         opacity: 1
                       }}
                     />
                   </Carousel.Item>
                 ))}
               </Carousel>
-              
-              {/* Navigation Arrow */}
-              <div 
-                className="position-absolute"
-                style={{
-                  bottom: '20px',
-                  right: '20px',
-                  width: '40px',
-                  height: '40px',
-                  backgroundColor: '#000',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  zIndex: 10
-                }}
-                onClick={handleNextImage}
-              >
-                <ChevronRight 
-                  size={20} 
-                  color="white"
-                />
-              </div>
-             </div>
+            </div>
+          </div>
+          
+          {/* Text and Button Section */}
+          <div className="text-center hero-text-container" style={{ marginTop: '3px' }}>
+            <h1 
+              className="fw-bold mb-3 hero-title"
+              style={{
+                width: 'auto',
+                minWidth: '320px',
+                height: '29px',
+                fontFamily: 'Century Gothic',
+                fontWeight: 700,
+                fontStyle: 'ExtraBold',
+                fontSize: '28px',
+                lineHeight: '120%',
+                letterSpacing: '0%',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                opacity: 1,
+                color: '#000',
+                margin: '0 auto',
+                whiteSpace: 'nowrap',
+                overflow: 'visible',
+                marginTop: '-140px',
+              }}
+            >
+              Rent Premium Fashion
+            </h1>
+            <p 
+              className="fs-5 mb-4 hero-description"
+              style={{
+                fontFamily: 'Century Gothic',
+                fontWeight: 400,
+                lineHeight: '1.4',
+                fontSize: '1.1rem',
+                color: '#666',
+                maxWidth: '600px',
+                margin: '0 auto'
+              }}
+            >
+              Perfect outfits for your special occasions. Rent premium men's fashion at affordable prices.
+            </p>
           </div>
         </Container>
       </div>
@@ -369,7 +472,7 @@ const RentNow = () => {
         <Row className="justify-content-center">
           <Col lg={10}>
             {/* Top Image Section */}
-            <div className="position-relative mb-4">
+            <div className="position-relative mb-4" style={{ marginTop: '40px' }}>
               <img 
                 src={Rent} 
                 alt="How Rent Now Works"
@@ -381,32 +484,21 @@ const RentNow = () => {
                   borderRadius: '15px'
                 }}
               />
-              
-              {/* Overlapping Heading */}
-              <div 
-                className="position-absolute"
+            </div>
+            
+            {/* Section Title */}
+            <div className="text-center mb-4">
+              <h2 
+                className="h3 fw-bold mb-0"
                 style={{
-                  bottom: '-2px',
-                  left: '20px',
-                  backgroundColor: 'transparent',
-                  padding: '0',
-                  zIndex: 10
+                  fontFamily: 'Century Gothic',
+                  fontWeight: 700,
+                  fontSize: '2.5rem',
+                  color: '#000'
                 }}
               >
-                 <h2 
-                   className="h3 fw-bold mb-0 mt-5"
-                   style={{
-                     fontFamily: 'Century Gothic',
-                     fontWeight: 700,
-                     fontSize: '2.5rem',
-                     color: '#000',
-                  
-                     textShadow: '2px 2px 4px rgba(255,255,255,0.8)'
-                   }}
-                 >
-                   How Rent Now Works
-                 </h2>
-              </div>
+                How Rent Now Works
+              </h2>
             </div>
             
             {/* Steps Section */}
@@ -569,8 +661,8 @@ const RentNow = () => {
       <main className="flex-grow-1">
         <Container fluid className="px-0">
           {renderHeroSection()}
-          {renderRentNowSection()}
           {renderTopCategoriesSection()}
+          {renderRentNowSection()}
           {renderHowRentNowWorksSection()}
           {renderFinalCTASection()}
         </Container>

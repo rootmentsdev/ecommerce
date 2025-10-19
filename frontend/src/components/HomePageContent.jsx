@@ -455,7 +455,7 @@ const HomePageContent = () => {
 
               }}
             >
-              Style Together, Shine Together - Premium Men's Fashion
+              Style Together, Shine Together
               </h1>
               <p 
               className="fs-5 mb-4 hero-description"

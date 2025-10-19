@@ -29,9 +29,14 @@ class ImageController {
       
       if (category && category !== 'all') {
         console.log('🎯 Backend getPublicImages filtering by category:', category);
+        console.log('🎯 Backend getPublicImages filter object before:', JSON.stringify(filter, null, 2));
         // Filter by primary category to prevent duplication
         // Products will appear in the section matching their primary category
         filter.category = category;
+        console.log('🎯 Backend getPublicImages filter object after:', JSON.stringify(filter, null, 2));
+      } else if (category === 'all') {
+        console.log('🎯 Backend getPublicImages fetching all active images');
+        // No additional filter - will fetch all active images
       }
       
       if (search && search.trim()) {
@@ -84,8 +89,14 @@ class ImageController {
           fabric: img.fabric,
           color: img.color,
           style: img.style,
-          category: img.category
+          category: img.category,
+          categories: img.categories
         })));
+        console.log('🎯 Backend getPublicImages - Filter used:', JSON.stringify(filter, null, 2));
+        console.log('🎯 Backend getPublicImages - Requested category:', category);
+      } else {
+        console.log('🎯 Backend getPublicImages - No images found with filter:', JSON.stringify(filter, null, 2));
+        console.log('🎯 Backend getPublicImages - Requested category:', category);
       }
 
       res.status(200).json({

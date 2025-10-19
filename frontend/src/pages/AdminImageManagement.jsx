@@ -219,8 +219,19 @@ const AdminImageManagement = () => {
         newCategories = ['rent']; // Default to rent
       }
       
-      // Set primary category to the first selected category
-      const primaryCategory = newCategories[0];
+      // Determine primary category based on priority
+      let primaryCategory;
+      if (newCategories.includes('rent')) {
+        primaryCategory = 'rent';
+      } else if (newCategories.includes('buy')) {
+        primaryCategory = 'buy';
+      } else {
+        // Use first selected category as fallback
+        primaryCategory = newCategories[0];
+      }
+      
+      console.log('🎯 AdminImageManagement - Selected categories:', newCategories);
+      console.log('🎯 AdminImageManagement - Primary category set to:', primaryCategory);
       
       return {
         ...prev,

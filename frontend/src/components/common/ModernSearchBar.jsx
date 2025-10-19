@@ -5,6 +5,7 @@ import { APP_CONFIG } from '../../constants';
 
 const ModernSearchBar = ({ 
   searchTerm, 
+  value,
   onSearchChange, 
   onFilterClick,
   placeholder = "Search" 
@@ -28,7 +29,7 @@ const ModernSearchBar = ({
         <Form.Control
           type="text"
           placeholder={placeholder}
-          value={searchTerm || ''}
+          value={value || searchTerm || ''}
           onChange={handleSearchChange}
           className="search-input-modern"
         />

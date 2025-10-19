@@ -5,6 +5,7 @@ import AuthCheck from './components/AuthCheck';
 import ScrollToTop from './components/ScrollToTop';
 import PageTransition from './components/PageTransition';
 import TopBanner from './components/TopBanner';
+import ErrorBoundary from './components/ErrorBoundary';
 import SEOService from './services/seoService';
 import FloatingWhatsAppButton from './components/FloatingWhatsAppButton';
 import HomePage from './pages/HomePage';
@@ -21,6 +22,8 @@ import Favorites from './pages/Favorites';
 import CategoryPage from './pages/CategoryPage';
 import BuyNow from './pages/BuyNow';
 import RentNow from './pages/RentNow';
+import BuyProducts from './pages/BuyProducts';
+import RentProducts from './pages/RentProducts';
 import './App.css';
 import './fonts.css';
 
@@ -65,7 +68,9 @@ function App() {
         } />
         <Route path="/products" element={
           <PageTransition>
-            <ProductListing />
+            <ErrorBoundary>
+              <ProductListing />
+            </ErrorBoundary>
           </PageTransition>
         } />
         <Route path="/product-details" element={
@@ -101,6 +106,20 @@ function App() {
         <Route path="/rent-now" element={
           <PageTransition>
             <RentNow />
+          </PageTransition>
+        } />
+        <Route path="/rent-products" element={
+          <PageTransition>
+            <ErrorBoundary>
+              <RentProducts />
+            </ErrorBoundary>
+          </PageTransition>
+        } />
+        <Route path="/buy-products" element={
+          <PageTransition>
+            <ErrorBoundary>
+              <BuyProducts />
+            </ErrorBoundary>
           </PageTransition>
         } />
         

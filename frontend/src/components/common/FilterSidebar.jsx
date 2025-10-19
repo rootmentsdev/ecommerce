@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Offcanvas, Form, Button, Row, Col } from 'react-bootstrap';
 import { X } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../../constants';
 import { CATEGORIES } from '../../data/products';
 
-const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
+const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = null }) => {
   // Filter state following clean code principles
-  const [filters, setFilters] = useState({
-    priceRange: [1000, 3500],
+  const [filters, setFilters] = useState(initialFilters || {
+    priceRange: [1000, 10000],
     categories: [],
     occasions: [],
     sizes: []
   });
+
+  // Update filters when initialFilters prop changes
+  React.useEffect(() => {
+    if (initialFilters) {
+      setFilters(initialFilters);
+    }
+  }, [initialFilters]);
 
   // Filter options data
   const CATEGORY_OPTIONS = CATEGORIES.map(cat => cat.name);
@@ -32,6 +39,22 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
   const handlePriceChange = (index, value) => {
     const newPriceRange = [...filters.priceRange];
     newPriceRange[index] = parseInt(value);
+    
+    // Ensure min price doesn't exceed max price
+    if (index === 0 && newPriceRange[0] > newPriceRange[1]) {
+      newPriceRange[1] = newPriceRange[0];
+    }
+    // Ensure max price doesn't go below min price
+    if (index === 1 && newPriceRange[1] < newPriceRange[0]) {
+      newPriceRange[0] = newPriceRange[1];
+    }
+    
+    console.log('🎯 FilterSidebar - Price range changed:', {
+      index: index,
+      value: value,
+      newPriceRange: newPriceRange
+    });
+    
     setFilters({ ...filters, priceRange: newPriceRange });
   };
 
@@ -58,7 +81,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
 
   const handleClearFilters = () => {
     const clearedFilters = {
-      priceRange: [1000, 3500],
+      priceRange: [1000, 10000],
       categories: [],
       occasions: [],
       sizes: []
@@ -68,6 +91,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
   };
 
   const handleApplyFilters = () => {
+    console.log('🎯 FilterSidebar - Applying filters:', filters);
     onApplyFilters(filters);
     handleClose();
   };
@@ -82,24 +106,51 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters }) => {
         Filter by Price
       </h6>
       <div className="px-2">
-        <Form.Range
-          min="1000"
-          max="3500"
-          step="100"
-          value={filters.priceRange[1]}
-          onChange={(e) => handlePriceChange(1, e.target.value)}
-          className="mb-2"
-          style={{ accentColor: '#000000' }}
-        />
-        <div className="d-flex justify-content-between">
+        {/* Min Price Slider */}
+        <div className="mb-3">
+          <label 
+            className="small text-muted mb-1 d-block"
+            style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
+          >
+            Min Price: ₹{filters.priceRange[0].toLocaleString('en-IN')}
+          </label>
+          <Form.Range
+            min="1000"
+            max="10000"
+            step="100"
+            value={filters.priceRange[0]}
+            onChange={(e) => handlePriceChange(0, e.target.value)}
+            style={{ accentColor: '#007bff' }}
+          />
+        </div>
+        
+        {/* Max Price Slider */}
+        <div className="mb-2">
+          <label 
+            className="small text-muted mb-1 d-block"
+            style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
+          >
+            Max Price: ₹{filters.priceRange[1].toLocaleString('en-IN')}
+          </label>
+          <Form.Range
+            min="1000"
+            max="10000"
+            step="100"
+            value={filters.priceRange[1]}
+            onChange={(e) => handlePriceChange(1, e.target.value)}
+            style={{ accentColor: '#28a745' }}
+          />
+        </div>
+        
+        <div className="d-flex justify-content-between mt-2">
           <span 
-            className="small text-muted"
+            className="small text-primary fw-bold"
             style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
           >
             ₹{filters.priceRange[0].toLocaleString('en-IN')}
           </span>
           <span 
-            className="small text-muted"
+            className="small text-success fw-bold"
             style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
           >
             ₹{filters.priceRange[1].toLocaleString('en-IN')}
