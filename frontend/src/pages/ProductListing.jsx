@@ -333,8 +333,17 @@ const ProductListing = () => {
 
   // Render methods following single responsibility principle
   const renderPageHeader = () => {
-    // Calculate total products count
-    const totalProducts = adminImages.length;
+    // Calculate total products count based on filtered images
+    const filteredImages = getFilteredImages();
+    const searchFiltered = searchQuery 
+      ? filteredImages.filter(image => 
+          image.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          image.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          image.altText?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : filteredImages;
+    
+    const totalProducts = searchFiltered.length;
     
     return (
     <Container className="py-3">

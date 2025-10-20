@@ -105,6 +105,16 @@ const BuyNow = () => {
       <div className="py-0">
         <style>
           {`
+            /* Mobile layout fixes */
+            body {
+              overflow-x: hidden !important;
+            }
+            
+            .container, .container-fluid {
+              max-width: 100% !important;
+              overflow-x: hidden !important;
+            }
+            
             /* Desktop styling - make text and images same size */
             @media (min-width: 992px) {
               .hero-carousel-container {
@@ -161,6 +171,20 @@ const BuyNow = () => {
                 width: 100% !important;
                 height: 150vw !important;
                 border-radius: 0 !important;
+              }
+              
+              /* Prevent horizontal scrolling on mobile */
+              .horizontal-scroll {
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+              }
+              
+              /* Ensure containers don't exceed viewport */
+              .container {
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+                max-width: 100% !important;
               }
             }
           `}
@@ -520,12 +544,10 @@ const BuyNow = () => {
       <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <main className="flex-grow-1">
-        <Container fluid className="px-0">
-          {renderHeroSection()}
-          {renderTopCategoriesSection()}
-          {renderBuyNowSection()}
-          {renderFinalCTASection()}
-        </Container>
+        {renderHeroSection()}
+        {renderTopCategoriesSection()}
+        {renderBuyNowSection()}
+        {renderFinalCTASection()}
       </main>
       
       <Footer />

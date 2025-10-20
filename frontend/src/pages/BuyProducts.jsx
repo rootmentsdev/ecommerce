@@ -269,7 +269,17 @@ const BuyProducts = () => {
   };
 
   const renderPageHeader = () => {
-    const totalProducts = adminImages.length;
+    // Calculate total products count based on filtered images
+    const filteredImages = getFilteredImages();
+    const searchFiltered = searchQuery 
+      ? filteredImages.filter(image => 
+          image.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          image.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          image.altText?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : filteredImages;
+    
+    const totalProducts = searchFiltered.length;
     
     // Determine page title based on URL category filter
     const pageTitle = categoryFilter 
