@@ -207,10 +207,6 @@ const HomePageContent = () => {
     navigate('/products');
   };
 
-  const handleViewAllProductsClick = () => {
-    console.log('View all products clicked');
-    navigate('/products');
-  };
 
   const handleProductClick = (product) => {
     console.log('Product clicked:', product);
@@ -754,7 +750,7 @@ const HomePageContent = () => {
                 fontWeight: 400,
               fontSize: '14px'
             }}
-              onClick={handleViewAllProductsClick}
+              onClick={handleExploreMoreClick}
           >
               View all products
           </Button>
@@ -908,27 +904,6 @@ const HomePageContent = () => {
             );
           })}
         </HorizontalScroll>
-        
-        {/* View All Products Button */}
-        <div className="text-center mt-4">
-          <Button 
-            variant="outline-dark" 
-            size="lg"
-            className="px-4 py-3"
-            style={{
-                fontFamily: 'Century Gothic',
-              fontWeight: 600,
-              borderRadius: '20px',
-              border: '2px solid #000',
-                  backgroundColor: 'transparent',
-              fontSize: '1rem',
-              color: '#000'
-            }}
-            onClick={handleViewAllProductsClick}
-          >
-            View All Products
-          </Button>
-    </div>
       </Container>
     );
   };

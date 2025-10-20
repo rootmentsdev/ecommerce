@@ -181,6 +181,22 @@ const EnquireNow = () => {
     if (!validation.isValid) {
       console.log('❌ EnquireNow - Form validation failed:', validation.errors);
       setErrors(validation.errors);
+      
+      // Auto-scroll to the first validation error field
+      const firstErrorField = Object.keys(validation.errors)[0];
+      if (firstErrorField) {
+        const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+        if (errorElement) {
+          errorElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+          // Focus the field after scrolling
+          setTimeout(() => {
+            errorElement.focus();
+          }, 500);
+        }
+      }
       return;
     }
     

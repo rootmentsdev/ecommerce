@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Container, Row, Col, Button, Form, InputGroup, Pagination, Card, Badge, Spinner } from 'react-bootstrap';
 import { ArrowLeft, Search, Funnel, Heart, HeartFill } from 'react-bootstrap-icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FavoritesService from '../services/favoritesService';
 
 // Import reusable components
@@ -20,6 +20,11 @@ import { APP_CONFIG } from '../constants';
 
 const RentProducts = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get category filter from URL params
+  const urlParams = new URLSearchParams(location.search);
+  const categoryFilter = urlParams.get('category');
   
   // State for admin images
   const [adminImages, setAdminImages] = useState([]);
@@ -281,6 +286,11 @@ const RentProducts = () => {
   const renderPageHeader = () => {
     const totalProducts = adminImages.length;
     
+    // Determine page title based on URL category filter
+    const pageTitle = categoryFilter 
+      ? `Rent ${categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}`
+      : 'Rent Products';
+    
     return (
     <Container className="py-3">
       <Row className="align-items-center mb-3">
@@ -302,7 +312,7 @@ const RentProducts = () => {
               fontWeight: 700
             }}
           >
-            Rent Products
+            {pageTitle}
           </h1>
           {totalProducts > 0 && (
             <p 
@@ -349,7 +359,26 @@ const RentProducts = () => {
           <Row>
             <Col>
               {(() => {
-                const filteredImages = getFilteredImages();
+                let filteredImages = getFilteredImages();
+                
+                // Apply URL category filter (for top categories from Rent Now page)
+                if (categoryFilter) {
+                  console.log('🎯 RentProducts - Filtering by URL category:', categoryFilter);
+                  filteredImages = filteredImages.filter(image => {
+                    const imageCategories = image.categories || [];
+                    const matchesCategory = imageCategories.some(cat => 
+                      cat.toLowerCase() === categoryFilter.toLowerCase()
+                    );
+                    console.log('🎯 RentProducts - Image category check:', {
+                      title: image.title,
+                      categories: imageCategories,
+                      categoryFilter: categoryFilter,
+                      matches: matchesCategory
+                    });
+                    return matchesCategory;
+                  });
+                  console.log('🎯 RentProducts - After URL category filter:', filteredImages.length);
+                }
                 
                 console.log('🎯 RentProducts - Displaying filtered images:', filteredImages.length);
                 console.log('🎯 RentProducts - Current applied filters:', appliedFilters);

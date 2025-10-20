@@ -378,6 +378,23 @@ const AdminImageManagement = () => {
     e.preventDefault();
 
     if (!validateForm()) {
+      // Auto-scroll to the first validation error field
+      setTimeout(() => {
+        const firstErrorField = Object.keys(formErrors)[0];
+        if (firstErrorField) {
+          const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+          if (errorElement) {
+            errorElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+            // Focus the field after scrolling
+            setTimeout(() => {
+              errorElement.focus();
+            }, 500);
+          }
+        }
+      }, 100); // Small delay to ensure formErrors state is updated
       return;
     }
 
