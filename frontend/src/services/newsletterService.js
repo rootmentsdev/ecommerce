@@ -2,9 +2,7 @@
  * Newsletter Service - Handles newsletter subscription and management
  */
 
-const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000'
-};
+import API_CONFIG from '../config/api.js';
 
 class NewsletterService {
   /**
@@ -16,7 +14,7 @@ class NewsletterService {
    */
   static async subscribe(email, preferences = {}, source = 'homepage') {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/newsletter/subscribe`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/newsletter/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +46,7 @@ class NewsletterService {
    */
   static async unsubscribe(email) {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/newsletter/unsubscribe`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/newsletter/unsubscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +73,7 @@ class NewsletterService {
    */
   static async getStats() {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/newsletter/stats`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/newsletter/stats`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +108,7 @@ class NewsletterService {
         status
       });
 
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/newsletter/subscribers?${queryParams}`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/newsletter/subscribers?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +137,7 @@ class NewsletterService {
    */
   static async updateSubscriberPreferences(email, preferences) {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/newsletter/subscribers/${email}`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/newsletter/subscribers/${email}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -122,7 +122,7 @@ const Favorites = () => {
       `}</style>
       <div className="min-vh-100" style={{ backgroundColor: '#f8f9fa' }}>
         <Header onMenuClick={handleMenuToggle} />
-        <SideMenu show={showSideMenu} onHide={() => setShowSideMenu(false)} />
+        <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <Container className="py-4">
         {/* Page Header */}

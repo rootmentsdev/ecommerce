@@ -1,25 +1,29 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Collapse, Image } from 'react-bootstrap';
 import { ChevronRight, Whatsapp, Facebook, Instagram } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/Logo.png';
 
 const Footer = () => {
+  const navigate = useNavigate();
   const [quickLinksOpen, setQuickLinksOpen] = useState(false);
   const [policiesOpen, setPoliciesOpen] = useState(false);
 
   const quickLinks = [
-    'About Us',
-    'Contact',
-    'Help Center',
-    'Shipping Info',
-    'Returns'
+    { label: 'About Us', href: '/about' },
+    { label: 'Rent Products', href: '/rent-products' },
+    { label: 'Buy Products', href: '/buy-products' },
+    { label: 'Favorites', href: '/favorites' },
+    // { label: 'Help Center', href: '/help' }, // Coming soon
+    // { label: 'Shipping Info', href: '/shipping' }, // Coming soon
+    // { label: 'Returns', href: '/returns' }, // Coming soon
   ];
 
   const policies = [
-    'Privacy Policy',
-    'Terms of Service',
-    'Cookie Policy',
-    'Refund Policy'
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Refund Policy', href: '/refund' },
+    { label: 'Shipping Policy', href: '/shipping' }
   ];
 
   const socialLinks = [
@@ -68,7 +72,7 @@ const Footer = () => {
                 opacity: 0.8
               }}
             >
-              Lorem ipsum dolor sit amet consectetur. Non volutpat nisi pretium blandit in risus sagittis auctor.
+              Your premier destination for premium men's fashion. Shop, rent, or book in bulk - we bring style and elegance to every celebration, from weddings to corporate events.
             </p>
           </Col>
         </Row>
@@ -99,62 +103,69 @@ const Footer = () => {
                   <div 
                     key={index}
                     className="mb-2 footer-link"
-                    style={{ fontSize: '0.9rem', color: 'white', opacity: 0.8 }}
+                    style={{ fontSize: '0.9rem', color: 'white', opacity: 0.8, cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(link.href);
+                    }}
                   >
-                    {link}
+                    {link.label}
                   </div>
                 ))}
               </div>
             </Collapse>
           </Col>
         </Row>
-
-        <hr style={{ borderColor: '#555', margin: '1rem 0' }} />
 
         {/* Policies Section */}
-        <Row className="mb-3">
-          <Col>
-            <div 
-              className="d-flex justify-content-between align-items-center footer-section"
-              onClick={() => setPoliciesOpen(!policiesOpen)}
-              style={{ cursor: 'pointer' }}
-            >
-              <span className="fw-medium" style={{ color: 'white' }}>Policies</span>
-              <ChevronRight 
-                size={16} 
-                style={{ 
-                  transform: policiesOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.3s ease'
-                }}
-              />
-            </div>
-            
-            <Collapse in={policiesOpen}>
-              <div className="mt-3">
-                {policies.map((policy, index) => (
-                  <div 
-                    key={index}
-                    className="mb-2 footer-link"
-                    style={{ fontSize: '0.9rem', color: 'white', opacity: 0.8 }}
-                  >
-                    {policy}
+        {policies.length > 0 && (
+          <>
+            <hr style={{ borderColor: '#555', margin: '1rem 0' }} />
+            <Row className="mb-3">
+              <Col>
+                <div 
+                  className="d-flex justify-content-between align-items-center footer-section"
+                  onClick={() => setPoliciesOpen(!policiesOpen)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <span className="fw-medium" style={{ color: 'white' }}>Policies</span>
+                  <ChevronRight 
+                    size={16} 
+                    style={{ 
+                      transform: policiesOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.3s ease'
+                    }}
+                  />
+                </div>
+                
+                <Collapse in={policiesOpen}>
+                  <div className="mt-3">
+                    {policies.map((policy, index) => (
+                      <div 
+                        key={index}
+                        className="mb-2 footer-link"
+                        style={{ fontSize: '0.9rem', color: 'white', opacity: 0.8, cursor: 'pointer' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(policy.href);
+                        }}
+                      >
+                        {policy.label}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </Collapse>
-          </Col>
-        </Row>
+                </Collapse>
+              </Col>
+            </Row>
+          </>
+        )}
 
         <hr style={{ borderColor: '#555', margin: '1rem 0' }} />
 
-        {/* Bottom Section - Policies, Social Media, Copyright */}
+        {/* Bottom Section - Social Media, Copyright */}
         <Row className="align-items-center">
-          <Col md={4}>
-            <span className="fw-medium" style={{ color: 'white' }}>Policies</span>
-          </Col>
-          
-          <Col md={4} className="text-center">
-            <div className="d-flex justify-content-center gap-3">
+          <Col md={6} className="text-center text-md-start mb-3 mb-md-0">
+            <div className="d-flex justify-content-center justify-content-md-start gap-3">
               {socialLinks.map((social, index) => {
                 const IconComponent = social.icon;
                 return (
@@ -172,12 +183,13 @@ const Footer = () => {
             </div>
           </Col>
           
-          <Col md={4} className="text-end">
+          <Col md={6} className="text-center text-md-end">
             <p 
               className="mb-0"
-              style={{ fontSize: '0.8rem', color: 'white', opacity: 0.8 }}
+              style={{ fontSize: '0.8rem', color: 'white', opacity: 0.8, lineHeight: '1.5' }}
             >
-              © 2025 YourBrand. All Rights Reserved.
+              © {new Date().getFullYear()} Dappr Squad. All Rights Reserved.<br className="d-md-none" />
+              <span className="d-none d-md-inline"> | </span>Premium Men's Fashion
             </p>
           </Col>
         </Row>

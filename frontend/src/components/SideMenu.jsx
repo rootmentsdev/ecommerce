@@ -12,7 +12,9 @@ import {
   ChatDots,
   Gear,
   BoxArrowRight,
-  X
+  X,
+  Cart3,
+  ArrowRepeat
 } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../constants';
 
@@ -22,20 +24,22 @@ const SideMenu = ({ show, handleClose }) => {
 
   // Constants following clean code principles
   const MENU_ITEMS = [
-    { icon: HouseDoor, label: 'Home', href: '/home' },
-    { icon: Person, label: 'Profile', href: '/profile' },
-    { icon: ListUl, label: 'Categories', href: '/categories' },
-    { icon: Box, label: 'My Orders', href: '/orders' },
+    { icon: HouseDoor, label: 'Home', href: '/' },
+    { icon: Cart3, label: 'Buy Now', href: '/buy-now' },
+    { icon: ArrowRepeat, label: 'Rent Now', href: '/rent-now' },
+    // { icon: Person, label: 'Profile', href: '/profile' }, // Coming soon
+    { icon: ListUl, label: 'Products', href: '/products' },
+    // { icon: Box, label: 'My Orders', href: '/orders' }, // Coming soon
     { icon: Heart, label: 'Favorites', href: '/favorites' },
-    { icon: ArrowClockwise, label: 'How it Works', href: '/how-it-works' },
-    { icon: GeoAlt, label: 'Store Near Me', href: '/store-locator' },
+    // { icon: ArrowClockwise, label: 'How it Works', href: '/how-it-works' }, // Coming soon
+    // { icon: GeoAlt, label: 'Store Near Me', href: '/store-locator' }, // Coming soon
     { icon: ChatDots, label: 'About Us', href: '/about' }
   ];
 
   const UTILITY_ITEMS = [
-    { icon: ChatDots, label: 'Support/ Help Center', href: '/support' },
-    { icon: Gear, label: 'Settings', href: '/settings' },
-    { icon: BoxArrowRight, label: 'Log Out', action: 'logout' }
+    // { icon: ChatDots, label: 'Support/ Help Center', href: '/support' }, // Coming soon
+    // { icon: Gear, label: 'Settings', href: '/settings' }, // Coming soon
+    // { icon: BoxArrowRight, label: 'Log Out', action: 'logout' }
   ];
 
   // Event handlers following clean code principles
@@ -55,7 +59,9 @@ const SideMenu = ({ show, handleClose }) => {
     }
   };
 
-  const handleCloseClick = () => {
+  const handleCloseClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (handleClose) {
       handleClose();
     }
@@ -86,13 +92,18 @@ const SideMenu = ({ show, handleClose }) => {
   // Render methods following single responsibility principle
   const renderCloseButton = () => (
     <Button 
+      type="button"
       variant="link" 
       onClick={handleCloseClick}
       className="p-0 text-dark close-btn"
-      style={{ fontSize: '1.5rem' }}
+      style={{ 
+        fontSize: '1.5rem',
+        cursor: 'pointer',
+        zIndex: 1000
+      }}
       aria-label="Close menu"
     >
-      <X />
+      <X size={24} />
     </Button>
   );
 
@@ -201,6 +212,9 @@ const SideMenu = ({ show, handleClose }) => {
             border-radius: 50%;
             padding: 8px;
             -webkit-tap-highlight-color: transparent;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            text-decoration: none !important;
           }
           
           .side-menu .close-btn:hover,
@@ -209,6 +223,7 @@ const SideMenu = ({ show, handleClose }) => {
             background-color: #000 !important;
             color: white !important;
             transform: scale(1.1);
+            text-decoration: none !important;
           }
           
           .side-menu .logo-section {
@@ -239,7 +254,9 @@ const SideMenu = ({ show, handleClose }) => {
       </style>
       <Offcanvas 
         show={show} 
-        onHide={handleClose} 
+        onHide={handleClose}
+        backdrop={true}
+        scroll={false}
         placement="start"
         className="side-menu"
         style={offcanvasStyles}
@@ -254,8 +271,12 @@ const SideMenu = ({ show, handleClose }) => {
           {renderLogo()}
         <hr className="my-3" />
           {renderMenuItems()}
-        <hr className="my-3" />
-          {renderUtilityItems()}
+        {UTILITY_ITEMS.length > 0 && (
+          <>
+            <hr className="my-3" />
+            {renderUtilityItems()}
+          </>
+        )}
       </Offcanvas.Body>
     </Offcanvas>
     </>
