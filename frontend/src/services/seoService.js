@@ -6,10 +6,10 @@
 class SEOService {
   // SEO Configuration
   static SITE_CONFIG = {
-    title: 'dappr SQUAD - Premium Men\'s Fashion & Suit Rental',
-    description: 'Premium men\'s fashion for every celebration. Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.',
-    keywords: 'mens fashion, suit rental, wedding suits, party wear, men\'s clothing, formal wear, tuxedo rental, designer suits',
-    url: 'https://dapprsquad.com',
+    title: 'Dappr Squad - Premium Men\'s Fashion & Suit Rental in Kerala',
+    description: 'Premium men\'s fashion for every celebration in Kerala. Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.',
+    keywords: 'mens fashion kerala, suit rental kochi, wedding suits kerala, party wear kerala, men\'s clothing kerala, formal wear kochi, tuxedo rental kerala, designer suits kerala',
+    url: 'https://ecommerce-pi-six-17.vercel.app',
     logo: '/assets/Logo.png',
     socialImage: '/assets/HomePage.png'
   };
@@ -146,21 +146,29 @@ class SEOService {
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "dappr SQUAD",
+      "name": "Dappr Squad",
+      "alternateName": "Dappr Squad Kerala",
       "url": this.SITE_CONFIG.url,
       "logo": `${this.SITE_CONFIG.url}${this.SITE_CONFIG.logo}`,
       "description": this.SITE_CONFIG.description,
       "foundingDate": "2024",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN",
+        "addressRegion": "Kerala",
+        "addressLocality": "Kochi"
+      },
+      "areaServed": {
+        "@type": "State",
+        "name": "Kerala"
+      },
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer service",
-        "availableLanguage": "English"
+        "availableLanguage": ["English", "Malayalam", "Hindi"]
       },
-      "sameAs": [
-        "https://www.facebook.com/dapprsquad",
-        "https://www.instagram.com/dapprsquad",
-        "https://www.twitter.com/dapprsquad"
-      ]
+      "priceRange": "₹₹-₹₹₹",
+      "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"]
     };
 
     this.addStructuredData(structuredData);
@@ -222,14 +230,14 @@ class SEOService {
    * Initialize SEO for homepage
    */
   static initializeHomepageSEO() {
-    this.setPageTitle('Buy Men\'s Suits in Kerala - dappr SQUAD Formalwear');
-    this.setPageDescription('Shop premium men\'s suits in Kerala at dappr SQUAD. Explore formal, wedding, and office wear suits with free delivery across Kerala. Elevate your style today!');
-    this.setPageKeywords('mens suits kerala, buy suits kochi, wedding suits kerala, formal wear kerala, designer suits kochi, mens fashion kerala, suit rental kerala, premium suits india');
+    this.setPageTitle('Buy Men\'s Suits in Kerala - Premium Formal Wear | Dappr Squad');
+    this.setPageDescription('Shop or rent premium men\'s suits in Kerala at Dappr Squad. Wedding suits, formal wear & designer outfits with free delivery across Kochi, Thrissur & Kerala.');
+    this.setPageKeywords('mens suits kerala, buy suits kochi, wedding suits kerala, formal wear kerala, designer suits kochi, mens fashion kerala, suit rental kerala, premium suits kochi, bandhgala kerala, kurta sets kerala');
     this.setCanonicalUrl('/');
-    this.setPageImage('/assets/HomePage.png', 'Buy Men\'s Suits in Kerala - dappr SQUAD');
+    this.setPageImage('/assets/HomePage.png', 'Buy Men\'s Suits in Kerala - Dappr Squad');
     
     // Add additional meta tags for better SEO
-    this.updateMetaTag('author', 'dappr SQUAD');
+    this.updateMetaTag('author', 'Dappr Squad');
     this.updateMetaTag('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
     this.updateMetaTag('googlebot', 'index, follow');
     this.updateMetaTag('bingbot', 'index, follow');
@@ -239,11 +247,13 @@ class SEOService {
     this.updateMetaTag('geo.region', 'IN-KL');
     this.updateMetaTag('geo.placename', 'Kerala');
     this.updateMetaTag('geo.position', '9.9312;76.2673');
+    this.updateMetaTag('ICBM', '9.9312, 76.2673');
     
     // Add business hours and contact info
     this.updateMetaTag('business:contact_data:street_address', 'Kochi, Kerala');
     this.updateMetaTag('business:contact_data:locality', 'Kochi');
     this.updateMetaTag('business:contact_data:region', 'Kerala');
+    this.updateMetaTag('business:contact_data:postal_code', '682001');
     this.updateMetaTag('business:contact_data:country_name', 'India');
     
     this.generateOrganizationStructuredData();
@@ -402,10 +412,11 @@ class SEOService {
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
-      "name": "dappr SQUAD",
+      "name": "Dappr Squad",
+      "alternateName": "Dappr Squad Men's Fashion Kerala",
       "description": this.SITE_CONFIG.description,
       "url": this.SITE_CONFIG.url,
-      "telephone": "+91-XXXXXXXXXX",
+      "image": `${this.SITE_CONFIG.url}${this.SITE_CONFIG.logo}`,
       "address": {
         "@type": "PostalAddress",
         "addressCountry": "IN",
@@ -418,9 +429,31 @@ class SEOService {
         "longitude": "76.2673"
       },
       "openingHours": "Mo-Su 09:00-21:00",
-      "priceRange": "₹₹",
-      "paymentAccepted": "Cash, Credit Card, UPI, Net Banking",
-      "currenciesAccepted": "INR"
+      "priceRange": "₹₹-₹₹₹",
+      "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"],
+      "currenciesAccepted": "INR",
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "Kochi"
+        },
+        {
+          "@type": "City",
+          "name": "Thrissur"
+        },
+        {
+          "@type": "City",
+          "name": "Kozhikode"
+        },
+        {
+          "@type": "City",
+          "name": "Thiruvananthapuram"
+        },
+        {
+          "@type": "City",
+          "name": "Kannur"
+        }
+      ]
     };
 
     this.addStructuredData(structuredData);

@@ -24,6 +24,7 @@ import BuyNow from './pages/BuyNow';
 import RentNow from './pages/RentNow';
 import BuyProducts from './pages/BuyProducts';
 import RentProducts from './pages/RentProducts';
+import CityLandingPage from './pages/CityLandingPage';
 import './App.css';
 import './fonts.css';
 
@@ -120,6 +121,33 @@ function App() {
             <ErrorBoundary>
               <BuyProducts />
             </ErrorBoundary>
+          </PageTransition>
+        } />
+        
+        {/* Kerala City Landing Pages for Local SEO */}
+        <Route path="/kochi" element={
+          <PageTransition>
+            <CityLandingPage />
+          </PageTransition>
+        } />
+        <Route path="/thrissur" element={
+          <PageTransition>
+            <CityLandingPage />
+          </PageTransition>
+        } />
+        <Route path="/kozhikode" element={
+          <PageTransition>
+            <CityLandingPage />
+          </PageTransition>
+        } />
+        <Route path="/trivandrum" element={
+          <PageTransition>
+            <CityLandingPage />
+          </PageTransition>
+        } />
+        <Route path="/kannur" element={
+          <PageTransition>
+            <CityLandingPage />
           </PageTransition>
         } />
         
