@@ -6,7 +6,7 @@
 class SEOService {
   // SEO Configuration
   static SITE_CONFIG = {
-    title: 'Dappr Squad - Premium Men\'s Fashion & Suit Rental in Kerala',
+    title: 'Dappr Squad - Premium Men\'s Suits Kerala',
     description: 'Premium men\'s fashion for every celebration in Kerala. Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.',
     keywords: 'mens fashion kerala, suit rental kochi, wedding suits kerala, party wear kerala, men\'s clothing kerala, formal wear kochi, tuxedo rental kerala, designer suits kerala',
     url: 'https://ecommerce-pi-six-17.vercel.app',
@@ -16,21 +16,24 @@ class SEOService {
 
   /**
    * Set page title with SEO optimization
-   * @param {string} title - Page title
+   * @param {string} title - Page title (should be 50-60 chars, already includes brand)
    * @param {string} category - Product category (optional)
    */
   static setPageTitle(title, category = '') {
-    const baseTitle = this.SITE_CONFIG.title;
-    const optimizedTitle = category 
-      ? `${title} - ${category} | ${baseTitle}`
-      : `${title} | ${baseTitle}`;
+    // Title should already include "| Dappr Squad" and be optimized to 50-60 chars
+    const optimizedTitle = title;
     
-    document.title = optimizedTitle;
+    // Ensure title doesn't exceed 60 characters for SEO best practice
+    const finalTitle = optimizedTitle.length > 60 
+      ? optimizedTitle.substring(0, 60) 
+      : optimizedTitle;
+    
+    document.title = finalTitle;
     
     // Update meta title
-    this.updateMetaTag('title', optimizedTitle);
-    this.updateMetaTag('og:title', optimizedTitle);
-    this.updateMetaTag('twitter:title', optimizedTitle);
+    this.updateMetaTag('title', finalTitle);
+    this.updateMetaTag('og:title', finalTitle);
+    this.updateMetaTag('twitter:title', finalTitle);
   }
 
   /**
@@ -230,11 +233,11 @@ class SEOService {
    * Initialize SEO for homepage
    */
   static initializeHomepageSEO() {
-    this.setPageTitle('Buy Men\'s Suits in Kerala - Premium Formal Wear | Dappr Squad');
+    this.setPageTitle('Men\'s Suits Kerala - Buy & Rent | Dappr Squad');
     this.setPageDescription('Shop or rent premium men\'s suits in Kerala at Dappr Squad. Wedding suits, formal wear & designer outfits with free delivery across Kochi, Thrissur & Kerala.');
     this.setPageKeywords('mens suits kerala, buy suits kochi, wedding suits kerala, formal wear kerala, designer suits kochi, mens fashion kerala, suit rental kerala, premium suits kochi, bandhgala kerala, kurta sets kerala');
     this.setCanonicalUrl('/');
-    this.setPageImage('/assets/HomePage.png', 'Buy Men\'s Suits in Kerala - Dappr Squad');
+    this.setPageImage('/assets/HomePage.png', 'Men\'s Suits Kerala - Dappr Squad');
     
     // Add additional meta tags for better SEO
     this.updateMetaTag('author', 'Dappr Squad');
@@ -265,9 +268,10 @@ class SEOService {
    */
   static initializeProductSEO(product) {
     const productName = product.name || product.title || 'Premium Suit';
-    const category = product.category || 'formal wear';
-    const title = `${productName} - ${category} Kerala | dappr SQUAD`;
-    const description = `Buy ${productName} in Kerala. Premium ${category} from dappr SQUAD with free delivery. Perfect for weddings and special occasions. Shop now!`;
+    const category = product.category || 'Suit';
+    // Optimize title to 50-60 chars: "{Product} - {Category} | Dappr Squad"
+    const title = `${productName} - ${category} | Dappr Squad`.substring(0, 60);
+    const description = `Buy ${productName} in Kerala. Premium ${category} from Dappr Squad with free delivery. Perfect for weddings and special occasions. Shop now!`;
     
     this.setPageTitle(title);
     this.setPageDescription(description);
@@ -281,8 +285,9 @@ class SEOService {
    * @param {string} category - Category name
    */
   static initializeCategorySEO(category) {
-    const title = `${category} Suits for Men in Kerala - dappr SQUAD`;
-    const description = `Shop ${category.toLowerCase()} suits for men in Kerala at dappr SQUAD. Premium quality with free delivery. Perfect for weddings and special occasions.`;
+    // Optimize title to 50-60 chars
+    const title = `${category} Suits Kerala - Men's | Dappr Squad`.substring(0, 60);
+    const description = `Shop ${category.toLowerCase()} suits for men in Kerala at Dappr Squad. Premium quality with free delivery. Perfect for weddings and special occasions.`;
     
     this.setPageTitle(title);
     this.setPageDescription(description);
@@ -295,8 +300,8 @@ class SEOService {
    * Initialize SEO for rent page
    */
   static initializeRentPageSEO() {
-    this.setPageTitle('Rent Men\'s Suits in Kerala - dappr SQUAD');
-    this.setPageDescription('Rent premium men\'s suits in Kerala at dappr SQUAD. Affordable formal wear for weddings, parties, and special occasions. Free delivery across Kerala.');
+    this.setPageTitle('Rent Men\'s Suits Kerala - Affordable | Dappr Squad');
+    this.setPageDescription('Rent premium men\'s suits in Kerala at Dappr Squad. Affordable formal wear for weddings, parties, and special occasions. Free delivery across Kerala.');
     this.setPageKeywords('rent suits kerala, suit rental kochi, wedding suit rental kerala, formal wear rental kerala, mens suit rental india');
     this.setCanonicalUrl('/rent-now');
     this.setPageImage('/assets/Rent.png', 'Rent Men\'s Suits Kerala');
@@ -306,8 +311,8 @@ class SEOService {
    * Initialize SEO for buy page
    */
   static initializeBuyPageSEO() {
-    this.setPageTitle('Buy Men\'s Suits Online Kerala - dappr SQUAD');
-    this.setPageDescription('Buy premium men\'s suits online in Kerala at dappr SQUAD. Designer formal wear with free delivery. Perfect for weddings and special occasions.');
+    this.setPageTitle('Buy Men\'s Suits Kerala - Designer | Dappr Squad');
+    this.setPageDescription('Buy premium men\'s suits online in Kerala at Dappr Squad. Designer formal wear with free delivery. Perfect for weddings and special occasions.');
     this.setPageKeywords('buy suits kerala, mens suits online kochi, wedding suits kerala, designer suits kerala, formal wear online india');
     this.setCanonicalUrl('/buy-now');
     this.setPageImage('/assets/Product1.png', 'Buy Men\'s Suits Kerala');
@@ -317,11 +322,11 @@ class SEOService {
    * Initialize SEO for about page
    */
   static initializeAboutPageSEO() {
-    this.setPageTitle('About dappr SQUAD - Kerala\'s Premium Men\'s Fashion');
-    this.setPageDescription('Learn about dappr SQUAD, Kerala\'s premier men\'s fashion brand. Premium suits, formal wear, and wedding attire with exceptional service.');
+    this.setPageTitle('About Dappr Squad - Premium Men\'s Fashion Kerala');
+    this.setPageDescription('Learn about Dappr Squad, Kerala\'s premier men\'s fashion brand. Premium suits, formal wear, and wedding attire with exceptional service.');
     this.setPageKeywords('about dappr squad, mens fashion brand kerala, premium suits kochi, wedding attire kerala, formal wear brand india');
     this.setCanonicalUrl('/about');
-    this.setPageImage('/assets/Aboutus1.png', 'About dappr SQUAD Kerala');
+    this.setPageImage('/assets/Aboutus1.png', 'About Dappr Squad Kerala');
   }
 
   /**

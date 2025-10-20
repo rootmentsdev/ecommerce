@@ -124,7 +124,7 @@ const CityLandingPage = () => {
   return (
     <>
       <SEOHead
-        title={`Buy Men's Suits in ${currentCity.name} - Premium Formal Wear | Dappr Squad`}
+        title={`Men's Suits ${currentCity.name} - Buy & Rent | Dappr Squad`}
         description={`Shop premium men's suits in ${currentCity.name}, Kerala. Wedding suits, formal wear, and designer outfits with free delivery across ${currentCity.popularAreas.join(', ')}. Rent or buy today!`}
         keywords={`${currentCity.keywords}, men's suits ${currentCity.name}, buy suits ${currentCity.name}, wedding attire ${currentCity.name}, mens fashion Kerala`}
         url={`/${city}`}
