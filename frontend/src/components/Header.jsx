@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, Container } from 'react-bootstrap';
-import { List, Search, Heart } from 'react-bootstrap-icons';
+import { List, Heart } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../constants';
 import FavoritesService from '../services/favoritesService';
 
@@ -38,12 +38,6 @@ const Header = ({ onMenuClick }) => {
       onMenuClick();
     }
   };
-
-  const handleSearchClick = () => {
-    console.log('Search clicked');
-    // TODO: Open search modal or navigate to search page
-  };
-
 
   const handleFavoritesClick = () => {
     window.location.href = '/favorites';
@@ -115,18 +109,6 @@ const Header = ({ onMenuClick }) => {
     </Navbar.Brand>
   );
 
-  const renderSearchButton = () => (
-    <button
-      onClick={handleSearchClick}
-      className="btn btn-link me-3 header-btn"
-      style={buttonStyles}
-      aria-label="Search"
-    >
-      <Search size={24} />
-    </button>
-  );
-
-
   const renderFavoritesButton = () => (
     <button
       onClick={handleFavoritesClick}
@@ -158,7 +140,6 @@ const Header = ({ onMenuClick }) => {
 
   const renderRightIcons = () => (
     <div className="d-flex align-items-center">
-      {renderSearchButton()}
       {renderFavoritesButton()}
     </div>
   );

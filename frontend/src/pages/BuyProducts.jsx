@@ -270,7 +270,19 @@ const BuyProducts = () => {
 
   const renderPageHeader = () => {
     // Calculate total products count based on filtered images
-    const filteredImages = getFilteredImages();
+    let filteredImages = getFilteredImages();
+    
+    // Apply URL category filter (same as in renderBuyImages)
+    if (categoryFilter) {
+      filteredImages = filteredImages.filter(image => {
+        const imageCategories = image.categories || [];
+        return imageCategories.some(cat => 
+          cat.toLowerCase() === categoryFilter.toLowerCase()
+        );
+      });
+    }
+    
+    // Apply search filter
     const searchFiltered = searchQuery 
       ? filteredImages.filter(image => 
           image.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
