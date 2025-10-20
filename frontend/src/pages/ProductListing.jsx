@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
-import { ArrowLeft, Search, Funnel, Heart } from 'react-bootstrap-icons';
+import { ArrowLeft, Search, Funnel, Heart, HeartFill } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // Import product data
@@ -17,6 +17,7 @@ import ProductImageGallery from '../components/common/ProductImageGallery';
 
 // Import services
 import ImageService from '../services/imageService';
+import FavoritesService from '../services/favoritesService';
 
 // Import constants and utilities
 import { APP_CONFIG } from '../constants';
@@ -37,6 +38,9 @@ const ProductListing = () => {
   // State for admin images
   const [adminImages, setAdminImages] = useState([]);
   const [loadingAdminImages, setLoadingAdminImages] = useState(false);
+  
+  // State for favorites
+  const [adminImageFavorites, setAdminImageFavorites] = useState(new Set());
   
   // State for filters
   const [appliedFilters, setAppliedFilters] = useState({
@@ -146,6 +150,30 @@ const ProductListing = () => {
         enquiryType: location.state?.enquiryType || 'rent'
       } 
     });
+  };
+
+  // Load saved favorites from localStorage
+  useEffect(() => {
+    const savedAdminFavorites = FavoritesService.getAdminFavorites();
+    setAdminImageFavorites(new Set(savedAdminFavorites));
+  }, []);
+
+  // Handle admin image favorite toggle
+  const handleAdminImageFavorite = (imageId, e) => {
+    e.stopPropagation();
+    const image = adminImages.find(img => img._id === imageId);
+    if (image) {
+      const newFavoriteStatus = FavoritesService.toggleFavorite(image);
+      setAdminImageFavorites(prev => {
+        const newFavorites = new Set(prev);
+        if (newFavoriteStatus) {
+          newFavorites.add(imageId);
+        } else {
+          newFavorites.delete(imageId);
+        }
+        return newFavorites;
+      });
+    }
   };
 
   // Convert admin image to product format
@@ -497,21 +525,31 @@ const ProductListing = () => {
                               position: 'absolute',
                               top: '10px',
                               right: '10px',
-                              backgroundColor: 'rgba(255,255,255,0.9)',
+                              backgroundColor: adminImageFavorites.has(image._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)',
                               borderRadius: '50%',
                               width: '36px',
                               height: '36px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease'
                             }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Handle favorite toggle here if needed
+                            onClick={(e) => handleAdminImageFavorite(image._id, e)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = adminImageFavorites.has(image._id) ? 'rgba(220, 53, 69, 0.2)' : 'rgba(255, 255, 255, 1)';
+                              e.currentTarget.style.transform = 'scale(1.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = adminImageFavorites.has(image._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)';
+                              e.currentTarget.style.transform = 'scale(1)';
                             }}
                           >
-                            <Heart size={18} color="#dc3545" />
+                            {adminImageFavorites.has(image._id) ? (
+                              <HeartFill size={18} color="#dc3545" />
+                            ) : (
+                              <Heart size={18} color="#dc3545" />
+                            )}
                           </div>
                         </div>
                         <div style={{ padding: '12px' }}>

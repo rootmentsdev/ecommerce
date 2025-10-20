@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import HorizontalScroll from '../components/common/HorizontalScroll';
 import { PRODUCTS_DATA } from '../data/products';
 import ImageService from '../services/imageService';
+import FavoritesService from '../services/favoritesService';
 
 const CategoryPage = () => {
   const navigate = useNavigate();
@@ -44,18 +45,28 @@ const CategoryPage = () => {
     }
   }, [category]);
 
+  // Load saved favorites from localStorage
+  useEffect(() => {
+    const savedAdminFavorites = FavoritesService.getAdminFavorites();
+    setAdminImageFavorites(new Set(savedAdminFavorites));
+  }, []);
+
   // Handle admin image favorite toggle
   const handleAdminImageFavorite = (imageId, e) => {
     e.stopPropagation();
-    setAdminImageFavorites(prev => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(imageId)) {
-        newFavorites.delete(imageId);
-      } else {
-        newFavorites.add(imageId);
-      }
-      return newFavorites;
-    });
+    const image = categoryImages.find(img => img._id === imageId);
+    if (image) {
+      const newFavoriteStatus = FavoritesService.toggleFavorite(image);
+      setAdminImageFavorites(prev => {
+        const newFavorites = new Set(prev);
+        if (newFavoriteStatus) {
+          newFavorites.add(imageId);
+        } else {
+          newFavorites.delete(imageId);
+        }
+        return newFavorites;
+      });
+    }
   };
 
   // Handle product click

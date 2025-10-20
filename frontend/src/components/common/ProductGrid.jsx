@@ -24,18 +24,16 @@ const ProductGrid = ({
 
   const handleFavoriteClick = (e, product) => {
     e.stopPropagation();
-    const isFavorited = favorites.has(product._id);
-    if (isFavorited) {
-      FavoritesService.removeFavorite(product._id);
-      setFavorites(prev => {
-        const newFavs = new Set(prev);
+    const newFavoriteStatus = FavoritesService.toggleFavorite(product);
+    setFavorites(prev => {
+      const newFavs = new Set(prev);
+      if (newFavoriteStatus) {
+        newFavs.add(product._id);
+      } else {
         newFavs.delete(product._id);
-        return newFavs;
-      });
-    } else {
-      FavoritesService.addFavorite(product._id);
-      setFavorites(prev => new Set([...prev, product._id]));
-    }
+      }
+      return newFavs;
+    });
   };
 
   const handleAddToCart = (e, product) => {
