@@ -46,7 +46,7 @@ const ProductListing = () => {
     sizes: []
   });
 
-  
+
   // Filter products based on category
   useEffect(() => {
     const products = getProductsByCategory(currentCategory === 'all' ? null : currentCategory);

@@ -441,7 +441,7 @@ const HomePageContent = () => {
                 fontFamily: 'Century Gothic',
                 fontWeight: 700,
                 fontStyle: 'ExtraBold',
-                fontSize: '28px',
+                fontSize: '25px',
                 lineHeight: '120%',
                 letterSpacing: '0%',
                 textAlign: 'center',
@@ -451,11 +451,11 @@ const HomePageContent = () => {
                 margin: '0 auto',
                 whiteSpace: 'nowrap',
                 overflow: 'visible',
-                marginTop: '-140px',
+                marginTop: '-150px',
 
               }}
             >
-              Style Together, Shine Together
+              Style Together,Shine Together
               </h1>
               <p 
               className="fs-5 mb-4 hero-description"
