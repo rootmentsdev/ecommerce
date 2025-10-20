@@ -1,9 +1,10 @@
-import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 /**
- * Comprehensive SEO Head Component
+ * Comprehensive SEO Head Component (React 19 Compatible)
  * Handles all meta tags, Open Graph, Twitter Cards, and Schema markup
+ * Works without react-helmet-async
  */
 const SEOHead = ({
   title = 'Dappr Squad - Premium Men\'s Suits & Fashion in Kerala',
@@ -24,150 +25,205 @@ const SEOHead = ({
   const fullUrl = url ? `${siteUrl}${url}` : siteUrl;
   const fullImageUrl = image.startsWith('http') ? image : `${siteUrl}${image}`;
 
-  // Generate breadcrumb structured data
-  const breadcrumbSchema = breadcrumbs.length > 0 ? {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    'itemListElement': breadcrumbs.map((item, index) => ({
-      '@type': 'ListItem',
-      'position': index + 1,
-      'name': item.name,
-      'item': `${siteUrl}${item.url}`
-    }))
-  } : null;
+  useEffect(() => {
+    // Set document title
+    document.title = title;
 
-  // Organization schema
-  const organizationSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    'name': 'Dappr Squad',
-    'url': siteUrl,
-    'logo': `${siteUrl}/assets/Logo.png`,
-    'description': 'Premium men\'s fashion and suit rental in Kerala. Buy or rent designer suits, kurtas, bandhgalas and formal wear for weddings and special occasions.',
-    'address': {
-      '@type': 'PostalAddress',
-      'addressCountry': 'IN',
-      'addressRegion': 'Kerala',
-      'addressLocality': 'Kochi'
-    },
-    'geo': {
-      '@type': 'GeoCoordinates',
-      'latitude': '9.9312',
-      'longitude': '76.2673'
-    },
-    'contactPoint': {
-      '@type': 'ContactPoint',
-      'contactType': 'customer service',
-      'availableLanguage': ['English', 'Malayalam', 'Hindi']
-    },
-    'priceRange': '₹₹-₹₹₹',
-    'paymentAccepted': ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking'],
-    'areaServed': {
-      '@type': 'State',
-      'name': 'Kerala'
+    // Helper function to update or create meta tags
+    const updateMetaTag = (selector, content, isProperty = false) => {
+      if (!content) return;
+      
+      const attribute = isProperty ? 'property' : 'name';
+      let meta = document.querySelector(`meta[${attribute}="${selector}"]`);
+      
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute(attribute, selector);
+        document.head.appendChild(meta);
+      }
+      
+      meta.setAttribute('content', content);
+    };
+
+    // Helper function to update link tags
+    const updateLinkTag = (rel, href) => {
+      if (!href) return;
+      
+      let link = document.querySelector(`link[rel="${rel}"]`);
+      
+      if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', rel);
+        document.head.appendChild(link);
+      }
+      
+      link.setAttribute('href', href);
+    };
+
+    // Primary Meta Tags
+    updateMetaTag('description', description);
+    updateMetaTag('keywords', keywords);
+    updateMetaTag('author', author);
+
+    // Canonical URL
+    updateLinkTag('canonical', fullUrl);
+
+    // Open Graph / Facebook
+    updateMetaTag('og:type', type, true);
+    updateMetaTag('og:url', fullUrl, true);
+    updateMetaTag('og:title', title, true);
+    updateMetaTag('og:description', description, true);
+    updateMetaTag('og:image', fullImageUrl, true);
+    updateMetaTag('og:image:alt', title, true);
+    updateMetaTag('og:image:width', '1200', true);
+    updateMetaTag('og:image:height', '630', true);
+    updateMetaTag('og:site_name', 'Dappr Squad', true);
+    updateMetaTag('og:locale', 'en_IN', true);
+
+    // Article specific tags
+    if (type === 'article') {
+      if (publishedTime) updateMetaTag('article:published_time', publishedTime, true);
+      if (modifiedTime) updateMetaTag('article:modified_time', modifiedTime, true);
+      if (section) updateMetaTag('article:section', section, true);
+      tags.forEach(tag => {
+        updateMetaTag('article:tag', tag, true);
+      });
     }
-  };
 
-  return (
-    <Helmet>
-      {/* Primary Meta Tags */}
-      <title>{title}</title>
-      <meta name="title" content={title} />
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="author" content={author} />
-      
-      {/* Canonical URL */}
-      <link rel="canonical" href={fullUrl} />
-      
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content={type} />
-      <meta property="og:url" content={fullUrl} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImageUrl} />
-      <meta property="og:image:alt" content={title} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="Dappr Squad" />
-      <meta property="og:locale" content="en_IN" />
-      
-      {/* Article specific tags */}
-      {type === 'article' && publishedTime && (
-        <meta property="article:published_time" content={publishedTime} />
-      )}
-      {type === 'article' && modifiedTime && (
-        <meta property="article:modified_time" content={modifiedTime} />
-      )}
-      {type === 'article' && section && (
-        <meta property="article:section" content={section} />
-      )}
-      {type === 'article' && tags.length > 0 && tags.map((tag, index) => (
-        <meta key={index} property="article:tag" content={tag} />
-      ))}
-      
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={fullUrl} />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullImageUrl} />
-      <meta name="twitter:image:alt" content={title} />
-      <meta name="twitter:site" content="@dapprsquad" />
-      <meta name="twitter:creator" content="@dapprsquad" />
-      
-      {/* Mobile/App Meta Tags */}
-      <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      <meta name="apple-mobile-web-app-title" content="Dappr Squad" />
-      <meta name="application-name" content="Dappr Squad" />
-      <meta name="theme-color" content="#000000" />
-      <meta name="msapplication-TileColor" content="#000000" />
-      
-      {/* SEO and Crawler Tags */}
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow" />
-      <meta name="bingbot" content="index, follow" />
-      <meta name="rating" content="general" />
-      <meta name="referrer" content="no-referrer-when-downgrade" />
-      
-      {/* Geographic Tags */}
-      <meta name="geo.region" content="IN-KL" />
-      <meta name="geo.placename" content="Kerala" />
-      <meta name="geo.position" content="9.9312;76.2673" />
-      <meta name="ICBM" content="9.9312, 76.2673" />
-      
-      {/* Language and Locale */}
-      <meta httpEquiv="content-language" content="en" />
-      <meta name="language" content="English" />
-      
-      {/* Structured Data - Organization */}
-      <script type="application/ld+json">
-        {JSON.stringify(organizationSchema)}
-      </script>
-      
-      {/* Structured Data - Breadcrumbs */}
-      {breadcrumbSchema && (
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbSchema)}
-        </script>
-      )}
-      
-      {/* Custom Structured Data */}
-      {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
-      )}
-      
-      {/* Preconnect for performance */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-      <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    </Helmet>
-  );
+    // Twitter
+    updateMetaTag('twitter:card', 'summary_large_image');
+    updateMetaTag('twitter:url', fullUrl);
+    updateMetaTag('twitter:title', title);
+    updateMetaTag('twitter:description', description);
+    updateMetaTag('twitter:image', fullImageUrl);
+    updateMetaTag('twitter:image:alt', title);
+    updateMetaTag('twitter:site', '@dapprsquad');
+    updateMetaTag('twitter:creator', '@dapprsquad');
+
+    // Mobile/App Meta Tags
+    updateMetaTag('mobile-web-app-capable', 'yes');
+    updateMetaTag('apple-mobile-web-app-capable', 'yes');
+    updateMetaTag('apple-mobile-web-app-status-bar-style', 'black-translucent');
+    updateMetaTag('apple-mobile-web-app-title', 'Dappr Squad');
+    updateMetaTag('application-name', 'Dappr Squad');
+    updateMetaTag('theme-color', '#000000');
+    updateMetaTag('msapplication-TileColor', '#000000');
+
+    // SEO and Crawler Tags
+    updateMetaTag('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+    updateMetaTag('googlebot', 'index, follow');
+    updateMetaTag('bingbot', 'index, follow');
+    updateMetaTag('rating', 'general');
+    updateMetaTag('referrer', 'no-referrer-when-downgrade');
+
+    // Geographic Tags
+    updateMetaTag('geo.region', 'IN-KL');
+    updateMetaTag('geo.placename', 'Kerala');
+    updateMetaTag('geo.position', '9.9312;76.2673');
+    updateMetaTag('ICBM', '9.9312, 76.2673');
+
+    // Language and Locale
+    updateMetaTag('language', 'English');
+
+    // Preconnect for performance
+    const preconnectUrls = [
+      'https://fonts.googleapis.com',
+      'https://fonts.gstatic.com'
+    ];
+
+    preconnectUrls.forEach(url => {
+      if (!document.querySelector(`link[rel="preconnect"][href="${url}"]`)) {
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = url;
+        if (url.includes('gstatic')) {
+          link.crossOrigin = 'anonymous';
+        }
+        document.head.appendChild(link);
+      }
+    });
+
+    // DNS prefetch
+    preconnectUrls.forEach(url => {
+      if (!document.querySelector(`link[rel="dns-prefetch"][href="${url}"]`)) {
+        const link = document.createElement('link');
+        link.rel = 'dns-prefetch';
+        link.href = url;
+        document.head.appendChild(link);
+      }
+    });
+
+  }, [title, description, keywords, image, fullUrl, fullImageUrl, type, author, publishedTime, modifiedTime, section, tags]);
+
+  // Add structured data
+  useEffect(() => {
+    const scriptId = 'seo-structured-data';
+    let script = document.getElementById(scriptId);
+
+    // Generate breadcrumb structured data
+    const breadcrumbSchema = breadcrumbs.length > 0 ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': breadcrumbs.map((item, index) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'name': item.name,
+        'item': `${siteUrl}${item.url}`
+      }))
+    } : null;
+
+    // Organization schema
+    const organizationSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      'name': 'Dappr Squad',
+      'url': siteUrl,
+      'logo': `${siteUrl}/assets/Logo.png`,
+      'description': 'Premium men\'s fashion and suit rental in Kerala. Buy or rent designer suits, kurtas, bandhgalas and formal wear for weddings and special occasions.',
+      'address': {
+        '@type': 'PostalAddress',
+        'addressCountry': 'IN',
+        'addressRegion': 'Kerala',
+        'addressLocality': 'Kochi'
+      },
+      'geo': {
+        '@type': 'GeoCoordinates',
+        'latitude': '9.9312',
+        'longitude': '76.2673'
+      },
+      'contactPoint': {
+        '@type': 'ContactPoint',
+        'contactType': 'customer service',
+        'availableLanguage': ['English', 'Malayalam', 'Hindi']
+      },
+      'priceRange': '₹₹-₹₹₹',
+      'paymentAccepted': ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking'],
+      'areaServed': {
+        '@type': 'State',
+        'name': 'Kerala'
+      }
+    };
+
+    // Combine all schemas
+    const allSchemas = [organizationSchema];
+    if (breadcrumbSchema) allSchemas.push(breadcrumbSchema);
+    if (structuredData) allSchemas.push(structuredData);
+
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.type = 'application/ld+json';
+      document.head.appendChild(script);
+    }
+
+    script.textContent = JSON.stringify(allSchemas);
+
+    return () => {
+      // Cleanup is optional as we're just updating content
+    };
+  }, [breadcrumbs, structuredData, siteUrl]);
+
+  return null; // This component doesn't render anything
 };
 
 SEOHead.propTypes = {
