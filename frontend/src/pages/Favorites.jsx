@@ -7,6 +7,7 @@ import SideMenu from '../components/SideMenu';
 import Footer from '../components/Footer';
 import { PRODUCTS_DATA } from '../data/products';
 import FavoritesService from '../services/favoritesService';
+import API_CONFIG from '../config/api';
 
 const Favorites = () => {
   const navigate = useNavigate();
@@ -37,13 +38,19 @@ const Favorites = () => {
         if (adminImageFavorites.length > 0) {
           try {
             // Fetch ALL admin images (not just specific categories)
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/images/public?limit=1000`);
+            console.log('🔍 Fetching admin images from:', `${API_CONFIG.BASE_URL}/images/public?limit=1000`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/images/public?limit=1000`);
             const data = await response.json();
             
-            if (data.success && data.data.images) {
+            console.log('🔍 API Response:', data);
+            
+            if (data.success && data.data && data.data.images) {
               // Filter by favorites
               adminFavorites = data.data.images.filter(img => adminImageFavorites.includes(img._id));
               console.log('🔍 Debug - Admin favorites found:', adminFavorites);
+              console.log('🔍 Debug - Matching IDs:', adminFavorites.map(img => img._id));
+            } else {
+              console.log('🔍 No images in response or response format unexpected');
             }
           } catch (error) {
             console.error('Error fetching admin images for favorites:', error);
@@ -153,7 +160,27 @@ const Favorites = () => {
                         style={{ 
                           borderRadius: '12px',
                           overflow: 'hidden',
-                          transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                          if (isAdminImage) {
+                            // Convert admin image to product format
+                            const product = {
+                              id: item._id,
+                              name: item.title,
+                              image: item.imageUrl,
+                              price: item.price || item.rentalPrice || 0,
+                              rentalPrice: item.rentalPrice || item.price || 0,
+                              actualPrice: item.actualPrice || 0,
+                              securityDeposit: item.securityDeposit || 0,
+                              description: item.description || '',
+                              category: item.category || 'product'
+                            };
+                            handleProductClick(product);
+                          } else {
+                            handleProductClick(item);
+                          }
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.transform = 'translateY(-2px)';
