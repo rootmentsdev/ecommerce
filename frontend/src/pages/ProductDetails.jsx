@@ -216,6 +216,18 @@ const ProductDetails = () => {
               >
                 Actual Price: ₹{product.actualPrice}
               </div>
+              {enquiryType === 'rent' && product.securityDeposit && (
+                <div 
+                  className="text-success mt-2"
+                  style={{
+                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}
+                >
+                  Security Deposit: ₹{product.securityDeposit.toLocaleString('en-IN')}
+                </div>
+              )}
               {enquiryType === 'rent' && (
                 <div 
                   className="text-info mt-2"

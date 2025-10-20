@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Container, Row, Col, Button, Form, InputGroup, Pagination, Card, Badge, Spinner } from 'react-bootstrap';
 import { ArrowLeft, Search, Funnel, Heart, HeartFill } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import FavoritesService from '../services/favoritesService';
 
 // Import reusable components
-import ProductCard from '../components/common/ProductCard';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SideMenu from '../components/SideMenu';
 import FilterSidebar from '../components/common/FilterSidebar';
 import ModernSearchBar from '../components/common/ModernSearchBar';
-import ProductImageGallery from '../components/common/ProductImageGallery';
 
 // Import services
 import ImageService from '../services/imageService';
@@ -29,11 +27,15 @@ const BuyProducts = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [adminImageFavorites, setAdminImageFavorites] = useState(new Set());
 
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
+
   // State management
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [1000, 10000],
+    priceRange: [1000, 100000], // Higher range for buy products (actual prices)
     categories: [],
     occasions: [],
     sizes: []
@@ -79,6 +81,17 @@ const BuyProducts = () => {
 
     loadBuyImages();
   }, []);
+
+  // Load saved favorites from localStorage
+  useEffect(() => {
+    const savedAdminFavorites = FavoritesService.getAdminFavorites();
+    setAdminImageFavorites(new Set(savedAdminFavorites));
+  }, []);
+
+  // Reset to page 1 when filters or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [appliedFilters, searchQuery]);
 
   // Event handlers
   const handleShowSideMenu = () => setShowSideMenu(true);
@@ -158,8 +171,8 @@ const BuyProducts = () => {
       const [minPrice, maxPrice] = appliedFilters.priceRange;
       console.log('🎯 BuyProducts - Filtering by price range:', minPrice, '-', maxPrice);
       filtered = filtered.filter(image => {
-        // Convert price to number and handle string prices
-        let price = image.price || image.actualPrice || 0;
+        // For BUY products, use purchase price (image.price) for filtering
+        let price = image.price || 0;
         
         // Convert string to number if needed
         if (typeof price === 'string') {
@@ -173,9 +186,8 @@ const BuyProducts = () => {
         
         console.log('🎯 BuyProducts - Price filter check:', {
           imageTitle: image.title,
-          originalPrice: image.price || image.actualPrice,
+          purchasePrice: image.price,
           convertedPrice: price,
-          priceType: typeof (image.price || image.actualPrice),
           minPrice: minPrice,
           maxPrice: maxPrice,
           matches: matches
@@ -188,19 +200,38 @@ const BuyProducts = () => {
 
     // Filter by categories
     if (appliedFilters.categories && appliedFilters.categories.length > 0) {
+      console.log('🎯 BuyProducts - Filtering by categories:', appliedFilters.categories);
       filtered = filtered.filter(image => {
-        const imageCategories = image.categories || [image.category];
-        return appliedFilters.categories.some(cat => {
-          // Simple category matching - check if image title or category contains the selected category
-          const imageTitle = (image.title || '').toLowerCase();
-          const imageCategory = (image.category || '').toLowerCase();
-          const selectedCategory = cat.toLowerCase();
+        const imageCategories = image.categories || [];
+        console.log('🎯 BuyProducts - Image categories check:', {
+          title: image.title,
+          primaryCategory: image.category,
+          categories: imageCategories
+        });
+        
+        return appliedFilters.categories.some(selectedCat => {
+          const selectedCatLower = selectedCat.toLowerCase();
           
-          return imageTitle.includes(selectedCategory) || 
-                 imageCategory.includes(selectedCategory) ||
-                 imageCategories.some(imgCat => imgCat.toLowerCase().includes(selectedCategory));
+          // Check if the selected category matches any of the image's categories
+          const matchesCategories = imageCategories.some(imgCat => {
+            const imgCatLower = imgCat.toLowerCase();
+            // Exact match or contains (e.g., "suits" matches "suits", "kurtas" matches "kurtas")
+            return imgCatLower === selectedCatLower || 
+                   imgCatLower.includes(selectedCatLower) ||
+                   selectedCatLower.includes(imgCatLower);
+          });
+          
+          const matches = matchesCategories;
+          console.log('🎯 BuyProducts - Category match result:', {
+            selectedCategory: selectedCat,
+            imageCategories: imageCategories,
+            matches: matches
+          });
+          
+          return matches;
         });
       });
+      console.log('🎯 BuyProducts - Images after category filtering:', filtered.length);
     }
 
     // Filter by occasions
@@ -232,7 +263,10 @@ const BuyProducts = () => {
     return filtered;
   };
 
-  const renderPageHeader = () => (
+  const renderPageHeader = () => {
+    const totalProducts = adminImages.length;
+    
+    return (
     <Container className="py-3">
       <Row className="align-items-center mb-3">
         <Col xs="auto">
@@ -245,9 +279,28 @@ const BuyProducts = () => {
           </Button>
         </Col>
         <Col>
-          <h1 style={{ fontFamily: 'Century Gothic', fontSize: '1.5rem', margin: 0 }}>
+          <h1 
+            className="h4 fw-bold mb-0"
+            style={{ 
+              fontFamily: 'Inter, sans-serif', 
+              letterSpacing: '-0.02em',
+              fontWeight: 700
+            }}
+          >
             Buy Products
           </h1>
+          {totalProducts > 0 && (
+            <p 
+              className="text-muted mb-0 mt-1" 
+              style={{ 
+                fontSize: '0.875rem',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: 400
+              }}
+            >
+              {totalProducts} {totalProducts === 1 ? 'product' : 'products'} available
+            </p>
+          )}
         </Col>
       </Row>
       
@@ -262,7 +315,8 @@ const BuyProducts = () => {
         </Col>
       </Row>
     </Container>
-  );
+    );
+  };
 
   const renderBuyImages = () => {
     try {
@@ -294,30 +348,33 @@ const BuyProducts = () => {
                 if (searchFiltered.length === 0) {
                   return (
                     <div className="text-center py-5">
-                      <p style={{ fontFamily: 'Century Gothic', color: '#6c757d' }}>
+                      <p className="text-muted">
                         No products found matching your criteria.
                       </p>
-                      <p style={{ fontFamily: 'Century Gothic', color: '#6c757d' }}>
+                      <p className="text-muted">
                         Try adjusting your search or filters.
                       </p>
                     </div>
                   );
                 }
 
+                // Pagination logic
+                const totalPages = Math.ceil(searchFiltered.length / ITEMS_PER_PAGE);
+                const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+                const endIndex = startIndex + ITEMS_PER_PAGE;
+                const paginatedImages = searchFiltered.slice(startIndex, endIndex);
+
                 return (
-                  <Row className="g-3">
-                    {searchFiltered.map((image, index) => (
+                  <>
+                    <Row className="g-3">
+                    {paginatedImages.map((image, index) => (
                       <Col key={image._id || index} xs={6} sm={6} md={4} lg={3}>
-                        <div 
-                          className="product-card"
+                        <Card 
+                          className="h-100 border-0 shadow-sm hover-card"
                           onClick={() => handleImageClick(image)}
-                          style={{
+                          style={{ 
                             cursor: 'pointer',
-                            border: '1px solid #e9ecef',
-                            borderRadius: '12px',
-                            overflow: 'hidden',
-                            transition: 'all 0.3s ease',
-                            backgroundColor: '#fff'
+                            transition: 'all 0.3s ease'
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-5px)';
@@ -325,80 +382,104 @@ const BuyProducts = () => {
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = 'none';
+                            e.currentTarget.style.boxShadow = '';
                           }}
                         >
-                          <div 
-                            style={{
-                              width: '100%',
-                              height: '240px',
-                              backgroundImage: `url(${image.imageUrl})`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              position: 'relative'
-                            }}
-                          >
-                            <div 
+                          <div className="position-relative">
+                            <Card.Img 
+                              variant="top" 
+                              src={image.imageUrl}
+                              alt={image.title || 'Product'}
+                              loading="lazy"
                               style={{
-                                position: 'absolute',
-                                top: '10px',
-                                right: '10px',
-                                backgroundColor: adminImageFavorites.has(image._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)',
-                                borderRadius: '50%',
+                                height: '240px',
+                                objectFit: 'cover'
+                              }}
+                            />
+                            <Button
+                              variant={adminImageFavorites.has(image._id) ? 'danger' : 'light'}
+                              size="sm"
+                              className="position-absolute top-0 end-0 m-2 rounded-circle p-0"
+                              style={{
                                 width: '36px',
                                 height: '36px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
+                                opacity: 0.9
                               }}
                               onClick={(e) => handleAdminImageFavorite(image._id, e)}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = adminImageFavorites.has(image._id) ? 'rgba(220, 53, 69, 0.2)' : 'rgba(255, 255, 255, 1)';
-                                e.currentTarget.style.transform = 'scale(1.1)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = adminImageFavorites.has(image._id) ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 255, 255, 0.9)';
-                                e.currentTarget.style.transform = 'scale(1)';
-                              }}
                             >
                               {adminImageFavorites.has(image._id) ? (
-                                <HeartFill size={18} color="#dc3545" />
+                                <HeartFill size={18} />
                               ) : (
-                                <Heart size={18} color="#dc3545" />
+                                <Heart size={18} />
                               )}
-                            </div>
+                            </Button>
                           </div>
-                          <div style={{ padding: '12px' }}>
-                            <h6 
-                              style={{ 
-                                fontFamily: 'Century Gothic', 
-                                fontWeight: '600',
-                                marginBottom: '8px',
-                                fontSize: '14px',
-                                lineHeight: '1.3'
-                              }}
-                            >
+                          <Card.Body className="p-3">
+                            <Card.Title className="h6 mb-2 text-truncate">
                               {image.title || 'Product'}
-                            </h6>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <span 
-                                style={{ 
-                                  fontFamily: 'Century Gothic', 
-                                  fontWeight: '700',
-                                  color: '#000',
-                                  fontSize: '16px'
-                                }}
-                              >
-                                ₹{(image.price || image.actualPrice || 0).toLocaleString('en-IN')}
+                            </Card.Title>
+                            <div className="d-flex justify-content-between align-items-center">
+                              <span className="fw-bold fs-6">
+                                ₹{(image.price || 0).toLocaleString('en-IN')}
                               </span>
+                              <small className="text-muted">Buy</small>
                             </div>
-                          </div>
-                        </div>
+                          </Card.Body>
+                        </Card>
                       </Col>
                     ))}
                   </Row>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="d-flex justify-content-center mt-4">
+                      <Pagination className="pagination-dark">
+                        <Pagination.First 
+                          onClick={() => setCurrentPage(1)} 
+                          disabled={currentPage === 1}
+                        />
+                        <Pagination.Prev 
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
+                          disabled={currentPage === 1}
+                        />
+                        
+                        {[...Array(totalPages)].map((_, idx) => {
+                          const pageNum = idx + 1;
+                          if (
+                            pageNum === 1 || 
+                            pageNum === totalPages || 
+                            (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                          ) {
+                            return (
+                              <Pagination.Item
+                                key={pageNum}
+                                active={pageNum === currentPage}
+                                onClick={() => setCurrentPage(pageNum)}
+                              >
+                                {pageNum}
+                              </Pagination.Item>
+                            );
+                          } else if (
+                            pageNum === currentPage - 2 || 
+                            pageNum === currentPage + 2
+                          ) {
+                            return <Pagination.Ellipsis key={pageNum} disabled />;
+                          }
+                          return null;
+                        })}
+                        
+                        <Pagination.Next 
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
+                          disabled={currentPage === totalPages}
+                        />
+                        <Pagination.Last 
+                          onClick={() => setCurrentPage(totalPages)} 
+                          disabled={currentPage === totalPages}
+                        />
+                      </Pagination>
+                    </div>
+                  )}
+                  </>
                 );
               })()}
             </Col>
@@ -421,9 +502,32 @@ const BuyProducts = () => {
 
   try {
     return (
-      <div className="d-flex flex-column min-vh-100">
-        <Header onMenuClick={handleShowSideMenu} />
-        <SideMenu show={showSideMenu} handleClose={handleCloseSideMenu} />
+      <>
+        <style>{`
+          .pagination-dark .page-link {
+            background-color: #000;
+            border-color: #000;
+            color: #fff;
+          }
+          .pagination-dark .page-link:hover {
+            background-color: #333;
+            border-color: #333;
+            color: #fff;
+          }
+          .pagination-dark .page-item.active .page-link {
+            background-color: #000;
+            border-color: #000;
+            color: #fff;
+          }
+          .pagination-dark .page-item.disabled .page-link {
+            background-color: #666;
+            border-color: #666;
+            color: #999;
+          }
+        `}</style>
+        <div className="d-flex flex-column min-vh-100">
+          <Header onMenuClick={handleShowSideMenu} />
+          <SideMenu show={showSideMenu} handleClose={handleCloseSideMenu} />
         
         <main className="flex-grow-1">
           {renderPageHeader()}
@@ -435,10 +539,12 @@ const BuyProducts = () => {
            handleClose={() => setShowFilterSidebar(false)}
            onApplyFilters={handleApplyFilters}
            initialFilters={appliedFilters}
+           maxPrice={100000}
          />
         
         <Footer />
       </div>
+      </>
     );
   } catch (error) {
     console.error('Error in BuyProducts component:', error);

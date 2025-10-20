@@ -5,7 +5,7 @@ import { ChevronRight, Headphones } from 'react-bootstrap-icons';
 import SEOService from '../services/seoService';
 import ImageService from '../services/imageService';
 
-// Import images
+// Import hero images (same as HomePage)
 import Home1 from '../assets/Home1.jpg';
 import Home2 from '../assets/Home2.jpg';
 import Home3 from '../assets/Home3.jpg';
@@ -14,7 +14,6 @@ import Product2 from '../assets/Product2.png';
 import Product3 from '../assets/Product3.png';
 import Product4 from '../assets/Product4.png';
 import Product5 from '../assets/Product5.png';
-import Aboutus4 from '../assets/Aboutus4.png';
 
 // Import reusable components
 import Header from '../components/Header';
@@ -54,7 +53,7 @@ const BuyNow = () => {
     fetchBuyImages();
   }, []);
 
-  // Always use static category images to show available categories
+  // Use same TOP_CATEGORIES as HomePage
   const TOP_CATEGORIES = [
     { id: 1, name: 'Suits', image: Product1, category: 'suits' },
     { id: 2, name: 'Kurtas', image: Product2, category: 'kurtas' },
@@ -98,6 +97,7 @@ const BuyNow = () => {
 
   // Render methods
   const renderHeroSection = () => {
+    // Use same hero images as HomePage
     const heroImages = [Home1, Home2, Home3];
     const [activeIndex, setActiveIndex] = useState(0);
     
@@ -196,7 +196,7 @@ const BuyNow = () => {
                   <Carousel.Item key={index}>
                     <img 
                       src={image} 
-                      alt={`dappr SQUAD Premium Men's Fashion - Hero Image ${index + 1}`}
+                      alt={`dappr SQUAD Buy Now - Hero Image ${index + 1}`}
                       className="hero-image"
                       style={{
                         width: '100%',
@@ -374,7 +374,7 @@ const BuyNow = () => {
             <div 
               className="position-relative"
               style={{ cursor: 'pointer' }}
-              onClick={() => handleCategoryClick(category)}
+              onClick={() => navigate(`/buy-products?category=${category.category}`)}
             >
               <img 
                 src={category.image} 
@@ -419,13 +419,7 @@ const BuyNow = () => {
                   borderBottomRightRadius: '15px'
                 }}
               >
-                <h6 
-                  className="text-white mb-0 fw-medium"
-                  style={{
-                    fontFamily: 'Century Gothic',
-                    fontWeight: 400
-                  }}
-                >
+                <h6 className="text-white mb-0 fw-medium">
                   {category.name}
                 </h6>
               </div>
@@ -441,21 +435,22 @@ const BuyNow = () => {
       <Container>
         <Row className="justify-content-center">
           <Col lg={8} className="text-center">
-            {/* Image Section */}
-            <div className="mb-4">
-              <img 
-                src={Aboutus4} 
-                alt="Celebration"
-                className="img-fluid"
-                style={{
-                  width: '100%',
-                  maxWidth: '800px',
-                  height: '400px',
-                  objectFit: 'cover',
-                  borderRadius: '15px'
-                }}
-              />
-            </div>
+            {/* Image Section - Using backend image */}
+            {buyImages.length > 0 && (
+              <div className="mb-4">
+                <img 
+                  src={buyImages[0]?.imageUrl} 
+                  alt="Celebration"
+                  className="img-fluid rounded"
+                  loading="lazy"
+                  style={{
+                    maxWidth: '800px',
+                    height: '400px',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
+            )}
             
             {/* Text Content */}
             <h2 

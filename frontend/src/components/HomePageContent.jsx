@@ -675,242 +675,53 @@ const HomePageContent = () => {
 
   // Render newsletter section
   const renderNewsletterSection = () => (
-    <Container className="py-5" style={{ 
-      backgroundColor: '#000000',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      {/* Background Pattern */}
-      <div 
-                 style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(255,255,255,0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.01) 0%, transparent 50%)',
-          pointerEvents: 'none'
-        }}
-      />
-      
-      <Row className="text-center position-relative">
-        <Col md={8} className="mx-auto">
-          {/* Icon */}
-          <div className="mb-4">
-            <div 
-                style={{
-                width: '80px',
-                height: '80px',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                margin: '0 auto',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)'
-                }}
-              >
-              <span style={{ fontSize: '2rem', color: '#fff' }}>📧</span>
-            </div>
-          </div>
-
-                <h3 
-                  style={{
-                    fontFamily: 'Century Gothic',
-                    fontWeight: 700,
-              fontSize: '2.5rem',
-              color: '#fff',
-              marginBottom: '1rem',
-              textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-            }}
-          >
-            Stay in the Loop
-                </h3>
-            <p 
-              style={{
-                fontFamily: 'Century Gothic',
-                fontWeight: 400,
-              fontSize: '1.2rem',
-              color: '#e0e0e0',
-              marginBottom: '2rem',
-              lineHeight: '1.6',
-              maxWidth: '600px',
-              margin: '0 auto 2rem auto'
-            }}
-          >
-            Get exclusive access to the latest fashion trends, special offers, and style tips delivered straight to your inbox
-          </p>
-          
-          <form onSubmit={handleNewsletterSubmit}>
-            <div 
-              className="d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center"
-              style={{ maxWidth: '500px', margin: '0 auto' }}
-            >
-              <div style={{ flex: 1, minWidth: '300px' }}>
-                <input
-                  type="email"
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  required
-                  disabled={newsletterLoading}
-                  style={{
-                    fontFamily: 'Century Gothic',
-                    padding: '16px 24px',
-                    borderRadius: '50px',
-                    border: '2px solid rgba(255,255,255,0.2)',
-                    fontSize: '1rem',
-                    width: '100%',
-                    outline: 'none',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    color: '#fff',
-                    backdropFilter: 'blur(10px)',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#fff';
-                    e.target.style.backgroundColor = 'rgba(255,255,255,0.15)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(255,255,255,0.2)';
-                    e.target.style.backgroundColor = 'rgba(255,255,255,0.1)';
-                  }}
-                />
-                <style>
-                  {`
-                    input::placeholder {
-                      color: rgba(255,255,255,0.7) !important;
-                    }
-                  `}
-                </style>
-    </div>
-              
-              <Button
-                type="submit"
-                disabled={newsletterLoading || !newsletterEmail.trim()}
-            style={{
-            fontFamily: 'Century Gothic',
-                  fontWeight: 600,
-                  padding: '16px 32px',
-                  borderRadius: '50px',
-                  backgroundColor: newsletterLoading ? 'rgba(255,255,255,0.3)' : '#fff',
-                  color: '#000',
-                  border: 'none',
-                  fontSize: '1rem',
-                  minWidth: '140px',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(255,255,255,0.2)',
-                  cursor: newsletterLoading ? 'not-allowed' : 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  if (!newsletterLoading && newsletterEmail.trim()) {
-                    e.target.style.backgroundColor = '#f0f0f0';
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 20px rgba(255,255,255,0.3)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!newsletterLoading) {
-                    e.target.style.backgroundColor = '#fff';
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 15px rgba(255,255,255,0.2)';
-                  }
-                }}
-              >
-                {newsletterLoading ? (
-                  <span>
-                    <span 
-                  style={{
-                        display: 'inline-block',
-                        width: '16px',
-                        height: '16px',
-                        border: '2px solid #000',
-                        borderTop: '2px solid transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite',
-                        marginRight: '8px'
-                      }}
-                    />
-                    Subscribing...
-                  </span>
-                ) : (
-                  'Subscribe Now'
-                )}
-              </Button>
-            </div>
+    <div className="py-5 bg-dark">
+      <Container>
+        <Row className="justify-content-center">
+          <Col md={8} lg={6} className="text-center">
+            <h3 className="text-white mb-3 fw-bold">
+              Stay in the Loop
+            </h3>
+            <p className="text-white-50 mb-4">
+              Subscribe to get updates on new arrivals and special offers
+            </p>
+            
+            <form onSubmit={handleNewsletterSubmit} className="mb-3">
+              <Row className="g-2">
+                <Col xs={12} md={8}>
+                  <input
+                    type="email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    disabled={newsletterLoading}
+                    className="form-control form-control-lg"
+                  />
+                </Col>
+                <Col xs={12} md={4}>
+                  <Button
+                    type="submit"
+                    variant="light"
+                    size="lg"
+                    disabled={newsletterLoading || !newsletterEmail.trim()}
+                    className="w-100"
+                  >
+                    {newsletterLoading ? 'Subscribing...' : 'Subscribe'}
+                  </Button>
+                </Col>
+              </Row>
+            </form>
             
             {newsletterSuccess && (
-              <div 
-                className="mt-4"
-                      style={{
-                  color: '#4CAF50',
-                        fontFamily: 'Century Gothic',
-                  fontWeight: 500,
-                  fontSize: '1.1rem',
-                  backgroundColor: 'rgba(76,175,80,0.1)',
-                  padding: '12px 24px',
-                  borderRadius: '25px',
-                  border: '1px solid rgba(76,175,80,0.3)',
-                  display: 'inline-block'
-                }}
-              >
-                ✓ Successfully subscribed! Welcome to the dappr SQUAD family!
+              <div className="alert alert-success mt-3">
+                ✓ Successfully subscribed! Welcome to dappr SQUAD!
               </div>
             )}
-
-            {/* Benefits */}
-            <div className="mt-4">
-              <p 
-                      style={{
-                        fontFamily: 'Century Gothic',
-                        fontWeight: 400,
-                  fontSize: '0.9rem',
-                  color: '#bbb',
-                  marginBottom: '0.5rem'
-                }}
-              >
-                What you'll get:
-              </p>
-              <div className="d-flex flex-wrap justify-content-center gap-3">
-                {[
-                  '🎯 Exclusive Offers',
-                  '👔 Style Tips',
-                  '🆕 New Arrivals',
-                  '📧 Weekly Updates'
-                ].map((benefit, index) => (
-                  <span 
-                    key={index}
-                    style={{
-                      fontFamily: 'Century Gothic',
-                      fontWeight: 400,
-                      fontSize: '0.85rem',
-                      color: '#ccc',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      padding: '4px 12px',
-                      borderRadius: '15px',
-                      border: '1px solid rgba(255,255,255,0.1)'
-                    }}
-                  >
-                    {benefit}
-                  </span>
-              ))}
-            </div>
-            </div>
-          </form>
-        </Col>
-      </Row>
-
-      {/* CSS Animation */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
+          </Col>
+        </Row>
       </Container>
+    </div>
   );
 
   const renderFeaturedProductsSection = () => {

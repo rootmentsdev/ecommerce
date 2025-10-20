@@ -9,6 +9,7 @@ const config = require('./config/config');
 const authRoutes = require('./routes/authRoutes');
 const enquiryRoutes = require('./routes/enquiryRoutes');
 const imageRoutes = require('./routes/imageRoutes');
+const newsletterRoutes = require('./routes/newsletterRoutes');
 
 const app = express();
 
@@ -85,6 +86,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/images', imageRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // API Info endpoint
 app.get('/api', (req, res) => {

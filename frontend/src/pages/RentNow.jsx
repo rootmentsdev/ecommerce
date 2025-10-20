@@ -5,7 +5,7 @@ import { ChevronRight, Headphones } from 'react-bootstrap-icons';
 import SEOService from '../services/seoService';
 import ImageService from '../services/imageService';
 
-// Import images
+// Import hero images (same as HomePage)
 import Home1 from '../assets/Home1.jpg';
 import Home2 from '../assets/Home2.jpg';
 import Home3 from '../assets/Home3.jpg';
@@ -14,8 +14,6 @@ import Product2 from '../assets/Product2.png';
 import Product3 from '../assets/Product3.png';
 import Product4 from '../assets/Product4.png';
 import Product5 from '../assets/Product5.png';
-import Aboutus4 from '../assets/Aboutus4.png';
-import Rent from '../assets/Rent.jpg';
 
 // Import reusable components
 import Header from '../components/Header';
@@ -55,7 +53,7 @@ const RentNow = () => {
     fetchRentImages();
   }, []);
 
-  // Always use static category images to show available categories
+  // Use same TOP_CATEGORIES as HomePage
   const TOP_CATEGORIES = [
     { id: 1, name: 'Suits', image: Product1, category: 'suits' },
     { id: 2, name: 'Kurtas', image: Product2, category: 'kurtas' },
@@ -128,6 +126,7 @@ const RentNow = () => {
 
   // Render methods following clean code principles
   const renderHeroSection = () => {
+    // Use same hero images as HomePage
     const heroImages = [Home1, Home2, Home3];
     const [activeIndex, setActiveIndex] = useState(0);
     
@@ -226,7 +225,7 @@ const RentNow = () => {
                   <Carousel.Item key={index}>
                     <img 
                       src={image} 
-                      alt={`dappr SQUAD Premium Men's Fashion - Hero Image ${index + 1}`}
+                      alt={`dappr SQUAD Rent Now - Hero Image ${index + 1}`}
                       className="hero-image"
                       style={{
                         width: '100%',
@@ -404,7 +403,7 @@ const RentNow = () => {
             <div 
               className="position-relative"
               style={{ cursor: 'pointer' }}
-              onClick={() => handleCategoryClick(category)}
+              onClick={() => navigate(`/rent-products?category=${category.category}`)}
             >
                <img 
                  src={category.image} 
@@ -449,13 +448,7 @@ const RentNow = () => {
                    borderBottomRightRadius: '15px'
                  }}
                >
-                <h6 
-                  className="text-white mb-0 fw-medium"
-                   style={{
-                     fontFamily: 'Century Gothic',
-                     fontWeight: 400
-                   }}
-                >
+                <h6 className="text-white mb-0 fw-medium">
                   {category.name}
                 </h6>
               </div>
@@ -471,20 +464,22 @@ const RentNow = () => {
       <Container>
         <Row className="justify-content-center">
           <Col lg={10}>
-            {/* Top Image Section */}
-            <div className="position-relative mb-4" style={{ marginTop: '40px' }}>
-              <img 
-                src={Rent} 
-                alt="How Rent Now Works"
-                className="img-fluid"
-                style={{
-                  width: '100%',
-                  height: '300px',
-                  objectFit: 'cover',
-                  borderRadius: '15px'
-                }}
-              />
-            </div>
+            {/* Top Image Section - Using backend image */}
+            {rentImages.length > 0 && (
+              <div className="position-relative mb-4" style={{ marginTop: '40px' }}>
+                <img 
+                  src={rentImages[rentImages.length > 1 ? 1 : 0]?.imageUrl} 
+                  alt="How Rent Now Works"
+                  className="img-fluid rounded"
+                  loading="lazy"
+                  style={{
+                    width: '100%',
+                    height: '300px',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
+            )}
             
             {/* Section Title */}
             <div className="text-center mb-4">
@@ -575,21 +570,22 @@ const RentNow = () => {
       <Container>
         <Row className="justify-content-center">
           <Col lg={8} className="text-center">
-            {/* Image Section */}
-            <div className="mb-4">
-              <img 
-                src={Aboutus4} 
-                alt="Celebration"
-                className="img-fluid"
-                style={{
-                  width: '100%',
-                  maxWidth: '800px',
-                  height: '400px',
-                  objectFit: 'cover',
-                  borderRadius: '15px'
-                }}
-              />
-            </div>
+            {/* Image Section - Using backend image */}
+            {rentImages.length > 0 && (
+              <div className="mb-4">
+                <img 
+                  src={rentImages[0]?.imageUrl} 
+                  alt="Celebration"
+                  className="img-fluid rounded"
+                  loading="lazy"
+                  style={{
+                    maxWidth: '800px',
+                    height: '400px',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
+            )}
             
             {/* Text Content */}
              <h2 

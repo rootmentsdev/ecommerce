@@ -4,10 +4,10 @@ import { X } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../../constants';
 import { CATEGORIES } from '../../data/products';
 
-const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = null }) => {
+const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = null, maxPrice = 10000 }) => {
   // Filter state following clean code principles
   const [filters, setFilters] = useState(initialFilters || {
-    priceRange: [1000, 10000],
+    priceRange: [1000, maxPrice],
     categories: [],
     occasions: [],
     sizes: []
@@ -81,7 +81,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
 
   const handleClearFilters = () => {
     const clearedFilters = {
-      priceRange: [1000, 10000],
+      priceRange: [1000, maxPrice],
       categories: [],
       occasions: [],
       sizes: []
@@ -116,7 +116,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
           </label>
           <Form.Range
             min="1000"
-            max="10000"
+            max={maxPrice}
             step="100"
             value={filters.priceRange[0]}
             onChange={(e) => handlePriceChange(0, e.target.value)}
@@ -134,7 +134,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
           </label>
           <Form.Range
             min="1000"
-            max="10000"
+            max={maxPrice}
             step="100"
             value={filters.priceRange[1]}
             onChange={(e) => handlePriceChange(1, e.target.value)}

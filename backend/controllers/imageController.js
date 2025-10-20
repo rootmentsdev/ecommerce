@@ -25,22 +25,25 @@ class ImageController {
 
       // Build filter object - only active images for public
       const filter = { isActive: true };
-      const orConditions = [];
+      const categoryOrConditions = [];
+      const searchOrConditions = [];
       
       if (category && category !== 'all') {
         console.log('🎯 Backend getPublicImages filtering by category:', category);
-        console.log('🎯 Backend getPublicImages filter object before:', JSON.stringify(filter, null, 2));
-        // Filter by primary category to prevent duplication
-        // Products will appear in the section matching their primary category
-        filter.category = category;
-        console.log('🎯 Backend getPublicImages filter object after:', JSON.stringify(filter, null, 2));
+        // Filter by primary category OR if category exists in categories array
+        // This allows products to appear in multiple category pages
+        categoryOrConditions.push(
+          { category: category },
+          { categories: { $in: [category] } }
+        );
+        console.log('🎯 Backend getPublicImages - Category filter created');
       } else if (category === 'all') {
         console.log('🎯 Backend getPublicImages fetching all active images');
         // No additional filter - will fetch all active images
       }
       
       if (search && search.trim()) {
-        orConditions.push(
+        searchOrConditions.push(
           { title: { $regex: search.trim(), $options: 'i' } },
           { description: { $regex: search.trim(), $options: 'i' } },
           { altText: { $regex: search.trim(), $options: 'i' } },
@@ -48,8 +51,18 @@ class ImageController {
         );
       }
 
-      if (orConditions.length > 0) {
-        filter.$or = orConditions;
+      // Combine category and search filters using $and
+      const andConditions = [];
+      if (categoryOrConditions.length > 0) {
+        andConditions.push({ $or: categoryOrConditions });
+      }
+      if (searchOrConditions.length > 0) {
+        andConditions.push({ $or: searchOrConditions });
+      }
+      
+      if (andConditions.length > 0) {
+        filter.$and = andConditions;
+        console.log('🎯 Backend getPublicImages - Final filter:', JSON.stringify(filter, null, 2));
       }
 
       if (tags && tags.trim()) {
@@ -276,6 +289,7 @@ class ImageController {
         sizes: requestData.sizes,
         type: requestData.type,
         category: requestData.category,
+        categories: requestData.categories,
         tags: requestData.tags,
         isActive: requestData.isActive,
         inStock: requestData.inStock
@@ -304,6 +318,7 @@ class ImageController {
         imageUrl: imageUrl.trim(),
         altText: altText.trim(),
         category,
+        categories: req.body.categories || [category], // Add categories array
         tags: processedTags,
         isActive,
         displayOrder: parseInt(displayOrder) || 0,
@@ -358,6 +373,7 @@ class ImageController {
         sizes: newImage.sizes,
         type: newImage.type,
         category: newImage.category,
+        categories: newImage.categories,
         tags: newImage.tags,
         isActive: newImage.isActive,
         inStock: newImage.inStock,

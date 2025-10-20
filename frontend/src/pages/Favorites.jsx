@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Image, Card } from 'react-bootstrap';
+import { Container, Row, Col, Button, Image, Card, Pagination, Badge, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Heart, HeartFill } from 'react-bootstrap-icons';
 import Header from '../components/Header';
@@ -14,6 +14,10 @@ const Favorites = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
 
   // Load favorites from localStorage and admin images
   useEffect(() => {
@@ -93,9 +97,32 @@ const Favorites = () => {
   };
 
   return (
-    <div className="min-vh-100" style={{ backgroundColor: '#f8f9fa' }}>
-      <Header onMenuClick={handleMenuToggle} />
-      <SideMenu show={showSideMenu} onHide={() => setShowSideMenu(false)} />
+    <>
+      <style>{`
+        .pagination-dark .page-link {
+          background-color: #000;
+          border-color: #000;
+          color: #fff;
+        }
+        .pagination-dark .page-link:hover {
+          background-color: #333;
+          border-color: #333;
+          color: #fff;
+        }
+        .pagination-dark .page-item.active .page-link {
+          background-color: #000;
+          border-color: #000;
+          color: #fff;
+        }
+        .pagination-dark .page-item.disabled .page-link {
+          background-color: #666;
+          border-color: #666;
+          color: #999;
+        }
+      `}</style>
+      <div className="min-vh-100" style={{ backgroundColor: '#f8f9fa' }}>
+        <Header onMenuClick={handleMenuToggle} />
+        <SideMenu show={showSideMenu} onHide={() => setShowSideMenu(false)} />
       
       <Container className="py-4">
         {/* Page Header */}
@@ -128,26 +155,34 @@ const Favorites = () => {
         {/* Favorites Grid - Same UI as Product Listing */}
         {loading ? (
           <div className="text-center py-5">
-            <p style={{ fontFamily: 'Century Gothic' }}>Loading your favorites...</p>
+            <Spinner animation="border" variant="primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+            <p className="mt-3 text-muted">Loading your favorites...</p>
           </div>
         ) : favorites.length > 0 ? (
           <div>
-            <h2 
-              style={{
-                fontFamily: 'Century Gothic',
-                fontWeight: 700,
-                fontSize: '1.5rem',
-                marginBottom: '2rem',
-                color: '#000'
-              }}
-            >
-              {favorites.length} Favorite Item{favorites.length !== 1 ? 's' : ''}
-            </h2>
+            {/* Pagination logic */}
+            {(() => {
+              const totalPages = Math.ceil(favorites.length / ITEMS_PER_PAGE);
+              const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+              const endIndex = startIndex + ITEMS_PER_PAGE;
+              const paginatedFavorites = favorites.slice(startIndex, endIndex);
+
+              return (
+                <>
+                  {/* Product Count Badge */}
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <Badge bg="dark" className="fs-6 fw-normal px-3 py-2">
+                      Showing {startIndex + 1}-{Math.min(endIndex, favorites.length)} of {favorites.length} favorites
+                    </Badge>
+                    {totalPages > 1 && <span className="text-muted">Page {currentPage} of {totalPages}</span>}
+                  </div>
             
             {/* Product Grid - Same as Product Listing Page */}
             <Container className="py-3">
               <Row className="g-3">
-                {favorites.map((item, index) => {
+                {paginatedFavorites.map((item, index) => {
                   const isAdminImage = item._id;
                   const imageSrc = isAdminImage ? item.imageUrl : item.image;
                   const title = isAdminImage ? item.title : item.name;
@@ -191,13 +226,13 @@ const Favorites = () => {
                           e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
                         }}
                       >
-                        <div style={{ position: 'relative' }}>
+                        <div className="position-relative">
                           <Card.Img
                             variant="top"
                             src={imageSrc}
                             alt={title}
+                            loading="lazy"
                             style={{
-                              width: '100%',
                               height: '240px',
                               objectFit: 'cover'
                             }}
@@ -205,29 +240,20 @@ const Favorites = () => {
                           
                           {/* Love Button - Same as Product Listing */}
                           <Button 
-                            variant="light"
-                            className="position-absolute"
+                            variant="danger"
+                            size="sm"
+                            className="position-absolute top-0 end-0 m-2 rounded-circle p-0"
                             style={{
-                              top: '8px',
-                              right: '8px',
-                              width: '32px',
-                              height: '32px',
-                              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                              border: 'none',
-                              borderRadius: '50%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              padding: 0
+                              width: '36px',
+                              height: '36px',
+                              opacity: 0.9
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleRemoveFavorite(item);
                             }}
                           >
-                            <HeartFill size={16} className="text-danger" />
+                            <HeartFill size={16} />
                           </Button>
                         </div>
                         
@@ -255,7 +281,60 @@ const Favorites = () => {
                   );
                 })}
               </Row>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="d-flex justify-content-center mt-4">
+                  <Pagination className="pagination-dark">
+                    <Pagination.First 
+                      onClick={() => setCurrentPage(1)} 
+                      disabled={currentPage === 1}
+                    />
+                    <Pagination.Prev 
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
+                      disabled={currentPage === 1}
+                    />
+                    
+                    {[...Array(totalPages)].map((_, idx) => {
+                      const pageNum = idx + 1;
+                      if (
+                        pageNum === 1 || 
+                        pageNum === totalPages || 
+                        (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                      ) {
+                        return (
+                          <Pagination.Item
+                            key={pageNum}
+                            active={pageNum === currentPage}
+                            onClick={() => setCurrentPage(pageNum)}
+                          >
+                            {pageNum}
+                          </Pagination.Item>
+                        );
+                      } else if (
+                        pageNum === currentPage - 2 || 
+                        pageNum === currentPage + 2
+                      ) {
+                        return <Pagination.Ellipsis key={pageNum} disabled />;
+                      }
+                      return null;
+                    })}
+                    
+                    <Pagination.Next 
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
+                      disabled={currentPage === totalPages}
+                    />
+                    <Pagination.Last 
+                      onClick={() => setCurrentPage(totalPages)} 
+                      disabled={currentPage === totalPages}
+                    />
+                  </Pagination>
+                </div>
+              )}
             </Container>
+            </>
+            );
+          })()}
           </div>
         ) : (
           <div className="text-center py-5">
@@ -305,6 +384,7 @@ const Favorites = () => {
       
       <Footer />
     </div>
+    </>
   );
 };
 

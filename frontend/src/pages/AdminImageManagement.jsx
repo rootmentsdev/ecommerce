@@ -202,6 +202,12 @@ const AdminImageManagement = () => {
    * Handle category selection (multi-select with proper primary category management)
    */
   const handleCategoryChange = (categoryValue, isChecked) => {
+    console.log('🎯 AdminImageManagement - handleCategoryChange called:', {
+      categoryValue,
+      isChecked,
+      currentCategories: formData.categories
+    });
+    
     setFormData(prev => {
       let newCategories;
       if (isChecked) {
@@ -230,8 +236,10 @@ const AdminImageManagement = () => {
         primaryCategory = newCategories[0];
       }
       
-      console.log('🎯 AdminImageManagement - Selected categories:', newCategories);
-      console.log('🎯 AdminImageManagement - Primary category set to:', primaryCategory);
+      console.log('🎯 AdminImageManagement - Updated state:', {
+        newCategories,
+        primaryCategory
+      });
       
       return {
         ...prev,
@@ -465,7 +473,8 @@ const AdminImageManagement = () => {
         care: formData.care,
         sizes: formData.sizes,
         type: formData.type,
-        category: formData.category
+        category: formData.category,
+        categories: formData.categories
       });
       
       console.log('📊 Submit Data - After processing:', {
@@ -484,7 +493,8 @@ const AdminImageManagement = () => {
         care: submitData.care,
         sizes: submitData.sizes,
         type: submitData.type,
-        category: submitData.category
+        category: submitData.category,
+        categories: submitData.categories
       });
       console.log('Submitting form data:', JSON.stringify(submitData, null, 2));
       console.log('📡 Final HTTP Request Data:', {
@@ -1053,13 +1063,17 @@ const AdminImageManagement = () => {
                         top: '8px',
                         right: '8px',
                         display: 'flex',
-                        gap: '4px'
+                        gap: '4px',
+                        flexWrap: 'wrap',
+                        maxWidth: '150px'
                       }}
                     >
-                      <Badge bg={getCategoryBadgeVariant(image.category)}>
-                        {image.category}
-                      </Badge>
-                      <Badge bg={image.isActive ? 'success' : 'secondary'}>
+                      {(image.categories && image.categories.length > 0 ? image.categories : [image.category]).map((cat, idx) => (
+                        <Badge key={idx} bg={getCategoryBadgeVariant(cat)} style={{ fontSize: '0.7rem' }}>
+                          {cat}
+                        </Badge>
+                      ))}
+                      <Badge bg={image.isActive ? 'success' : 'secondary'} style={{ fontSize: '0.7rem' }}>
                         {image.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
@@ -1202,9 +1216,13 @@ const AdminImageManagement = () => {
                       </div>
                     </td>
                     <td>
-                      <Badge bg={getCategoryBadgeVariant(image.category)}>
-                        {image.category}
-                      </Badge>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        {(image.categories && image.categories.length > 0 ? image.categories : [image.category]).map((cat, idx) => (
+                          <Badge key={idx} bg={getCategoryBadgeVariant(cat)} style={{ fontSize: '0.75rem' }}>
+                            {cat}
+                          </Badge>
+                        ))}
+                      </div>
                     </td>
                     <td>
                       <Badge bg={image.isActive ? 'success' : 'secondary'}>
