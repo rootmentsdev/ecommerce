@@ -7,6 +7,11 @@
 const isDevelopment = import.meta.env.DEV;
 const isProduction = import.meta.env.PROD;
 
+// Check if we're on Vercel by looking at the URL
+const isVercelDeployment = typeof window !== 'undefined' && 
+  (window.location.hostname.includes('vercel.app') || 
+   window.location.hostname.includes('ecommerce-pi-six-17'));
+
 // Backend API URLs
 const API_URLS = {
   development: 'http://localhost:5000/api',
@@ -16,13 +21,22 @@ const API_URLS = {
 
 // Current environment API URL
 const getCurrentApiUrl = () => {
+  // ALWAYS use production URL if on Vercel
+  if (isVercelDeployment) {
+    console.log('🚀 Using PRODUCTION backend:', API_URLS.production);
+    return API_URLS.production;
+  }
+  
   if (isDevelopment) {
+    console.log('💻 Using DEVELOPMENT backend:', API_URLS.development);
     return API_URLS.development;
   } else if (isProduction) {
+    console.log('🌐 Using PRODUCTION backend:', API_URLS.production);
     return API_URLS.production;
   } else {
-    // Fallback to development for other environments
-    return API_URLS.development;
+    // Fallback to production for safety
+    console.log('⚠️ Fallback to PRODUCTION backend:', API_URLS.production);
+    return API_URLS.production;
   }
 };
 
@@ -117,12 +131,19 @@ export const getEnvironmentInfo = () => {
     environment: API_CONFIG.ENVIRONMENT,
     baseUrl: API_CONFIG.BASE_URL,
     isDevelopment,
-    isProduction
+    isProduction,
+    isVercelDeployment,
+    hostname: typeof window !== 'undefined' ? window.location.hostname : 'server'
   };
 };
+
+// Log configuration on load for debugging
+if (typeof window !== 'undefined') {
+  console.log('📡 API Configuration Loaded:', getEnvironmentInfo());
+}
 
 // Export the main configuration
 export default API_CONFIG;
 
 // Export individual URL configurations for direct access
-export { API_URLS, getCurrentApiUrl };
+export { API_URLS, getCurrentApiUrl, isVercelDeployment };
