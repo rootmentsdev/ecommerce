@@ -40,7 +40,7 @@ const RentProducts = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [1000, 10000],
+    priceRange: [0, 10000], // Changed from 1000 to 0 to include all rental prices
     categories: [],
     occasions: [],
     sizes: []
@@ -70,13 +70,29 @@ const RentProducts = () => {
           console.log('🎯 RentProducts - Images data:', response.data.images?.map(img => ({
             id: img._id,
             title: img.title,
-            category: img.category,
-            categories: img.categories,
+            category: img.category, // PRIMARY category (should be 'rent')
+            categories: img.categories, // ARRAY of categories (should include 'rent' and 'suits')
             price: img.price,
             rentalPrice: img.rentalPrice,
-            actualPrice: img.actualPrice
+            actualPrice: img.actualPrice,
+            isActive: img.isActive // Should be true
           })));
+          
+          // 🚨 DEBUG: Log if any images have 'rent' in categories but not as primary category
+          const mismatchedImages = response.data.images?.filter(img => 
+            img.categories?.includes('rent') && img.category !== 'rent'
+          );
+          if (mismatchedImages && mismatchedImages.length > 0) {
+            console.error('⚠️ FOUND MISMATCHED IMAGES! These have "rent" in categories array but primary category is not "rent":', 
+              mismatchedImages.map(img => ({
+                title: img.title,
+                primaryCategory: img.category,
+                categoriesArray: img.categories
+              }))
+            );
+          }
         } else {
+          console.error('🎯 RentProducts - Failed to load images:', response);
           setAdminImages([]);
         }
       } catch (error) {
@@ -437,11 +453,13 @@ const RentProducts = () => {
                   <>
                     <Row className="g-3">
                     {paginatedImages.map((image, index) => {
-                      // For RENT products, always show rental price
-                      const displayPrice = image.rentalPrice || 0;
+                      // For RENT products, show rental price with fallback to purchase price
+                      const displayPrice = image.rentalPrice || image.price || 0;
                       console.log('🎯 RentProducts - Displaying image:', {
                         title: image.title,
-                        rentalPrice: displayPrice,
+                        rentalPrice: image.rentalPrice,
+                        price: image.price,
+                        displayPrice: displayPrice,
                         index: index
                       });
                       
@@ -499,7 +517,7 @@ const RentProducts = () => {
                             <div className="d-flex flex-column">
                               <div className="d-flex justify-content-between align-items-center mb-1">
                                 <span className="fw-bold fs-6">
-                                  ₹{(image.rentalPrice || 0).toLocaleString('en-IN')}
+                                  ₹{(image.rentalPrice || image.price || 0).toLocaleString('en-IN')}
                                 </span>
                                 <small className="text-muted">Rental</small>
                               </div>

@@ -471,6 +471,13 @@ const AdminImageManagement = () => {
         // Keep empty strings for product fields - don't convert to null
       });
 
+      // ⚠️ CRITICAL DEBUG: Category Configuration
+      console.log('🚨🚨🚨 CATEGORY DEBUG 🚨🚨🚨');
+      console.log('Primary Category (category):', submitData.category);
+      console.log('Categories Array (categories):', submitData.categories);
+      console.log('Is Active:', submitData.isActive);
+      console.log('🚨🚨🚨 END CATEGORY DEBUG 🚨🚨🚨');
+      
       console.log('Form data category:', formData.category);
       console.log('Submit data category:', submitData.category);
       console.log('Available categories:', categories);

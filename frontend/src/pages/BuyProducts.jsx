@@ -40,7 +40,7 @@ const BuyProducts = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [1000, 100000], // Higher range for buy products (actual prices)
+    priceRange: [0, 100000], // Changed from 1000 to 0 to include all purchase prices
     categories: [],
     occasions: [],
     sizes: []
@@ -471,7 +471,7 @@ const BuyProducts = () => {
                             </Card.Title>
                             <div className="d-flex justify-content-between align-items-center">
                               <span className="fw-bold fs-6">
-                                ₹{(image.price || 0).toLocaleString('en-IN')}
+                                ₹{(image.price || image.actualPrice || 0).toLocaleString('en-IN')}
                               </span>
                               <small className="text-muted">Buy</small>
                             </div>

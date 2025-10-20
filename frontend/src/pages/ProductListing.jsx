@@ -42,7 +42,7 @@ const ProductListing = () => {
   
   // State for filters
   const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [1000, 100000], // Higher range to accommodate both rent and buy products
+    priceRange: [0, 100000], // Changed from 1000 to 0 to include all prices
     categories: [],
     occasions: [],
     sizes: []
@@ -97,10 +97,26 @@ const ProductListing = () => {
             console.log('🎯 ProductListing - Images data:', response.data.images?.map(img => ({
               id: img._id,
               title: img.title,
-              category: img.category,
-              categories: img.categories
+              category: img.category, // PRIMARY category
+              categories: img.categories, // ARRAY of categories
+              isActive: img.isActive
             })));
+            
+            // 🚨 DEBUG: Check for category mismatches
+            const mismatchedImages = response.data.images?.filter(img => 
+              img.categories?.includes(fetchCategory) && img.category !== fetchCategory
+            );
+            if (mismatchedImages && mismatchedImages.length > 0) {
+              console.warn(`⚠️ FOUND MISMATCHED IMAGES for category "${fetchCategory}":`, 
+                mismatchedImages.map(img => ({
+                  title: img.title,
+                  primaryCategory: img.category,
+                  categoriesArray: img.categories
+                }))
+              );
+            }
           } else {
+            console.error('🎯 ProductListing - Failed to load images for category:', fetchCategory, response);
             setAdminImages([]);
           }
         } else if (fetchCategory === null) {
@@ -482,13 +498,13 @@ const ProductListing = () => {
                 <>
                   <Row className="g-3">
                   {paginatedImages.map((image, index) => {
-                    // Show appropriate price based on category
+                    // Show appropriate price based on category with fallbacks
                     let displayPrice, priceLabel;
                     if (image.category === 'rent') {
-                      displayPrice = image.rentalPrice || 0;
+                      displayPrice = image.rentalPrice || image.price || 0;
                       priceLabel = 'Rental';
                     } else if (image.category === 'buy') {
-                      displayPrice = image.price || 0; // Show purchase price for buy products
+                      displayPrice = image.price || image.actualPrice || 0; // Show purchase price for buy products
                       priceLabel = 'Buy';
                     } else {
                       displayPrice = image.price || image.rentalPrice || image.actualPrice || 0;
