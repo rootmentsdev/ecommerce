@@ -121,7 +121,6 @@ const BuyNow = () => {
               .hero-carousel-container {
                 width: 100% !important;
                 max-width: 100% !important;
-                height: 400px !important;
                 margin: 0 auto !important;
               }
               .hero-carousel {
@@ -161,48 +160,35 @@ const BuyNow = () => {
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 !important;
-                margin: 0 0 15px 0 !important;
+                margin: 0 !important;
               }
               .hero-carousel {
                 width: 100% !important;
-                height: 140vw !important;
+                height: 150vw !important;
                 border-radius: 0 !important;
               }
               .hero-image {
                 width: 100% !important;
-                height: 140vw !important;
+                height: 150vw !important;
                 border-radius: 0 !important;
               }
               
+              /* Reduce gap and increase text size on mobile */
               .hero-text-container {
-                margin-top: -200px !important;
-                padding: 0 15px !important;
-              
+                margin-top: 15px !important;
+                padding: 0 20px !important;
               }
               
               .hero-title {
-                margin-top: 0 !important;
-                margin-bottom: 10px !important;
-                font-size: 20px !important;
+                font-size: 24px !important;
+                line-height: 1.3 !important;
+                margin-bottom: 12px !important;
               }
               
               .hero-description {
-                margin-bottom: 15px !important;
-                padding: 0 10px !important;
-              }
-              
-              /* Prevent horizontal scrolling on mobile */
-              .horizontal-scroll {
-                overflow-x: auto !important;
-                overflow-y: hidden !important;
-                -webkit-overflow-scrolling: touch !important;
-              }
-              
-              /* Ensure containers don't exceed viewport */
-              .container {
-                padding-left: 15px !important;
-                padding-right: 15px !important;
-                max-width: 100% !important;
+                font-size: 15px !important;
+                line-height: 1.5 !important;
+                margin-bottom: 20px !important;
               }
             }
           `}
@@ -215,11 +201,8 @@ const BuyNow = () => {
                style={{
                  width: '100%',
                  maxWidth: '500px',
-                 height: '800px',
                  position: 'relative',
-                 margin: '0 auto',
-                 touchAction: 'pan-y',
-                 WebkitOverflowScrolling: 'touch'
+                 margin: '0 auto'
                }}
              >
               <Carousel 
@@ -228,15 +211,11 @@ const BuyNow = () => {
                 indicators={false}
                 controls={false}
                 interval={3000}
-                touch={false}
-                slide={false}
                 className="hero-carousel"
                 style={{
                   borderRadius: '20px',
                   overflow: 'hidden',
-                  width: '100%',
-                  height: '100%',
-                  touchAction: 'pan-y'
+                  width: '100%'
                 }}
               >
                 {heroImages.map((image, index) => (
@@ -245,23 +224,11 @@ const BuyNow = () => {
                       src={image} 
                       alt={`dappr SQUAD Buy Now - Hero Image ${index + 1}`}
                       className="hero-image"
-                      draggable={false}
                       style={{
                         width: '100%',
-                        height: '800px',
                         objectFit: 'cover',
                         borderRadius: '20px',
-                        opacity: 1,
-                        pointerEvents: 'auto',
-                        userSelect: 'none',
-                        WebkitUserSelect: 'none',
-                        touchAction: 'pan-y'
-                      }}
-                      onTouchStart={(e) => {
-                        e.stopPropagation();
-                      }}
-                      onTouchMove={(e) => {
-                        e.stopPropagation();
+                        opacity: 1
                       }}
                     />
                   </Carousel.Item>
@@ -271,17 +238,17 @@ const BuyNow = () => {
           </div>
           
           {/* Text and Button Section */}
-          <div className="text-center hero-text-container" style={{ marginTop: '0' }}>
+          <div className="text-center hero-text-container" style={{ marginTop: '20px', padding: '0 20px' }}>
             <h1 
               className="fw-bold hero-title"
               style={{
                 fontFamily: 'Poppins',
                 fontWeight: 700,
-                fontSize: '20px',
+                fontSize: '34px',
                 lineHeight: '1.3',
                 textAlign: 'center',
                 color: '#000',
-                margin: '0 auto 10px',
+                margin: '0 auto 15px',
                 maxWidth: '380px'
               }}
             >
@@ -293,11 +260,10 @@ const BuyNow = () => {
                 fontFamily: 'Poppins',
                 fontWeight: 400,
                 lineHeight: '1.5',
-                fontSize: '14px',
+                fontSize: '16px',
                 color: '#666',
                 maxWidth: '380px',
-                margin: '0 auto 15px',
-                padding: '0 15px'
+                margin: '0 auto 25px'
               }}
             >
               Own premium men's fashion pieces. Buy high-quality suits, kurtas, and traditional wear for your wardrobe.
