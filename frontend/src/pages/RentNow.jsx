@@ -133,174 +133,74 @@ const RentNow = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     
     return (
-      <div className="py-0">
-        <style>
-          {`
-            /* Mobile layout fixes */
-            body {
-              overflow-x: hidden !important;
-            }
-            
-            .container, .container-fluid {
-              max-width: 100% !important;
-              overflow-x: hidden !important;
-            }
-            
-            /* Desktop styling - make text and images same size */
-            @media (min-width: 992px) {
-              .hero-carousel-container {
-                width: 100% !important;
-                max-width: 100% !important;
-                margin: 0 auto !important;
-              }
-              .hero-carousel {
-                width: 100% !important;
-                height: 400px !important;
-                border-radius: 15px !important;
-              }
-              .hero-image {
-                width: 100% !important;
-                height: 400px !important;
-                border-radius: 15px !important;
-              }
-              .hero-text-container {
-                margin-top: 0px !important;
-                padding-top: 0px !important;
-                position: relative !important;
-                z-index: 10 !important;
-              }
-              .hero-title {
-                font-size: 2.5rem !important;
-                margin-bottom: 1rem !important;
-                margin-top: 0 !important;
-                position: relative !important;
-                z-index: 10 !important;
-              }
-              .hero-description {
-                font-size: 1.1rem !important;
-                margin-bottom: 2rem !important;
-                position: relative !important;
-                z-index: 10 !important;
-              }
-            }
-            
-            /* Mobile styling */
-            @media (max-width: 768px) {
-              .hero-carousel-container {
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-              }
-              .hero-carousel {
-                width: 100% !important;
-                height: 150vw !important;
-                border-radius: 0 !important;
-              }
-              .hero-image {
-                width: 100% !important;
-                height: 150vw !important;
-                border-radius: 0 !important;
-              }
-              
-              /* Reduce gap and increase text size on mobile */
-              .hero-text-container {
-                margin-top: 15px !important;
-                padding: 0 20px !important;
-              }
-              
-              .hero-title {
-                font-size: 32px !important;
-                line-height: 1.2 !important;
-                margin-bottom: 12px !important;
-              }
-              
-              .hero-description {
-                font-size: 15px !important;
-                line-height: 1.5 !important;
-                margin-bottom: 20px !important;
-              }
-            }
-          `}
-        </style>
-        <Container>
-          {/* Image Carousel Section */}
-          <div className="text-center mb-0 position-relative">
-             <div 
-               className="hero-carousel-container"
-               style={{
-                 width: '100%',
-                 maxWidth: '500px',
-                 position: 'relative',
-                 margin: '0 auto'
-               }}
-             >
-              <Carousel 
-                activeIndex={activeIndex}
-                onSelect={setActiveIndex}
-                indicators={false}
-                controls={false}
-                interval={3000}
-                className="hero-carousel"
-                style={{
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                  width: '100%'
-                }}
-              >
-                {heroImages.map((image, index) => (
-                  <Carousel.Item key={index}>
-                    <img 
-                      src={image} 
-                      alt={`dappr SQUAD Rent Now - Hero Image ${index + 1}`}
-                      className="hero-image"
-                      style={{
-                        width: '100%',
-                        objectFit: 'cover',
-                        borderRadius: '20px',
-                        opacity: 1
-                      }}
-                    />
-                  </Carousel.Item>
-                ))}
-              </Carousel>
-            </div>
-          </div>
-          
-          {/* Text and Button Section */}
-          <div className="text-center hero-text-container" style={{ marginTop: '20px', padding: '0 20px' }}>
+      <Container className="px-0">
+        {/* Image Carousel Section */}
+        <Row className="g-0">
+          <Col>
+            <Carousel 
+              activeIndex={activeIndex}
+              onSelect={setActiveIndex}
+              indicators={false}
+              controls={false}
+              interval={3000}
+              style={{
+                borderRadius: window.innerWidth > 768 ? '20px' : '0',
+                overflow: 'hidden',
+                maxWidth: window.innerWidth > 768 ? '100%' : '100vw'
+              }}
+            >
+              {heroImages.map((image, index) => (
+                <Carousel.Item key={index}>
+                  <img 
+                    src={image} 
+                    alt={`dappr SQUAD Rent Now - Hero Image ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: window.innerWidth > 768 ? '400px' : '150vw',
+                      objectFit: 'cover',
+                      borderRadius: window.innerWidth > 768 ? '20px' : '0'
+                    }}
+                  />
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          </Col>
+        </Row>
+        
+        {/* Text and Button Section */}
+        <Row className="mt-2">
+          <Col className="text-center px-3">
             <h1 
-              className="fw-bold hero-title"
+              className="fw-bold mb-3"
               style={{
                 fontFamily: 'Poppins',
                 fontWeight: 700,
-                fontSize: '34px',
-                lineHeight: '1.3',
-                textAlign: 'center',
+                fontSize: 'clamp(28px, 8vw, 2.5rem)',
+                lineHeight: '1.2',
                 color: '#000',
-                margin: '0 auto 15px',
-                maxWidth: '380px'
+                maxWidth: '500px',
+                margin: '0 auto 15px'
               }}
             >
               Rent Premium Fashion
             </h1>
             <p 
-              className="hero-description"
+              className="mb-4"
               style={{
                 fontFamily: 'Poppins',
                 fontWeight: 400,
+                fontSize: 'clamp(14px, 4vw, 1.1rem)',
                 lineHeight: '1.5',
-                fontSize: '16px',
                 color: '#666',
-                maxWidth: '380px',
+                maxWidth: '500px',
                 margin: '0 auto 25px'
               }}
             >
               Perfect outfits for your special occasions. Rent premium men's fashion at affordable prices.
             </p>
-          </div>
-        </Container>
-      </div>
+          </Col>
+        </Row>
+      </Container>
     );
   };
 
