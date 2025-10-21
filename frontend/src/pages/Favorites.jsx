@@ -194,8 +194,7 @@ const Favorites = () => {
                   </div>
             
             {/* Product Grid - Same as Product Listing Page */}
-            <Container className="py-3">
-              <Row className="g-3">
+              <Row className="g-2 g-md-3">
                 {paginatedFavorites.map((item, index) => {
                   const isAdminImage = item._id;
                   const imageSrc = isAdminImage ? item.imageUrl : item.image;
@@ -247,8 +246,9 @@ const Favorites = () => {
                             alt={title}
                             loading="lazy"
                             style={{
-                              height: '240px',
-                              objectFit: 'cover'
+                              height: window.innerWidth <= 768 ? '220px' : '240px',
+                              objectFit: 'cover',
+                              width: '100%'
                             }}
                           />
                           
@@ -271,20 +271,23 @@ const Favorites = () => {
                           </Button>
                         </div>
                         
-                        <Card.Body className="p-3">
-                          <Card.Title className="h6 mb-2" style={{
+                        <Card.Body className="p-2">
+                          <Card.Title className="mb-1" style={{
                             fontFamily: 'Poppins',
                             fontWeight: 600,
-                            fontSize: '14px',
+                            fontSize: window.innerWidth <= 768 ? '12px' : '14px',
                             color: '#000',
-                            lineHeight: '1.4'
+                            lineHeight: '1.3',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
                           }}>
                             {title}
                           </Card.Title>
-                          <Card.Text className="h5 mb-0 fw-bold" style={{
+                          <Card.Text className="mb-0 fw-bold" style={{
                             fontFamily: 'Poppins',
                             fontWeight: 700,
-                            fontSize: '16px',
+                            fontSize: window.innerWidth <= 768 ? '14px' : '16px',
                             color: '#000'
                           }}>
                             ₹{price}
@@ -345,7 +348,6 @@ const Favorites = () => {
                   </Pagination>
                 </div>
               )}
-            </Container>
             </>
             );
           })()}

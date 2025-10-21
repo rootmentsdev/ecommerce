@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form, Card, Modal } from 'react-bootstrap';
-import { ArrowLeft, Heart, Share, ChevronDown, GeoAlt } from 'react-bootstrap-icons';
+import { ArrowLeft, Share, ChevronDown, GeoAlt } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SEOService from '../services/seoService';
 
@@ -73,7 +73,6 @@ const ProductDetails = () => {
 
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'L');
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [showSideMenu, setShowSideMenu] = useState(false);
 
   // Available sizes - use admin data or fallback to defaults
@@ -91,10 +90,6 @@ const ProductDetails = () => {
 
   const handleQuantityChange = (quantity) => {
     setSelectedQuantity(quantity);
-  };
-
-  const handleFavoriteToggle = () => {
-    setIsFavorite(!isFavorite);
   };
 
   const handleShowSideMenu = () => {
@@ -146,23 +141,6 @@ const ProductDetails = () => {
         className="w-100 h-100 object-fit-cover"
         style={{ borderRadius: '0px 0px 12px 12px' }}
       />
-      <Button
-        variant="light"
-        className="position-absolute top-0 end-0 m-3 rounded-circle p-2"
-        onClick={handleFavoriteToggle}
-        style={{ 
-          width: '40px', 
-          height: '40px',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          border: 'none'
-        }}
-      >
-        <Heart 
-          size={20} 
-          className={isFavorite ? 'text-danger' : 'text-muted'}
-          fill={isFavorite ? 'currentColor' : 'none'}
-        />
-      </Button>
     </div>
   );
 
