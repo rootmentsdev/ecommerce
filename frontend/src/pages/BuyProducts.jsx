@@ -5,9 +5,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import FavoritesService from '../services/favoritesService';
 
 // Import reusable components
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import SideMenu from '../components/SideMenu';
+import Header from '../components/HeaderClean';
+import Footer from '../components/FooterClean';
+import SideMenu from '../components/SideMenuClean';
 import FilterSidebar from '../components/common/FilterSidebar';
 import ModernSearchBar from '../components/common/ModernSearchBar';
 

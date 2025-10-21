@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../components/Header';
-import SideMenu from '../components/SideMenu';
-import Footer from '../components/Footer';
-import HomePageContent from '../components/HomePageContent';
+import Header from '../components/HeaderClean';
+import SideMenu from '../components/SideMenuClean';
+import Footer from '../components/FooterClean';
+import HomePageContentClean from '../components/HomePageContentClean';
 
 const HomePage = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
@@ -21,7 +21,7 @@ const HomePage = () => {
       
       {/* Main Content */}
       <main className="flex-grow-1">
-        <HomePageContent />
+        <HomePageContentClean />
       </main>
       
       {/* Footer */}

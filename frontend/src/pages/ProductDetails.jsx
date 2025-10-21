@@ -8,9 +8,9 @@ import SEOService from '../services/seoService';
 import demo1 from '../assets/demo1.png';
 
 // Import reusable components
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import SideMenu from '../components/SideMenu';
+import Header from '../components/HeaderClean';
+import Footer from '../components/FooterClean';
+import SideMenu from '../components/SideMenuClean';
 import SizeSelector from '../components/common/SizeSelector';
 
 // Import constants

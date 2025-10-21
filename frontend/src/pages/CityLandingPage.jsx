@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GeoAlt, Truck, Clock, Phone } from 'react-bootstrap-icons';
-import Header from '../components/Header';
-import SideMenu from '../components/SideMenu';
-import Footer from '../components/Footer';
+import Header from '../components/HeaderClean';
+import SideMenu from '../components/SideMenuClean';
+import Footer from '../components/FooterClean';
 import SEOHead from '../components/SEOHead';
 import Breadcrumb from '../components/common/Breadcrumb';
 

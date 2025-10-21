@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './LoginPage.css';
 import LoginImage from '../assets/LoginImage.png';
 import AuthService from '../services/authService';
 
