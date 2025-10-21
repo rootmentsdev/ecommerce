@@ -47,7 +47,7 @@ export const PRODUCTS_DATA = [
   // Kurtas Category
   {
     id: 4,
-    name: 'Traditional White Kurta',
+    name: 'Traditional Kurta',
     category: 'kurtas',
     price: 1200,
     rentalPrice: 400,

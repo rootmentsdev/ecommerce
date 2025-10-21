@@ -98,7 +98,7 @@ const HomePageContent = () => {
   // Featured products - showcasing best products from each category
   const FEATURED_PRODUCTS = [
     PRODUCTS_DATA.find(p => p.id === 1), // Classic Navy Suit
-    PRODUCTS_DATA.find(p => p.id === 4), // Traditional White Kurta
+    PRODUCTS_DATA.find(p => p.id === 4), // Traditional Kurta
     PRODUCTS_DATA.find(p => p.id === 7), // Classic Bandhgala
     PRODUCTS_DATA.find(p => p.id === 10), // Business Blazer
     PRODUCTS_DATA.find(p => p.id === 13), // Sherwani Set
