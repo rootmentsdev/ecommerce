@@ -40,10 +40,8 @@ const BuyProducts = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [0, 100000], // Changed from 1000 to 0 to include all purchase prices
-    categories: [],
-    occasions: [],
-    sizes: []
+    priceRange: [0, 100000],
+    sortBy: 'none'
   });
 
   // Initialize SEO for buy products page
@@ -239,30 +237,24 @@ const BuyProducts = () => {
       console.log('🎯 BuyProducts - Images after category filtering:', filtered.length);
     }
 
-    // Filter by occasions
-    if (appliedFilters.occasions && appliedFilters.occasions.length > 0) {
-      filtered = filtered.filter(image => {
-        const occasions = image.occasions || [];
-        return appliedFilters.occasions.some(occasion => 
-          occasions.some(imgOccasion => 
-            imgOccasion.toLowerCase().includes(occasion.toLowerCase()) ||
-            occasion.toLowerCase().includes(imgOccasion.toLowerCase())
-          )
-        );
-      });
-    }
-
-    // Filter by sizes
-    if (appliedFilters.sizes && appliedFilters.sizes.length > 0) {
-      filtered = filtered.filter(image => {
-        const sizes = image.sizes ? image.sizes.split(',').map(s => s.trim()) : [];
-        return appliedFilters.sizes.some(size => 
-          sizes.some(imgSize => 
-            imgSize.toLowerCase().includes(size.toLowerCase()) ||
-            size.toLowerCase().includes(imgSize.toLowerCase())
-          )
-        );
-      });
+    // Apply sorting
+    if (appliedFilters.sortBy && appliedFilters.sortBy !== 'none') {
+      switch (appliedFilters.sortBy) {
+        case 'price-low-high':
+          filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+          break;
+        case 'price-high-low':
+          filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+          break;
+        case 'name-asc':
+          filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+          break;
+        case 'name-desc':
+          filtered.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+          break;
+        default:
+          break;
+      }
     }
 
     return filtered;

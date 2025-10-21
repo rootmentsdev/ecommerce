@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Offcanvas, Form, Button, Row, Col } from 'react-bootstrap';
 import { X } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../../constants';
-import { CATEGORIES } from '../../data/products';
 
 const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = null, maxPrice = 10000 }) => {
   // Filter state following clean code principles
   const [filters, setFilters] = useState(initialFilters || {
     priceRange: [1000, maxPrice],
-    categories: []
+    sortBy: 'none'
   });
 
   // Update filters when initialFilters prop changes
@@ -19,7 +18,13 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
   }, [initialFilters]);
 
   // Filter options data
-  const CATEGORY_OPTIONS = CATEGORIES.map(cat => cat.name);
+  const SORT_OPTIONS = [
+    { value: 'none', label: 'Default' },
+    { value: 'price-low-high', label: 'Price: Low to High' },
+    { value: 'price-high-low', label: 'Price: High to Low' },
+    { value: 'name-asc', label: 'Name: A to Z' },
+    { value: 'name-desc', label: 'Name: Z to A' }
+  ];
 
   // Event handlers following clean code principles
   const handlePriceChange = (index, value) => {
@@ -44,17 +49,14 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
     setFilters({ ...filters, priceRange: newPriceRange });
   };
 
-  const handleCategoryChange = (category) => {
-    const newCategories = filters.categories.includes(category)
-      ? filters.categories.filter(c => c !== category)
-      : [...filters.categories, category];
-    setFilters({ ...filters, categories: newCategories });
+  const handleSortChange = (sortValue) => {
+    setFilters({ ...filters, sortBy: sortValue });
   };
 
   const handleClearFilters = () => {
     const clearedFilters = {
       priceRange: [1000, maxPrice],
-      categories: []
+      sortBy: 'none'
     };
     setFilters(clearedFilters);
     onApplyFilters(clearedFilters);
@@ -130,25 +132,35 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
     </div>
   );
 
-  const renderCheckboxList = (items, selectedItems, onChange, title) => (
+
+  const renderSortOptions = () => (
     <div className="mb-4">
       <h6 
         className="fw-bold mb-3"
         style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
       >
-        {title}
+        Sort By
       </h6>
       <div className="d-flex flex-column gap-2">
-        {items.map((item) => (
-          <Form.Check
-            key={item}
-            type="checkbox"
-            id={`${title.toLowerCase()}-${item}`}
-            label={item}
-            checked={selectedItems.includes(item)}
-            onChange={() => onChange(item)}
-            style={{ fontFamily: APP_CONFIG.FONTS.SECONDARY }}
-          />
+        {SORT_OPTIONS.map((option) => (
+          <Button
+            key={option.value}
+            variant={filters.sortBy === option.value ? 'dark' : 'outline-secondary'}
+            className="text-start py-2 px-3"
+            style={{
+              fontFamily: APP_CONFIG.FONTS.SECONDARY,
+              fontSize: '14px',
+              fontWeight: filters.sortBy === option.value ? '600' : '400',
+              borderRadius: '8px',
+              border: filters.sortBy === option.value ? 'none' : '1px solid #dee2e6',
+              backgroundColor: filters.sortBy === option.value ? '#000' : 'transparent',
+              color: filters.sortBy === option.value ? '#fff' : '#333',
+              transition: 'all 0.2s ease'
+            }}
+            onClick={() => handleSortChange(option.value)}
+          >
+            {option.label}
+          </Button>
         ))}
       </div>
     </div>
@@ -218,8 +230,8 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
       </Offcanvas.Header>
       
       <Offcanvas.Body className="pt-3">
+        {renderSortOptions()}
         {renderPriceFilter()}
-        {renderCheckboxList(CATEGORY_OPTIONS, filters.categories, handleCategoryChange, 'Categories')}
         {renderApplyButton()}
       </Offcanvas.Body>
     </Offcanvas>

@@ -42,10 +42,8 @@ const ProductListing = () => {
   
   // State for filters
   const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [0, 100000], // Changed from 1000 to 0 to include all prices
-    categories: [],
-    occasions: [],
-    sizes: []
+    priceRange: [0, 100000],
+    sortBy: 'none'
   });
 
 
@@ -337,6 +335,34 @@ const ProductListing = () => {
       console.log('🎯 ProductListing - Images after price filtering:', filtered.length);
     } else {
       console.log('🎯 ProductListing - No price filter applied');
+    }
+
+    // Apply sorting
+    if (appliedFilters.sortBy && appliedFilters.sortBy !== 'none') {
+      switch (appliedFilters.sortBy) {
+        case 'price-low-high':
+          filtered.sort((a, b) => {
+            const priceA = a.rentalPrice || a.price || 0;
+            const priceB = b.rentalPrice || b.price || 0;
+            return priceA - priceB;
+          });
+          break;
+        case 'price-high-low':
+          filtered.sort((a, b) => {
+            const priceA = a.rentalPrice || a.price || 0;
+            const priceB = b.rentalPrice || b.price || 0;
+            return priceB - priceA;
+          });
+          break;
+        case 'name-asc':
+          filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+          break;
+        case 'name-desc':
+          filtered.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+          break;
+        default:
+          break;
+      }
     }
 
     console.log('🎯 ProductListing - Images after filtering:', filtered.length);

@@ -836,7 +836,15 @@ const AdminImageManagement = () => {
                 Image Management
               </h5>
             </Col>
-            <Col xs="auto">
+            <Col xs="auto" className="ms-auto">
+              <Button
+                variant="outline-primary"
+                size="sm"
+                onClick={() => navigate('/admin/dashboard')}
+                style={{ fontFamily: 'Poppins, sans-serif', marginRight: '10px' }}
+              >
+                ← Back to Dashboard
+              </Button>
               <Button
                 variant="outline-danger"
                 size="sm"
