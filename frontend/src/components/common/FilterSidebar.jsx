@@ -8,9 +8,7 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
   // Filter state following clean code principles
   const [filters, setFilters] = useState(initialFilters || {
     priceRange: [1000, maxPrice],
-    categories: [],
-    occasions: [],
-    sizes: []
+    categories: []
   });
 
   // Update filters when initialFilters prop changes
@@ -22,18 +20,6 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
 
   // Filter options data
   const CATEGORY_OPTIONS = CATEGORIES.map(cat => cat.name);
-
-  const OCCASIONS = [
-    'Wedding',
-    'Formal',
-    'Party',
-    'Business',
-    'Casual'
-  ];
-
-  const SIZES = [
-    'XS', 'S', 'M', 'L', 'XL', 'XXL'
-  ];
 
   // Event handlers following clean code principles
   const handlePriceChange = (index, value) => {
@@ -65,26 +51,10 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
     setFilters({ ...filters, categories: newCategories });
   };
 
-  const handleOccasionChange = (occasion) => {
-    const newOccasions = filters.occasions.includes(occasion)
-      ? filters.occasions.filter(o => o !== occasion)
-      : [...filters.occasions, occasion];
-    setFilters({ ...filters, occasions: newOccasions });
-  };
-
-  const handleSizeChange = (size) => {
-    const newSizes = filters.sizes.includes(size)
-      ? filters.sizes.filter(s => s !== size)
-      : [...filters.sizes, size];
-    setFilters({ ...filters, sizes: newSizes });
-  };
-
   const handleClearFilters = () => {
     const clearedFilters = {
       priceRange: [1000, maxPrice],
-      categories: [],
-      occasions: [],
-      sizes: []
+      categories: []
     };
     setFilters(clearedFilters);
     onApplyFilters(clearedFilters);
@@ -250,8 +220,6 @@ const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = nul
       <Offcanvas.Body className="pt-3">
         {renderPriceFilter()}
         {renderCheckboxList(CATEGORY_OPTIONS, filters.categories, handleCategoryChange, 'Categories')}
-        {renderCheckboxList(OCCASIONS, filters.occasions, handleOccasionChange, 'Occasion')}
-        {renderCheckboxList(SIZES, filters.sizes, handleSizeChange, 'Size')}
         {renderApplyButton()}
       </Offcanvas.Body>
     </Offcanvas>
