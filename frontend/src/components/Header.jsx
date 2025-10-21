@@ -350,14 +350,14 @@ const Header = ({ onMenuClick }) => {
         }}
       >
         <Container fluid className="px-3">
-          <div className="d-flex align-items-center w-100 justify-content-between" style={{ minHeight: '60px' }}>
-            <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center w-100" style={{ minHeight: '60px', position: 'relative' }}>
+            <div className="d-flex align-items-center" style={{ flex: '1 1 0', justifyContent: 'flex-start' }}>
               {renderMenuButton()}
             </div>
-            <div className="d-flex align-items-center flex-grow-1 justify-content-center">
+            <div className="d-flex align-items-center justify-content-center" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
               {renderLogo()}
             </div>
-            <div className="d-flex align-items-center">
+            <div className="d-flex align-items-center justify-content-end" style={{ flex: '1 1 0' }}>
               {renderRightIcons()}
             </div>
           </div>

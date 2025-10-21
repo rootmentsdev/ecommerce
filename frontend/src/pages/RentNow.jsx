@@ -210,8 +210,8 @@ const RentNow = () => {
               }
               
               .hero-title {
-                font-size: 24px !important;
-                line-height: 1.3 !important;
+                font-size: 32px !important;
+                line-height: 1.2 !important;
                 margin-bottom: 12px !important;
               }
               
@@ -314,7 +314,7 @@ const RentNow = () => {
                style={{
                  fontFamily: 'Poppins',
                  fontWeight: 700,
-                 fontSize: '2.5rem',
+                 fontSize: 'clamp(22px, 5vw, 2.5rem)',
                  color: '#000',
                  marginBottom: '30px'
                }}
@@ -393,7 +393,8 @@ const RentNow = () => {
              style={{
                fontFamily: 'Poppins',
                fontWeight: 700,
-               letterSpacing: '-0.02em'
+               letterSpacing: '-0.02em',
+               fontSize: 'clamp(18px, 4vw, 24px)'
              }}
            >
              Top Categories
@@ -484,7 +485,7 @@ const RentNow = () => {
                 style={{
                   fontFamily: 'Poppins',
                   fontWeight: 700,
-                  fontSize: '2.5rem',
+                  fontSize: 'clamp(22px, 5vw, 2.5rem)',
                   color: '#000'
                 }}
               >
@@ -587,7 +588,7 @@ const RentNow = () => {
             style={{
               fontFamily: 'Poppins',
               fontWeight: 700,
-              fontSize: '2rem',
+              fontSize: 'clamp(20px, 4.5vw, 2rem)',
               color: '#000'
             }}
           >

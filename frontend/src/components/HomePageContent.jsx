@@ -383,8 +383,8 @@ const HomePageContent = () => {
               }
               
               .hero-title {
-                font-size: 24px !important;
-                line-height: 1.3 !important;
+                font-size: 32px !important;
+                line-height: 1.2 !important;
                 margin-bottom: 12px !important;
               }
               
@@ -568,7 +568,7 @@ const HomePageContent = () => {
             style={{
               fontFamily: 'Poppins',
               fontWeight: 700,
-              fontSize: '2rem',
+              fontSize: 'clamp(20px, 4.5vw, 2rem)',
               color: '#000',
               marginBottom: '1rem'
             }}
@@ -784,10 +784,11 @@ const HomePageContent = () => {
         <Col>
           <h3 
             className="h3 fw-bold mb-0"
-                  style={{
-                    fontFamily: 'Poppins',
-                    fontWeight: 700,
-              letterSpacing: '-0.02em'
+            style={{
+              fontFamily: 'Poppins',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              fontSize: 'clamp(18px, 4vw, 24px)'
             }}
           >
             Featured Products
@@ -952,7 +953,8 @@ const HomePageContent = () => {
                   style={{
                     fontFamily: 'Poppins',
                     fontWeight: 700,
-                    letterSpacing: '-0.02em'
+                    letterSpacing: '-0.02em',
+                    fontSize: 'clamp(18px, 4vw, 24px)'
                   }}
                 >
                   Top Categories
@@ -1137,7 +1139,7 @@ const HomePageContent = () => {
               fontFamily: 'Poppins',
               fontWeight: 700,
               letterSpacing: '-0.02em',
-              fontSize: '2.5rem',
+              fontSize: 'clamp(22px, 5vw, 2.5rem)',
               color: '#000'
             }}
           >

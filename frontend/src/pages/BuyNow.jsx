@@ -180,8 +180,8 @@ const BuyNow = () => {
               }
               
               .hero-title {
-                font-size: 24px !important;
-                line-height: 1.3 !important;
+                font-size: 32px !important;
+                line-height: 1.2 !important;
                 margin-bottom: 12px !important;
               }
               
@@ -279,18 +279,18 @@ const BuyNow = () => {
       <Container>
         <Row className="justify-content-center">
           <Col lg={8} className="text-center">
-            <h1 
-              className="h2 fw-bold mb-4"
-              style={{
-                fontFamily: 'Poppins',
-                fontWeight: 700,
-                fontSize: '2.5rem',
-                color: '#000',
-                marginBottom: '30px'
-              }}
-            >
-              Buy Now
-            </h1>
+             <h1 
+               className="h2 fw-bold mb-4"
+               style={{
+                 fontFamily: 'Poppins',
+                 fontWeight: 700,
+                 fontSize: 'clamp(22px, 5vw, 2.5rem)',
+                 color: '#000',
+                 marginBottom: '30px'
+               }}
+             >
+               Buy Now
+             </h1>
             
             <div 
               className="mb-4"
@@ -363,7 +363,8 @@ const BuyNow = () => {
             style={{
               fontFamily: 'Poppins',
               fontWeight: 700,
-              letterSpacing: '-0.02em'
+              letterSpacing: '-0.02em',
+              fontSize: 'clamp(18px, 4vw, 24px)'
             }}
           >
             Top Categories
@@ -451,7 +452,7 @@ const BuyNow = () => {
             style={{
               fontFamily: 'Poppins',
               fontWeight: 700,
-              fontSize: '2rem',
+              fontSize: 'clamp(20px, 4.5vw, 2rem)',
               color: '#000'
             }}
           >
