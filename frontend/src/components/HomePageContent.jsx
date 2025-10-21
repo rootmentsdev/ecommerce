@@ -286,235 +286,97 @@ const HomePageContent = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     
     return (
-      <div className="py-0">
-        <style>
-          {`
-            /* Desktop styling - make text and images same size */
-            @media (min-width: 992px) {
-              .hero-carousel-container {
-                width: 100% !important;
-                max-width: 100% !important;
-                height: 400px !important;
-                margin: 0 auto !important;
-              }
-              .hero-carousel {
-                width: 100% !important;
-                height: 400px !important;
-                border-radius: 15px !important;
-              }
-              .hero-image {
-                width: 100% !important;
-                height: 400px !important;
-                border-radius: 15px !important;
-              }
-              .hero-text-container {
-                margin-top: 0px !important;
-                padding-top: 0px !important;
-                position: relative !important;
-                z-index: 10 !important;
-              }
-              .hero-title {
-                font-size: 2.5rem !important;
-                margin-bottom: 1rem !important;
-                margin-top: 0 !important;
-                position: relative !important;
-                z-index: 10 !important;
-              }
-              .hero-description {
-                font-size: 1.1rem !important;
-                margin-bottom: 2rem !important;
-                position: relative !important;
-                z-index: 10 !important;
-              }
-              
-              /* Desktop section titles */
-              .section-title {
-                font-size: 2.5rem !important;
-                margin-bottom: 2rem !important;
-              }
-              
-              /* Desktop product/category cards */
-              .desktop-card {
-                width: 280px !important;
-                height: 350px !important;
-                margin: 0 15px !important;
-              }
-              
-              .desktop-card img {
-                width: 100% !important;
-                height: 240px !important;
-                object-fit: cover !important;
-              }
-              
-              .desktop-card-title {
-                font-size: 1.1rem !important;
-                margin-bottom: 0.5rem !important;
-              }
-              
-              .desktop-card-price {
-                font-size: 1.2rem !important;
-                font-weight: 700 !important;
-              }
-            }
-            
-            /* Mobile styling */
-            @media (max-width: 768px) {
-              .hero-carousel-container {
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-              }
-              .hero-carousel {
-                width: 100% !important;
-                height: 150vw !important;
-                border-radius: 0 !important;
-              }
-              .hero-image {
-                width: 100% !important;
-                height: 150vw !important;
-                border-radius: 0 !important;
-              }
-              
-              /* Reduce gap and increase text size on mobile */
-              .hero-text-container {
-                margin-top: 15px !important;
-                padding: 0 20px !important;
-              }
-              
-              .hero-title {
-                font-size: 32px !important;
-                line-height: 1.2 !important;
-                margin-bottom: 12px !important;
-              }
-              
-              .hero-description {
-                font-size: 15px !important;
-                line-height: 1.5 !important;
-                margin-bottom: 20px !important;
-              }
-              
-              .hero-buttons {
-                margin-bottom: 25px !important;
-              }
-              
-              .hero-buttons .btn {
-                font-size: 15px !important;
-                padding: 11px 26px !important;
-              }
-            }
-          `}
-        </style>
-        <Container>
-          {/* Image Carousel Section */}
-          <div className="text-center mb-0 position-relative">
-             <div 
-               className="hero-carousel-container"
-               style={{
-                 width: '100%',
-                 maxWidth: '500px',
-                 height: '800px',
-                 position: 'relative',
-                 margin: '0 auto'
-               }}
-             >
-              <Carousel 
-                activeIndex={activeIndex}
-                onSelect={setActiveIndex}
-                indicators={false}
-                controls={false}
-                interval={3000}
-                className="hero-carousel"
-                style={{
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                  width: '100%',
-                  height: '100%'
-                }}
-              >
-                {heroImages.map((image, index) => (
-                  <Carousel.Item key={index}>
-                    <Image 
-                      src={image} 
-                      alt={`dappr SQUAD Premium Men's Fashion - Hero Image ${index + 1}`}
-                      fluid
-                      className="hero-image"
-                      style={{
-                        width: '100%',
-                        height: '800px',
-                        objectFit: 'cover',
-                        borderRadius: '20px',
-                        opacity: 1
-                      }}
-                    />
-                  </Carousel.Item>
-                ))}
-              </Carousel>
-            </div>
-          </div>
-          
-          {/* Text and Button Section */}
-          <div className="text-center hero-text-container" style={{ marginTop: '20px', padding: '0 20px' }}>
+      <Container className="px-0">
+        {/* Image Carousel Section */}
+        <Row className="g-0">
+          <Col>
+            <Carousel 
+              activeIndex={activeIndex}
+              onSelect={setActiveIndex}
+              indicators={false}
+              controls={false}
+              interval={3000}
+              style={{
+                borderRadius: window.innerWidth > 768 ? '20px' : '0',
+                overflow: 'hidden',
+                maxWidth: window.innerWidth > 768 ? '100%' : '100vw'
+              }}
+            >
+              {heroImages.map((image, index) => (
+                <Carousel.Item key={index}>
+                  <Image 
+                    src={image} 
+                    alt={`dappr SQUAD Premium Men's Fashion - Hero Image ${index + 1}`}
+                    fluid
+                    style={{
+                      width: '100%',
+                      height: window.innerWidth > 768 ? '400px' : '150vw',
+                      objectFit: 'cover',
+                      borderRadius: window.innerWidth > 768 ? '20px' : '0'
+                    }}
+                  />
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          </Col>
+        </Row>
+        
+        {/* Text and Button Section */}
+        <Row className="mt-2">
+          <Col className="text-center px-3">
             <h1 
-              className="fw-bold mb-3 hero-title"
-                style={{
+              className="fw-bold mb-3"
+              style={{
                 fontFamily: 'Poppins',
                 fontWeight: 700,
-                fontSize: '34px',
-                lineHeight: '1.3',
-                textAlign: 'center',
+                fontSize: 'clamp(28px, 8vw, 2.5rem)',
+                lineHeight: '1.2',
                 color: '#000',
-                margin: '0 auto 15px',
-                maxWidth: '380px',
-                marginTop: '-150px',
+                maxWidth: '500px',
+                margin: '0 auto 15px'
               }}
             >
               Style Together, Shine Together
-              </h1>
-              <p 
-              className="mb-4 hero-description"
-                style={{
+            </h1>
+            <p 
+              className="mb-4"
+              style={{
                 fontFamily: 'Poppins',
                 fontWeight: 400,
+                fontSize: 'clamp(14px, 4vw, 1.1rem)',
                 lineHeight: '1.5',
-                fontSize: '16px',
                 color: '#666',
-                maxWidth: '380px',
+                maxWidth: '500px',
                 margin: '0 auto 25px'
               }}
             >
               Premium men's fashion for every celebration. Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.
             </p>
-            <div className="d-flex gap-2 justify-content-center mb-4 hero-buttons">
-                <Button 
-                  variant="outline-dark" 
-                  size="md"
-                  className="btn-custom"
-                  style={{
-                    fontFamily: 'Poppins',
-                    fontWeight: 600,
-                    borderRadius: '20px',
-                    border: '2px solid #000',
-                    backgroundColor: 'transparent',
-                    fontSize: '14px',
-                    color: '#000',
-                    padding: '10px 24px'
-                  }}
-                  onClick={handleRentNowClick}
+            
+            <div className="d-flex gap-2 justify-content-center mb-4">
+              <Button 
+                variant="outline-dark" 
+                size="md"
+                style={{
+                  fontFamily: 'Poppins',
+                  fontWeight: 600,
+                  borderRadius: '20px',
+                  border: '2px solid #000',
+                  fontSize: 'clamp(13px, 3.5vw, 16px)',
+                  padding: '10px 24px'
+                }}
+                onClick={handleRentNowClick}
               >
                 Rent Now
               </Button>
               <Button 
                 variant="dark" 
                 size="md"
-                className="btn-custom"
                 style={{
                   fontFamily: 'Poppins',
                   fontWeight: 600,
                   borderRadius: '20px',
-                  backgroundColor: '#000',
-                  border: 'none',
-                  fontSize: '14px',
+                  fontSize: 'clamp(13px, 3.5vw, 16px)',
                   padding: '10px 24px'
                 }}
                 onClick={handleShopNowClick}
@@ -524,36 +386,36 @@ const HomePageContent = () => {
             </div>
             
             {/* Feature Icons Section */}
-            <div className="d-flex justify-content-center gap-3">
+            <Row className="justify-content-center">
               {FEATURES.map((feature, index) => (
-                <div key={index} className="text-center">
+                <Col key={index} xs="auto" className="text-center px-2">
                   <div 
                     className="rounded-circle bg-dark d-flex align-items-center justify-content-center mx-auto mb-2"
-            style={{
+                    style={{
                       width: '40px',
                       height: '40px'
-            }}
-          >
+                    }}
+                  >
                     <feature.icon size={16} className="text-white" />
-          </div>
+                  </div>
                   <h6 
                     className="fw-medium mb-0"
-            style={{
+                    style={{
                       fontFamily: 'Poppins',
                       fontWeight: 400,
-              fontSize: '10px',
+                      fontSize: '10px',
                       color: '#000',
                       lineHeight: '1.3'
-            }}
-          >
-            {feature.title}
+                    }}
+                  >
+                    {feature.title}
                   </h6>
-                </div>
+                </Col>
               ))}
-            </div>
-          </div>
-        </Container>
-    </div>
+            </Row>
+          </Col>
+        </Row>
+      </Container>
   );
   };
 
