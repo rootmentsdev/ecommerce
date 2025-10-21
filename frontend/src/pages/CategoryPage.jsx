@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Image, Card } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Heart, HeartFill, ChevronRight } from 'react-bootstrap-icons';
+import { Heart, HeartFill } from 'react-bootstrap-icons';
 import Header from '../components/Header';
 import SideMenu from '../components/SideMenu';
 import Footer from '../components/Footer';
@@ -111,7 +111,7 @@ const CategoryPage = () => {
         <div className="text-center mb-5">
           <h1 
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 700,
               fontSize: '2.5rem',
               color: '#000',
@@ -122,7 +122,7 @@ const CategoryPage = () => {
           </h1>
           <p 
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 400,
               fontSize: '1.1rem',
               color: '#666',
@@ -137,13 +137,13 @@ const CategoryPage = () => {
         {/* Category Images Grid */}
         {loading ? (
           <div className="text-center py-5">
-            <p style={{ fontFamily: 'Century Gothic' }}>Loading {getCategoryDisplayName().toLowerCase()}...</p>
+            <p style={{ fontFamily: 'Poppins' }}>Loading {getCategoryDisplayName().toLowerCase()}...</p>
           </div>
         ) : categoryImages.length > 0 ? (
           <div>
             <h2 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 fontSize: '1.5rem',
                 marginBottom: '2rem',
@@ -217,42 +217,12 @@ const CategoryPage = () => {
                             <Heart size={18} color="#000" />
                           )}
                         </div>
-                        
-                        {/* Navigation Arrow */}
-                        <div 
-                          className="position-absolute"
-                          style={{
-                            bottom: '15px',
-                            right: '15px',
-                            width: '30px',
-                            height: '30px',
-                            backgroundColor: '#000',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                          }}
-                          onClick={() => handleProductClick({
-                            id: item._id,
-                            name: item.title,
-                            image: item.imageUrl,
-                            price: item.price || 0,
-                            rentalPrice: item.rentalPrice || 0
-                          })}
-                        >
-                          <ChevronRight 
-                            size={14} 
-                            color="white"
-                          />
-                        </div>
                       </div>
                       
                       <Card.Body style={{ padding: '1rem' }}>
                         <Card.Title 
                           style={{
-                            fontFamily: 'Century Gothic',
+                            fontFamily: 'Poppins',
                             fontWeight: 700,
                             fontSize: '1rem',
                             color: '#000',
@@ -263,7 +233,7 @@ const CategoryPage = () => {
                         </Card.Title>
                         <Card.Text 
                           style={{
-                            fontFamily: 'Century Gothic',
+                            fontFamily: 'Poppins',
                             fontWeight: 600,
                             fontSize: '1.1rem',
                             color: '#000',
@@ -283,7 +253,7 @@ const CategoryPage = () => {
           <div className="text-center py-5">
             <h3 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 fontSize: '1.5rem',
                 color: '#666',
@@ -294,7 +264,7 @@ const CategoryPage = () => {
             </h3>
             <p 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 400,
                 fontSize: '1rem',
                 color: '#999',
@@ -308,7 +278,7 @@ const CategoryPage = () => {
               size="lg"
               onClick={() => navigate('/')}
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 600,
                 borderRadius: '20px',
                 padding: '0.75rem 2rem'

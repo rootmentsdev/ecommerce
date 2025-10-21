@@ -40,118 +40,10 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
-      <TopBanner />
+    <div className="app-wrapper">
       <ScrollToTop />
-      <FloatingWhatsAppButton />
       <Routes>
-        {/* Home page as base route */}
-        <Route path="/" element={
-          <PageTransition>
-            <HomePage />
-          </PageTransition>
-        } />
-        
-        {/* Login page with auth check */}
-        <Route path="/login" element={
-          <PageTransition>
-            <AuthCheck>
-              <LoginPage />
-            </AuthCheck>
-          </PageTransition>
-        } />
-        
-        {/* Protected routes */}
-        <Route path="/home" element={
-          <PageTransition>
-            <HomePage />
-          </PageTransition>
-        } />
-        <Route path="/products" element={
-          <PageTransition>
-            <ErrorBoundary>
-              <ProductListing />
-            </ErrorBoundary>
-          </PageTransition>
-        } />
-        <Route path="/product-details" element={
-          <PageTransition>
-            <ProductDetails />
-          </PageTransition>
-        } />
-        <Route path="/enquire" element={
-          <PageTransition>
-            <EnquireNow />
-          </PageTransition>
-        } />
-        <Route path="/about" element={
-          <PageTransition>
-            <AboutUs />
-          </PageTransition>
-        } />
-        <Route path="/favorites" element={
-          <PageTransition>
-            <Favorites />
-          </PageTransition>
-        } />
-        <Route path="/category/:category" element={
-          <PageTransition>
-            <CategoryPage />
-          </PageTransition>
-        } />
-        <Route path="/buy-now" element={
-          <PageTransition>
-            <BuyNow />
-          </PageTransition>
-        } />
-        <Route path="/rent-now" element={
-          <PageTransition>
-            <RentNow />
-          </PageTransition>
-        } />
-        <Route path="/rent-products" element={
-          <PageTransition>
-            <ErrorBoundary>
-              <RentProducts />
-            </ErrorBoundary>
-          </PageTransition>
-        } />
-        <Route path="/buy-products" element={
-          <PageTransition>
-            <ErrorBoundary>
-              <BuyProducts />
-            </ErrorBoundary>
-          </PageTransition>
-        } />
-        
-        {/* Kerala City Landing Pages for Local SEO */}
-        <Route path="/kochi" element={
-          <PageTransition>
-            <CityLandingPage />
-          </PageTransition>
-        } />
-        <Route path="/thrissur" element={
-          <PageTransition>
-            <CityLandingPage />
-          </PageTransition>
-        } />
-        <Route path="/kozhikode" element={
-          <PageTransition>
-            <CityLandingPage />
-          </PageTransition>
-        } />
-        <Route path="/trivandrum" element={
-          <PageTransition>
-            <CityLandingPage />
-          </PageTransition>
-        } />
-        <Route path="/kannur" element={
-          <PageTransition>
-            <CityLandingPage />
-          </PageTransition>
-        } />
-        
-        {/* Admin routes */}
+        {/* Admin routes - Full Screen (no mobile container) */}
         <Route path="/admin/login" element={
           <PageTransition>
             <AdminLogin />
@@ -167,10 +59,126 @@ function App() {
             <AdminImageManagement />
           </PageTransition>
         } />
-        <Route path="/test-images" element={
-          <PageTransition>
-            <ImageTestPage />
-          </PageTransition>
+        
+        {/* All other routes - Mobile-First Centered View */}
+        <Route path="/*" element={
+          <div className="mobile-view-container">
+            <TopBanner />
+            <FloatingWhatsAppButton />
+            <Routes>
+              {/* Home page as base route */}
+              <Route path="/" element={
+                <PageTransition>
+                  <HomePage />
+                </PageTransition>
+              } />
+              
+              {/* Login page with auth check */}
+              <Route path="/login" element={
+                <PageTransition>
+                  <AuthCheck>
+                    <LoginPage />
+                  </AuthCheck>
+                </PageTransition>
+              } />
+              
+              {/* Protected routes */}
+              <Route path="/home" element={
+                <PageTransition>
+                  <HomePage />
+                </PageTransition>
+              } />
+              <Route path="/products" element={
+                <PageTransition>
+                  <ErrorBoundary>
+                    <ProductListing />
+                  </ErrorBoundary>
+                </PageTransition>
+              } />
+              <Route path="/product-details" element={
+                <PageTransition>
+                  <ProductDetails />
+                </PageTransition>
+              } />
+              <Route path="/enquire" element={
+                <PageTransition>
+                  <EnquireNow />
+                </PageTransition>
+              } />
+              <Route path="/about" element={
+                <PageTransition>
+                  <AboutUs />
+                </PageTransition>
+              } />
+              <Route path="/favorites" element={
+                <PageTransition>
+                  <Favorites />
+                </PageTransition>
+              } />
+              <Route path="/category/:category" element={
+                <PageTransition>
+                  <CategoryPage />
+                </PageTransition>
+              } />
+              <Route path="/buy-now" element={
+                <PageTransition>
+                  <BuyNow />
+                </PageTransition>
+              } />
+              <Route path="/rent-now" element={
+                <PageTransition>
+                  <RentNow />
+                </PageTransition>
+              } />
+              <Route path="/rent-products" element={
+                <PageTransition>
+                  <ErrorBoundary>
+                    <RentProducts />
+                  </ErrorBoundary>
+                </PageTransition>
+              } />
+              <Route path="/buy-products" element={
+                <PageTransition>
+                  <ErrorBoundary>
+                    <BuyProducts />
+                  </ErrorBoundary>
+                </PageTransition>
+              } />
+              
+              {/* Kerala City Landing Pages for Local SEO */}
+              <Route path="/kochi" element={
+                <PageTransition>
+                  <CityLandingPage />
+                </PageTransition>
+              } />
+              <Route path="/thrissur" element={
+                <PageTransition>
+                  <CityLandingPage />
+                </PageTransition>
+              } />
+              <Route path="/kozhikode" element={
+                <PageTransition>
+                  <CityLandingPage />
+                </PageTransition>
+              } />
+              <Route path="/trivandrum" element={
+                <PageTransition>
+                  <CityLandingPage />
+                </PageTransition>
+              } />
+              <Route path="/kannur" element={
+                <PageTransition>
+                  <CityLandingPage />
+                </PageTransition>
+              } />
+              
+              <Route path="/test-images" element={
+                <PageTransition>
+                  <ImageTestPage />
+                </PageTransition>
+              } />
+            </Routes>
+          </div>
         } />
       </Routes>
     </div>

@@ -113,7 +113,7 @@ const SideMenu = ({ show, handleClose }) => {
         <div 
           className="fw-bold"
           style={{
-            fontFamily: 'Century Gothic',
+            fontFamily: 'Poppins',
             fontWeight: 700,
             fontSize: '1.8rem',
             color: '#000',
@@ -125,7 +125,7 @@ const SideMenu = ({ show, handleClose }) => {
         </div>
         <div 
           style={{
-            fontFamily: 'Century Gothic',
+            fontFamily: 'Poppins',
             fontWeight: 400,
             fontSize: '1.2rem',
             color: '#000',

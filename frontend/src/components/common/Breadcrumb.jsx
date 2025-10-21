@@ -105,7 +105,7 @@ const Breadcrumb = ({ items = [], className = '' }) => {
                       color: '#333',
                       fontWeight: '500',
                       cursor: 'default',
-                      fontFamily: 'Century Gothic, sans-serif'
+                      fontFamily: 'Poppins, sans-serif'
                     }}
                     aria-current="page"
                   >
@@ -119,7 +119,7 @@ const Breadcrumb = ({ items = [], className = '' }) => {
                       cursor: 'pointer',
                       textDecoration: 'none',
                       transition: 'color 0.2s ease',
-                      fontFamily: 'Century Gothic, sans-serif',
+                      fontFamily: 'Poppins, sans-serif',
                       display: 'flex',
                       alignItems: 'center'
                     }}
@@ -138,7 +138,7 @@ const Breadcrumb = ({ items = [], className = '' }) => {
       <style>
         {`
           .breadcrumb-nav {
-            font-family: 'Century Gothic', sans-serif;
+            font-family: 'Poppins', sans-serif;
           }
 
           .breadcrumb-item span {

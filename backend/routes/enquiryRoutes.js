@@ -152,21 +152,21 @@ router.get('/', getAllEnquiriesValidation, EnquiryController.getAllEnquiries);
  * @desc    Get all enquiries with pagination and filtering (Admin only)
  * @access  Private (Admin only)
  */
-router.get('/admin', auth, getAllEnquiriesValidation, EnquiryController.getAllEnquiries);
+router.get('/admin', adminAuth, getAllEnquiriesValidation, EnquiryController.getAllEnquiries);
 
 /**
  * @route   GET /api/enquiries/stats
  * @desc    Get enquiry statistics for dashboard
  * @access  Private (Admin only)
  */
-router.get('/stats', auth, EnquiryController.getEnquiryStats);
+router.get('/stats', adminAuth, EnquiryController.getEnquiryStats);
 
 /**
  * @route   GET /api/enquiries/:id
  * @desc    Get enquiry by ID
  * @access  Private (Admin only)
  */
-router.get('/:id', auth, getEnquiryValidation, EnquiryController.getEnquiryById);
+router.get('/:id', adminAuth, getEnquiryValidation, EnquiryController.getEnquiryById);
 
 /**
  * @route   PUT /api/enquiries/:id
@@ -180,7 +180,7 @@ router.put('/:id', updateEnquiryValidation, EnquiryController.updateEnquiry);
  * @desc    Delete enquiry
  * @access  Private (Admin only)
  */
-router.delete('/:id', auth, getEnquiryValidation, EnquiryController.deleteEnquiry);
+router.delete('/:id', adminAuth, getEnquiryValidation, EnquiryController.deleteEnquiry);
 
 /**
  * Admin Routes - Dashboard Access

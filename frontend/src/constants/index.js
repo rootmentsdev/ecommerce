@@ -1,7 +1,7 @@
 // Constants file for better maintainability
 export const APP_CONFIG = {
   FONTS: {
-    PRIMARY: "'Century Gothic', sans-serif", // For headings
+    PRIMARY: "'Poppins', sans-serif", // For headings
     SECONDARY: "'Poppins', sans-serif"       // For body text
   },
   COLORS: {

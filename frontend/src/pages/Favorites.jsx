@@ -77,13 +77,22 @@ const Favorites = () => {
 
   // Handle removing from favorites
   const handleRemoveFavorite = (item) => {
+    console.log('🗑️ Removing favorite:', item);
+    
     // Use centralized favorites service
     FavoritesService.removeFromFavorites(item);
     
     // Update local state
-    setFavorites(prev => prev.filter(fav => 
-      (item.id && fav.id !== item.id) || (item._id && fav._id !== item._id)
-    ));
+    setFavorites(prev => {
+      const updated = prev.filter(fav => 
+        (item.id && fav.id !== item.id) || (item._id && fav._id !== item._id)
+      );
+      console.log('💖 Updated favorites list:', updated.length, 'items');
+      return updated;
+    });
+    
+    // Force dispatch the event to ensure header updates
+    FavoritesService.dispatchFavoritesUpdated();
   };
 
   // Handle product click
@@ -129,7 +138,7 @@ const Favorites = () => {
         <div className="text-center mb-5">
           <h1 
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 700,
               fontSize: '2.5rem',
               color: '#000',
@@ -140,16 +149,21 @@ const Favorites = () => {
           </h1>
           <p 
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 400,
               fontSize: '1.1rem',
               color: '#666',
               maxWidth: '600px',
-              margin: '0 auto'
+              margin: '0 auto 1rem auto'
             }}
           >
             Your saved items and favorite products
           </p>
+          {favorites.length > 0 && (
+            <Badge bg="secondary" style={{ fontSize: '0.9rem', fontFamily: 'Poppins' }}>
+              {favorites.length} {favorites.length === 1 ? 'item' : 'items'}
+            </Badge>
+          )}
         </div>
 
         {/* Favorites Grid - Same UI as Product Listing */}
@@ -259,7 +273,7 @@ const Favorites = () => {
                         
                         <Card.Body className="p-3">
                           <Card.Title className="h6 mb-2" style={{
-                            fontFamily: 'Century Gothic',
+                            fontFamily: 'Poppins',
                             fontWeight: 600,
                             fontSize: '14px',
                             color: '#000',
@@ -268,7 +282,7 @@ const Favorites = () => {
                             {title}
                           </Card.Title>
                           <Card.Text className="h5 mb-0 fw-bold" style={{
-                            fontFamily: 'Century Gothic',
+                            fontFamily: 'Poppins',
                             fontWeight: 700,
                             fontSize: '16px',
                             color: '#000'
@@ -345,7 +359,7 @@ const Favorites = () => {
             />
             <h3 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 fontSize: '1.5rem',
                 color: '#666',
@@ -356,7 +370,7 @@ const Favorites = () => {
             </h3>
             <p 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 400,
                 fontSize: '1rem',
                 color: '#999',
@@ -370,7 +384,7 @@ const Favorites = () => {
               size="lg"
               onClick={() => navigate('/')}
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 600,
                 borderRadius: '20px',
                 padding: '0.75rem 2rem'

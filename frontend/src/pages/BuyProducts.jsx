@@ -357,7 +357,7 @@ const BuyProducts = () => {
           {/* Show loading state */}
           {loadingAdminImages && (
             <div className="text-center py-4">
-              <p style={{ fontFamily: 'Century Gothic' }}>Loading buy products...</p>
+              <p style={{ fontFamily: 'Poppins' }}>Loading buy products...</p>
             </div>
           )}
           
@@ -417,25 +417,27 @@ const BuyProducts = () => {
 
                 return (
                   <>
-                    <Row className="g-3">
+                    <Row className="g-2">
                     {paginatedImages.map((image, index) => (
-                      <Col key={image._id || index} xs={6} sm={6} md={4} lg={3}>
-                        <Card 
-                          className="h-100 border-0 shadow-sm hover-card"
-                          onClick={() => handleImageClick(image)}
-                          style={{ 
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-5px)';
-                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '';
-                          }}
-                        >
+                      <Col key={image._id || index} xs={6} sm={6} md={6} lg={6}>
+                      <Card 
+                        className="h-100 border-0 shadow-sm hover-card"
+                        onClick={() => handleImageClick(image)}
+                        style={{ 
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          borderRadius: '12px',
+                          overflow: 'hidden'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '';
+                        }}
+                      >
                           <div className="position-relative">
                             <Card.Img 
                               variant="top" 
@@ -443,8 +445,9 @@ const BuyProducts = () => {
                               alt={image.title || 'Product'}
                               loading="lazy"
                               style={{
-                                height: '240px',
-                                objectFit: 'cover'
+                                height: '220px',
+                                objectFit: 'cover',
+                                borderRadius: '12px 12px 0 0'
                               }}
                             />
                             <Button
@@ -542,7 +545,7 @@ const BuyProducts = () => {
       return (
         <Container className="py-3">
           <div className="text-center py-4">
-            <p style={{ fontFamily: 'Century Gothic', color: '#dc3545' }}>
+            <p style={{ fontFamily: 'Poppins', color: '#dc3545' }}>
               Error loading buy products. Please try again.
             </p>
           </div>
@@ -605,10 +608,10 @@ const BuyProducts = () => {
         <main className="flex-grow-1">
           <Container className="py-5">
             <div className="text-center">
-              <h2 style={{ fontFamily: 'Century Gothic', color: '#dc3545' }}>
+              <h2 style={{ fontFamily: 'Poppins', color: '#dc3545' }}>
                 Something went wrong
               </h2>
-              <p style={{ fontFamily: 'Century Gothic' }}>
+              <p style={{ fontFamily: 'Poppins' }}>
                 Please refresh the page or try again later.
               </p>
             </div>

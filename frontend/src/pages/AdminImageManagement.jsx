@@ -88,12 +88,9 @@ const AdminImageManagement = () => {
     securityDeposit: '',
     fabric: '',
     color: '',
-    colors: '',
     style: '',
-    occasions: '',
     inclusions: '',
     care: '',
-    sizes: '',
     type: 'newArrivals',
     // productCategory is now handled by the category field
     inStock: true,
@@ -490,13 +487,8 @@ const AdminImageManagement = () => {
         securityDeposit: formData.securityDeposit,
         fabric: formData.fabric,
         color: formData.color,
-        colors: formData.colors,
         style: formData.style,
-        occasions: formData.occasions,
         inclusions: formData.inclusions,
-        care: formData.care,
-        sizes: formData.sizes,
-        type: formData.type,
         category: formData.category,
         categories: formData.categories
       });
@@ -510,13 +502,8 @@ const AdminImageManagement = () => {
         securityDeposit: submitData.securityDeposit,
         fabric: submitData.fabric,
         color: submitData.color,
-        colors: submitData.colors,
         style: submitData.style,
-        occasions: submitData.occasions,
         inclusions: submitData.inclusions,
-        care: submitData.care,
-        sizes: submitData.sizes,
-        type: submitData.type,
         category: submitData.category,
         categories: submitData.categories
       });
@@ -611,13 +598,8 @@ const AdminImageManagement = () => {
       securityDeposit: '',
       fabric: '',
       color: '',
-      colors: '',
       style: '',
-      occasions: '',
       inclusions: '',
-      care: '',
-      sizes: '',
-      type: 'newArrivals',
       inStock: true,
       metadata: {
         fileSize: '',
@@ -657,13 +639,8 @@ const AdminImageManagement = () => {
       securityDeposit: image.securityDeposit || '',
       fabric: image.fabric || '',
       color: image.color || '',
-      colors: image.colors || '',
       style: image.style || '',
-      occasions: image.occasions || '',
       inclusions: image.inclusions || '',
-      care: image.care || '',
-      sizes: image.sizes || '',
-      type: image.type || 'newArrivals',
       inStock: image.inStock !== false,
       metadata: {
         fileSize: image.metadata?.fileSize || '',
@@ -717,13 +694,8 @@ const AdminImageManagement = () => {
       securityDeposit: '',
       fabric: '',
       color: '',
-      colors: '',
       style: '',
-      occasions: '',
       inclusions: '',
-      care: '',
-      sizes: '',
-      type: 'newArrivals',
       inStock: true,
       metadata: {
         fileSize: '',
@@ -838,7 +810,7 @@ const AdminImageManagement = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div className="admin-page" style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       {/* Header */}
       <Card style={{ borderRadius: 0, borderBottom: '1px solid #e9ecef' }}>
         <Card.Body style={{ padding: '16px 24px' }}>
@@ -856,7 +828,7 @@ const AdminImageManagement = () => {
             </Col>
             <Col xs="auto">
               <h5 style={{ 
-                fontFamily: 'Century Gothic, sans-serif',
+                fontFamily: 'Poppins, sans-serif',
                 fontWeight: '600',
                 color: '#2c3e50',
                 margin: 0
@@ -1105,7 +1077,7 @@ const AdminImageManagement = () => {
                   <Card.Body>
                     <Card.Title 
                       style={{ 
-                        fontFamily: 'Century Gothic, sans-serif',
+                        fontFamily: 'Poppins, sans-serif',
                         fontSize: '1rem',
                         fontWeight: '600'
                       }}
@@ -1184,7 +1156,7 @@ const AdminImageManagement = () => {
           <Card>
             <Table responsive hover>
               <thead>
-                <tr style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                <tr style={{ fontFamily: 'Poppins, sans-serif' }}>
                   <th>Image</th>
                   <th>Title</th>
                   <th>Category</th>
@@ -1290,7 +1262,7 @@ const AdminImageManagement = () => {
         {!loading && images.length === 0 && (
           <Card>
             <Card.Body className="text-center py-5">
-              <h5 style={{ fontFamily: 'Century Gothic, sans-serif' }}>No images found</h5>
+              <h5 style={{ fontFamily: 'Poppins, sans-serif' }}>No images found</h5>
               <p style={{ fontFamily: 'Poppins, sans-serif', color: '#6c757d' }}>
                 {searchTerm || selectedCategory !== 'all' || statusFilter !== 'all'
                   ? 'Try adjusting your search criteria or filters.'
@@ -1355,9 +1327,9 @@ const AdminImageManagement = () => {
       </Container>
 
       {/* Create Image Modal */}
-      <Modal show={showCreateModal} onHide={handleCloseModal} size="lg">
+      <Modal show={showCreateModal} onHide={handleCloseModal} size="xl" fullscreen="lg-down">
         <Modal.Header closeButton>
-          <Modal.Title style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+          <Modal.Title style={{ fontFamily: 'Poppins, sans-serif' }}>
             Add New Image
           </Modal.Title>
         </Modal.Header>
@@ -1531,7 +1503,7 @@ const AdminImageManagement = () => {
 
             {/* Product Information Section */}
             <hr className="my-4" />
-            <h6 style={{ fontFamily: 'Century Gothic, sans-serif', fontWeight: '600', color: '#2c3e50' }}>
+            <h6 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '600', color: '#2c3e50' }}>
               Product Information (Optional)
             </h6>
             <p className="text-muted small mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -1655,39 +1627,7 @@ const AdminImageManagement = () => {
                   />
                 </Form.Group>
               </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
-                    Care Instructions
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="care"
-                    value={formData.care}
-                    onChange={handleInputChange}
-                    placeholder="Dry Clean Only"
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
-                  />
-                </Form.Group>
-              </Col>
             </Row>
-
-            <Form.Group className="mb-3">
-              <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
-                Occasions
-              </Form.Label>
-              <Form.Control
-                type="text"
-                name="occasions"
-                value={formData.occasions}
-                onChange={handleInputChange}
-                placeholder="Wedding Guest, Corporate Events, Reception, Cocktail Party"
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              />
-              <Form.Text className="text-muted">
-                Separate multiple occasions with commas
-              </Form.Text>
-            </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
@@ -1705,64 +1645,6 @@ const AdminImageManagement = () => {
                 List what's included in the outfit
               </Form.Text>
             </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
-                Available Sizes
-              </Form.Label>
-              <Form.Control
-                type="text"
-                name="sizes"
-                value={formData.sizes}
-                onChange={handleInputChange}
-                placeholder="S, M, L, XL, XXL"
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              />
-              <Form.Text className="text-muted">
-                Separate sizes with commas
-              </Form.Text>
-            </Form.Group>
-
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
-                    Available Colors
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="colors"
-                    value={formData.colors}
-                    onChange={handleInputChange}
-                    placeholder="Black, Navy Blue, Charcoal, White"
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
-                  />
-                  <Form.Text className="text-muted">
-                    Separate colors with commas
-                  </Form.Text>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}>
-                    Product Type
-                  </Form.Label>
-                  <Form.Select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleInputChange}
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
-                  >
-                    <option value="newArrivals">New Arrivals</option>
-                    <option value="featured">Featured</option>
-                    <option value="popular">Popular</option>
-                    <option value="sale">Sale</option>
-                    <option value="bestseller">Bestseller</option>
-                    <option value="limited">Limited Edition</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
 
             <Form.Group className="mb-3">
               <Form.Check
@@ -1819,9 +1701,9 @@ const AdminImageManagement = () => {
       </Modal>
 
       {/* Edit Image Modal */}
-      <Modal show={showEditModal} onHide={handleCloseModal} size="lg">
+      <Modal show={showEditModal} onHide={handleCloseModal} size="xl" fullscreen="lg-down">
         <Modal.Header closeButton>
-          <Modal.Title style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+          <Modal.Title style={{ fontFamily: 'Poppins, sans-serif' }}>
             Edit Image
           </Modal.Title>
         </Modal.Header>
@@ -2039,7 +1921,7 @@ const AdminImageManagement = () => {
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+          <Modal.Title style={{ fontFamily: 'Poppins, sans-serif' }}>
             Confirm Delete
           </Modal.Title>
         </Modal.Header>

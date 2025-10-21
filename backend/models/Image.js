@@ -112,37 +112,13 @@ const imageSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  colors: {
-    type: String,
-    trim: true
-  },
   style: {
-    type: String,
-    trim: true
-  },
-  occasions: {
     type: String,
     trim: true
   },
   inclusions: {
     type: String,
     trim: true
-  },
-  care: {
-    type: String,
-    trim: true
-  },
-  sizes: {
-    type: String,
-    trim: true
-  },
-  type: {
-    type: String,
-    enum: {
-      values: ['newArrivals', 'featured', 'popular', 'sale', 'bestseller', 'limited'],
-      message: 'Type must be one of: newArrivals, featured, popular, sale, bestseller, limited'
-    },
-    default: 'newArrivals'
   },
   inStock: {
     type: Boolean,

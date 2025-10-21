@@ -226,6 +226,70 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedEnquiries.length === 0) return;
+
+    const confirmed = window.confirm(
+      `⚠️ PERMANENT ACTION: Are you sure you want to DELETE ${selectedEnquiries.length} enquiry(ies)? This will permanently remove them from the database and CANNOT be undone.`
+    );
+
+    if (!confirmed) return;
+
+    // Double confirmation for safety
+    const doubleConfirmed = window.confirm(
+      `This is your final warning. Click OK to permanently delete ${selectedEnquiries.length} enquiry(ies).`
+    );
+
+    if (!doubleConfirmed) return;
+
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      
+      // Delete enquiries using DELETE endpoint
+      const deletePromises = selectedEnquiries.map(enquiryId => 
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.DELETE(enquiryId)), {
+          method: 'DELETE',
+          headers: {
+            ...API_CONFIG.DEFAULT_HEADERS,
+            'Authorization': `Bearer ${adminToken}`
+          }
+        })
+      );
+
+      const responses = await Promise.all(deletePromises);
+      const results = await Promise.all(responses.map(res => res.json()));
+
+      // Check if all deletions were successful
+      const allSuccessful = results.every(result => result.success);
+      
+      if (allSuccessful) {
+        // Remove deleted enquiries from local state
+        setEnquiries(prevEnquiries => 
+          prevEnquiries.filter(enquiry => !selectedEnquiries.includes(enquiry._id))
+        );
+        
+        // Recalculate stats
+        const updatedEnquiries = enquiries.filter(enquiry => !selectedEnquiries.includes(enquiry._id));
+        calculateStats(updatedEnquiries);
+        
+        // Clear selection
+        setSelectedEnquiries([]);
+        setShowBulkActions(false);
+        
+        alert(`Successfully deleted ${selectedEnquiries.length} enquiry(ies) permanently.`);
+        
+        // Refresh dashboard data
+        fetchDashboardData();
+      } else {
+        const failedCount = results.filter(result => !result.success).length;
+        alert(`Failed to delete ${failedCount} enquiry(ies). Please try again.`);
+      }
+    } catch (error) {
+      console.error('Error deleting enquiries:', error);
+      alert('Error deleting enquiries. Please try again.');
+    }
+  };
+
   const handleSelectEnquiry = (enquiryId) => {
     setSelectedEnquiries(prev => {
       if (prev.includes(enquiryId)) {
@@ -247,6 +311,91 @@ const AdminDashboard = () => {
     } else {
       setSelectedEnquiries(paginatedEnquiries.map(enquiry => enquiry._id));
       setShowBulkActions(true);
+    }
+  };
+
+  const handleDeleteAllEnquiries = async () => {
+    if (enquiries.length === 0) {
+      alert('No enquiries to delete.');
+      return;
+    }
+
+    // First confirmation
+    const confirmed = window.confirm(
+      `⚠️ DANGER ZONE ⚠️\n\nYou are about to DELETE ALL ${enquiries.length} ENQUIRIES from the database.\n\nThis action is PERMANENT and CANNOT be undone!\n\nAre you absolutely sure you want to proceed?`
+    );
+
+    if (!confirmed) return;
+
+    // Second confirmation - type specific text
+    const confirmationText = prompt(
+      `To confirm deletion of ALL ${enquiries.length} enquiries, please type: DELETE ALL ENQUIRIES\n\n(Type exactly as shown, in CAPITAL LETTERS)`
+    );
+
+    if (confirmationText !== 'DELETE ALL ENQUIRIES') {
+      if (confirmationText !== null) {
+        alert('Confirmation text did not match. Deletion cancelled for your safety.');
+      }
+      return;
+    }
+
+    // Final confirmation
+    const finalConfirmed = window.confirm(
+      `THIS IS YOUR FINAL WARNING!\n\nClicking OK will permanently delete ${enquiries.length} enquiry(ies).\n\nClick OK to DELETE ALL or Cancel to abort.`
+    );
+
+    if (!finalConfirmed) return;
+
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      
+      // Delete all enquiries
+      const deletePromises = enquiries.map(enquiry => 
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRIES.DELETE(enquiry._id)), {
+          method: 'DELETE',
+          headers: {
+            ...API_CONFIG.DEFAULT_HEADERS,
+            'Authorization': `Bearer ${adminToken}`
+          }
+        })
+      );
+
+      const responses = await Promise.all(deletePromises);
+      const results = await Promise.all(responses.map(res => res.json()));
+
+      // Check results
+      const successCount = results.filter(result => result.success).length;
+      const failedCount = results.length - successCount;
+      
+      if (successCount > 0) {
+        // Clear all state
+        setEnquiries([]);
+        setSelectedEnquiries([]);
+        setShowBulkActions(false);
+        
+        // Reset stats
+        setDashboardStats({
+          totalEnquiries: 0,
+          newEnquiries: 0,
+          contactedCustomers: 0,
+          convertedEnquiries: 0,
+          cancelledEnquiries: 0
+        });
+        
+        if (failedCount === 0) {
+          alert(`✅ Successfully deleted all ${successCount} enquiries.`);
+        } else {
+          alert(`⚠️ Partially completed:\n- Deleted: ${successCount} enquiries\n- Failed: ${failedCount} enquiries`);
+        }
+        
+        // Refresh dashboard data
+        fetchDashboardData();
+      } else {
+        alert('❌ Failed to delete enquiries. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error deleting all enquiries:', error);
+      alert('❌ Error deleting enquiries. Please check the console and try again.');
     }
   };
 
@@ -340,7 +489,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <div className="admin-page" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       {/* Top Header */}
       <div style={{ 
         backgroundColor: 'white', 
@@ -741,7 +890,15 @@ const AdminDashboard = () => {
                           </span>
                         </Col>
                         <Col className="text-end">
-                          <div className="d-flex gap-2">
+                          <div className="d-flex gap-2 justify-content-end flex-wrap">
+                            <Button 
+                              variant="danger" 
+                              size="sm"
+                              onClick={handleBulkDelete}
+                              style={{ borderRadius: '8px', fontWeight: '500' }}
+                            >
+                              🗑️ Delete Selected
+                            </Button>
                             <Button 
                               variant="outline-danger" 
                               size="sm"
@@ -796,7 +953,7 @@ const AdminDashboard = () => {
                         />
                       </div>
                     </Col>
-                    <Col xs={12} md={6} className="d-flex gap-2 justify-content-md-end">
+                    <Col xs={12} md={6} className="d-flex gap-2 justify-content-md-end flex-wrap">
                       <Button variant="dark" size="sm" style={{ borderRadius: '8px' }}>
                         <Download size={14} className="me-1" />
                         Export CSV / PDF
@@ -813,6 +970,25 @@ const AdminDashboard = () => {
                         {(startDate || endDate) && (
                           <Badge bg="light" text="dark" className="ms-1" style={{ fontSize: '10px' }}>
                             {filteredEnquiries.length}
+                          </Badge>
+                        )}
+                      </Button>
+                      <Button 
+                        variant="danger" 
+                        size="sm" 
+                        style={{ 
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          backgroundColor: '#dc3545',
+                          border: 'none'
+                        }}
+                        onClick={handleDeleteAllEnquiries}
+                        disabled={enquiries.length === 0}
+                      >
+                        🗑️ Delete All
+                        {enquiries.length > 0 && (
+                          <Badge bg="white" text="danger" className="ms-1" style={{ fontSize: '10px' }}>
+                            {enquiries.length}
                           </Badge>
                         )}
                       </Button>

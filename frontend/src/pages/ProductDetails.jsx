@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Form, Card, Nav, Tab, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form, Card, Modal } from 'react-bootstrap';
 import { ArrowLeft, Heart, Share, ChevronDown, GeoAlt } from 'react-bootstrap-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SEOService from '../services/seoService';
@@ -75,7 +75,6 @@ const ProductDetails = () => {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showSideMenu, setShowSideMenu] = useState(false);
-  const [activeTab, setActiveTab] = useState('details');
 
   // Available sizes - use admin data or fallback to defaults
   const sizes = product.sizes || ['S', 'M', 'L', 'XL', 'XXL'];
@@ -380,53 +379,28 @@ const ProductDetails = () => {
     </Card>
   );
 
-  const renderNavigationTabs = () => (
-    <div className="bg-white border-top">
-      <Container>
-        <Nav variant="tabs" className="border-0">
-          {['Details', 'Availability', 'Return', 'Review'].map((tab) => (
-            <Nav.Item key={tab}>
-              <Nav.Link
-                eventKey={tab.toLowerCase()}
-                className={`border-0 px-4 py-3 ${
-                  activeTab === tab.toLowerCase() ? 'bg-dark text-white' : 'text-muted'
-                }`}
-                onClick={() => setActiveTab(tab.toLowerCase())}
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  borderRadius: activeTab === tab.toLowerCase() ? '8px 8px 0px 0px' : '0px'
-                }}
-              >
-                {tab}
-              </Nav.Link>
-            </Nav.Item>
-          ))}
-        </Nav>
-      </Container>
-    </div>
-  );
-
   const renderProductDetails = () => (
-    <Container className="py-4">
+    <Container className="py-4" style={{ borderTop: '1px solid #e9ecef' }}>
       <div 
-        className="mb-3"
+        className="mb-4"
         style={{
           fontFamily: APP_CONFIG.FONTS.PRIMARY,
-          fontSize: '18px',
-          fontWeight: '600'
+          fontSize: '22px',
+          fontWeight: '700',
+          color: '#000'
         }}
       >
         Product Details
       </div>
-      <div className="row g-3">
+      <div className="row g-4">
         <div className="col-6">
           <div 
             className="text-muted"
             style={{
               fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '12px'
+              fontSize: '14px',
+              fontWeight: '500',
+              marginBottom: '8px'
             }}
           >
             Fabric
@@ -434,8 +408,9 @@ const ProductDetails = () => {
           <div 
             style={{
               fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '14px',
-              fontWeight: '500'
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#000'
             }}
           >
             {product.fabric}
@@ -446,7 +421,9 @@ const ProductDetails = () => {
             className="text-muted"
             style={{
               fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '12px'
+              fontSize: '14px',
+              fontWeight: '500',
+              marginBottom: '8px'
             }}
           >
             Color
@@ -454,8 +431,9 @@ const ProductDetails = () => {
           <div 
             style={{
               fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '14px',
-              fontWeight: '500'
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#000'
             }}
           >
             {product.color}
@@ -466,7 +444,9 @@ const ProductDetails = () => {
             className="text-muted"
             style={{
               fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '12px'
+              fontSize: '14px',
+              fontWeight: '500',
+              marginBottom: '8px'
             }}
           >
             Style
@@ -474,8 +454,9 @@ const ProductDetails = () => {
           <div 
             style={{
               fontFamily: APP_CONFIG.FONTS.SECONDARY,
-              fontSize: '14px',
-              fontWeight: '500'
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#000'
             }}
           >
             {product.style}
@@ -537,7 +518,6 @@ const ProductDetails = () => {
       <div className="flex-grow-1" style={{ paddingBottom: '100px' }}>
         {renderProductImage()}
         {renderProductInfo()}
-        {renderNavigationTabs()}
         {renderProductDetails()}
         {renderActionButtons()}
       </div>

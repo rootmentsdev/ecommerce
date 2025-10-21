@@ -99,7 +99,7 @@ const ImageTestPage = () => {
   const renderTestResults = () => (
     <Card className="mb-4">
       <Card.Header>
-        <h5 style={{ fontFamily: 'Century Gothic, sans-serif', margin: 0 }}>
+        <h5 style={{ fontFamily: 'Poppins, sans-serif', margin: 0 }}>
           🧪 Admin Image Integration Test Results
         </h5>
       </Card.Header>
@@ -157,7 +157,7 @@ const ImageTestPage = () => {
   const renderImagePreview = () => (
     <Card>
       <Card.Header>
-        <h5 style={{ fontFamily: 'Century Gothic, sans-serif', margin: 0 }}>
+        <h5 style={{ fontFamily: 'Poppins, sans-serif', margin: 0 }}>
           🖼️ Image Preview
         </h5>
       </Card.Header>
@@ -186,7 +186,7 @@ const ImageTestPage = () => {
     <Container className="py-4">
       <Row>
         <Col>
-          <h2 style={{ fontFamily: 'Century Gothic, sans-serif', marginBottom: '30px' }}>
+          <h2 style={{ fontFamily: 'Poppins, sans-serif', marginBottom: '30px' }}>
             🧪 Admin Image Integration Test
           </h2>
           
@@ -198,7 +198,7 @@ const ImageTestPage = () => {
               
               <Card className="mt-4">
                 <Card.Header>
-                  <h5 style={{ fontFamily: 'Century Gothic, sans-serif', margin: 0 }}>
+                  <h5 style={{ fontFamily: 'Poppins, sans-serif', margin: 0 }}>
                     🎨 Product Image Gallery Component
                   </h5>
                 </Card.Header>

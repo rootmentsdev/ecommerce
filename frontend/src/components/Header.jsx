@@ -11,13 +11,16 @@ const Header = ({ onMenuClick }) => {
   useEffect(() => {
     const updateFavoritesCount = () => {
       const count = FavoritesService.getTotalFavoritesCount();
+      console.log('💖 Header - Updating favorites count to:', count);
       setFavoritesCount(count);
     };
 
+    // Initial update
     updateFavoritesCount();
 
     // Listen for storage changes to update count in real-time
-    const handleStorageChange = () => {
+    const handleStorageChange = (event) => {
+      console.log('💖 Header - Storage/Favorites updated event received', event.type);
       updateFavoritesCount();
     };
 
@@ -56,7 +59,7 @@ const Header = ({ onMenuClick }) => {
 
   const logoStyles = {
     color: '#000',
-    fontFamily: 'Century Gothic'
+    fontFamily: 'Poppins'
   };
 
   const buttonStyles = {
@@ -90,7 +93,7 @@ const Header = ({ onMenuClick }) => {
     >
       <div style={{ textAlign: 'center', lineHeight: '1.1' }}>
         <div style={{ 
-          fontFamily: 'Century Gothic',
+          fontFamily: 'Poppins',
           fontWeight: 700,
           fontSize: '1.4rem',
           color: '#000'
@@ -98,7 +101,7 @@ const Header = ({ onMenuClick }) => {
           dappr
         </div>
         <div style={{ 
-          fontFamily: 'Century Gothic',
+          fontFamily: 'Poppins',
           fontWeight: 400,
           fontSize: '1rem',
           color: '#000'

@@ -122,7 +122,15 @@ class FavoritesService {
   static getTotalFavoritesCount() {
     const staticFavorites = this.getStaticFavorites();
     const adminFavorites = this.getAdminFavorites();
-    return staticFavorites.length + adminFavorites.length;
+    const total = staticFavorites.length + adminFavorites.length;
+    console.log('💖 Favorites count:', {
+      static: staticFavorites.length,
+      admin: adminFavorites.length,
+      total: total,
+      staticIds: staticFavorites,
+      adminIds: adminFavorites
+    });
+    return total;
   }
 
   /**

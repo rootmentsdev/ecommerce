@@ -388,7 +388,7 @@ const RentProducts = () => {
           {/* Show loading state */}
           {loadingAdminImages && (
             <div className="text-center py-4">
-              <p style={{ fontFamily: 'Century Gothic' }}>Loading rent products...</p>
+              <p style={{ fontFamily: 'Poppins' }}>Loading rent products...</p>
             </div>
           )}
           
@@ -451,7 +451,7 @@ const RentProducts = () => {
 
                 return (
                   <>
-                    <Row className="g-3">
+                    <Row className="g-2">
                     {paginatedImages.map((image, index) => {
                       // For RENT products, show rental price with fallback to purchase price
                       const displayPrice = image.rentalPrice || image.price || 0;
@@ -464,13 +464,15 @@ const RentProducts = () => {
                       });
                       
                       return (
-                      <Col key={image._id || index} xs={6} sm={6} md={4} lg={3}>
+                      <Col key={image._id || index} xs={6} sm={6} md={6} lg={6}>
                         <Card 
                           className="h-100 border-0 shadow-sm hover-card"
                           onClick={() => handleImageClick(image)}
                           style={{ 
                             cursor: 'pointer',
-                            transition: 'all 0.3s ease'
+                            transition: 'all 0.3s ease',
+                            borderRadius: '12px',
+                            overflow: 'hidden'
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-5px)';
@@ -488,8 +490,9 @@ const RentProducts = () => {
                               alt={image.title || 'Product'}
                               loading="lazy"
                               style={{
-                                height: '240px',
-                                objectFit: 'cover'
+                                height: '220px',
+                                objectFit: 'cover',
+                                borderRadius: '12px 12px 0 0'
                               }}
                             />
                             <Button
@@ -595,7 +598,7 @@ const RentProducts = () => {
       return (
         <Container className="py-3">
           <div className="text-center py-4">
-            <p style={{ fontFamily: 'Century Gothic', color: '#dc3545' }}>
+            <p style={{ fontFamily: 'Poppins', color: '#dc3545' }}>
               Error loading rent products. Please try again.
             </p>
           </div>
@@ -657,10 +660,10 @@ const RentProducts = () => {
         <main className="flex-grow-1">
           <Container className="py-5">
             <div className="text-center">
-              <h2 style={{ fontFamily: 'Century Gothic', color: '#dc3545' }}>
+              <h2 style={{ fontFamily: 'Poppins', color: '#dc3545' }}>
                 Something went wrong
               </h2>
-              <p style={{ fontFamily: 'Century Gothic' }}>
+              <p style={{ fontFamily: 'Poppins' }}>
                 Please refresh the page or try again later.
               </p>
             </div>

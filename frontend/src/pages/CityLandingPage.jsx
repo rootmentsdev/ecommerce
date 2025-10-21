@@ -145,7 +145,7 @@ const CityLandingPage = () => {
           <div className="text-center py-5">
             <h1 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 fontSize: '2.5rem',
                 color: '#000',
@@ -156,7 +156,7 @@ const CityLandingPage = () => {
             </h1>
             <p 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontSize: '1.1rem',
                 color: '#666',
                 maxWidth: '800px',
@@ -174,7 +174,7 @@ const CityLandingPage = () => {
                 size="lg"
                 onClick={() => navigate('/buy-now')}
                 style={{
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   borderRadius: '25px',
                   padding: '0.75rem 2rem'
                 }}
@@ -186,7 +186,7 @@ const CityLandingPage = () => {
                 size="lg"
                 onClick={() => navigate('/rent-now')}
                 style={{
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   borderRadius: '25px',
                   padding: '0.75rem 2rem'
                 }}
@@ -208,7 +208,7 @@ const CityLandingPage = () => {
                     </div>
                     <h5 
                       style={{
-                        fontFamily: 'Century Gothic',
+                        fontFamily: 'Poppins',
                         fontWeight: 600,
                         marginBottom: '0.5rem'
                       }}
@@ -217,7 +217,7 @@ const CityLandingPage = () => {
                     </h5>
                     <p 
                       style={{
-                        fontFamily: 'Century Gothic',
+                        fontFamily: 'Poppins',
                         color: '#666',
                         fontSize: '0.9rem',
                         marginBottom: 0
@@ -236,7 +236,7 @@ const CityLandingPage = () => {
             <h2 
               className="text-center mb-4"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 color: '#000'
               }}
@@ -244,10 +244,10 @@ const CityLandingPage = () => {
               We Deliver Across {currentCity.name}
             </h2>
             <div className="text-center">
-              <p style={{ fontFamily: 'Century Gothic', fontSize: '1.1rem', color: '#666' }}>
+              <p style={{ fontFamily: 'Poppins', fontSize: '1.1rem', color: '#666' }}>
                 {currentCity.popularAreas.join(' • ')}
               </p>
-              <p style={{ fontFamily: 'Century Gothic', color: '#999', fontSize: '0.9rem' }}>
+              <p style={{ fontFamily: 'Poppins', color: '#999', fontSize: '0.9rem' }}>
                 ...and many more areas in {currentCity.name}
               </p>
             </div>
@@ -258,7 +258,7 @@ const CityLandingPage = () => {
             <h2 
               className="text-center mb-4"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 color: '#000'
               }}
@@ -267,20 +267,20 @@ const CityLandingPage = () => {
             </h2>
             <Row className="g-4">
               <Col md={4}>
-                <h5 style={{ fontFamily: 'Century Gothic', fontWeight: 600 }}>Premium Quality</h5>
-                <p style={{ fontFamily: 'Century Gothic', color: '#666' }}>
+                <h5 style={{ fontFamily: 'Poppins', fontWeight: 600 }}>Premium Quality</h5>
+                <p style={{ fontFamily: 'Poppins', color: '#666' }}>
                   Handpicked collection of premium suits and formal wear designed for Kerala's climate and occasions.
                 </p>
               </Col>
               <Col md={4}>
-                <h5 style={{ fontFamily: 'Century Gothic', fontWeight: 600 }}>Affordable Pricing</h5>
-                <p style={{ fontFamily: 'Century Gothic', color: '#666' }}>
+                <h5 style={{ fontFamily: 'Poppins', fontWeight: 600 }}>Affordable Pricing</h5>
+                <p style={{ fontFamily: 'Poppins', color: '#666' }}>
                   Competitive prices with flexible rental and purchase options to suit every budget.
                 </p>
               </Col>
               <Col md={4}>
-                <h5 style={{ fontFamily: 'Century Gothic', fontWeight: 600 }}>Perfect Fit</h5>
-                <p style={{ fontFamily: 'Century Gothic', color: '#666' }}>
+                <h5 style={{ fontFamily: 'Poppins', fontWeight: 600 }}>Perfect Fit</h5>
+                <p style={{ fontFamily: 'Poppins', color: '#666' }}>
                   Expert fitting guidance and alterations to ensure you look your absolute best.
                 </p>
               </Col>
@@ -291,7 +291,7 @@ const CityLandingPage = () => {
           <div className="text-center py-5">
             <h2 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 color: '#000',
                 marginBottom: '1rem'
@@ -301,7 +301,7 @@ const CityLandingPage = () => {
             </h2>
             <p 
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontSize: '1.1rem',
                 color: '#666',
                 marginBottom: '2rem'
@@ -315,7 +315,7 @@ const CityLandingPage = () => {
                 size="lg"
                 onClick={() => navigate('/products')}
                 style={{
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   borderRadius: '25px',
                   padding: '0.75rem 2rem'
                 }}

@@ -338,7 +338,7 @@ const ImageUploader = ({ onUploadSuccess, onUploadError, maxFileSize = 5 * 1024 
   return (
     <Card>
       <Card.Body>
-        <Card.Title style={{ fontFamily: 'Century Gothic, sans-serif', marginBottom: '20px' }}>
+        <Card.Title style={{ fontFamily: 'Poppins, sans-serif', marginBottom: '20px' }}>
           Upload Image
         </Card.Title>
 
@@ -376,7 +376,7 @@ const ImageUploader = ({ onUploadSuccess, onUploadError, maxFileSize = 5 * 1024 
           {!selectedFile ? (
             <>
               <Upload size={48} color="#6c757d" className="mb-3" />
-              <h5 style={{ fontFamily: 'Century Gothic, sans-serif', color: '#495057' }}>
+              <h5 style={{ fontFamily: 'Poppins, sans-serif', color: '#495057' }}>
                 Choose an image or drag it here
               </h5>
               <p style={{ fontFamily: 'Poppins, sans-serif', color: '#6c757d', marginBottom: '20px' }}>

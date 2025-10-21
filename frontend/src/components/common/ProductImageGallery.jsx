@@ -256,7 +256,7 @@ const ProductImageGallery = ({
           <Col xs={12}>
             <div className="text-center py-4">
               <Spinner animation="border" variant="primary" />
-              <p className="mt-2" style={{ fontFamily: 'Century Gothic' }}>
+              <p className="mt-2" style={{ fontFamily: 'Poppins' }}>
                 Loading images...
               </p>
             </div>
@@ -273,7 +273,7 @@ const ProductImageGallery = ({
         <Row className="g-3">
           <Col xs={12}>
             <Alert variant="warning" className="text-center">
-              <p style={{ fontFamily: 'Century Gothic', margin: 0 }}>
+              <p style={{ fontFamily: 'Poppins', margin: 0 }}>
                 {error}
               </p>
             </Alert>
@@ -292,7 +292,7 @@ const ProductImageGallery = ({
             <div className="text-center py-5">
               <h3 
                 style={{
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   fontWeight: 700,
                   fontSize: '1.5rem',
                   color: '#666',
@@ -303,7 +303,7 @@ const ProductImageGallery = ({
               </h3>
               <p 
                 style={{
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   fontWeight: 400,
                   fontSize: '1rem',
                   color: '#999'

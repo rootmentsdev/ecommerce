@@ -375,6 +375,33 @@ const HomePageContent = () => {
                 height: 150vw !important;
                 border-radius: 0 !important;
               }
+              
+              /* Reduce gap and increase text size on mobile */
+              .hero-text-container {
+                margin-top: 15px !important;
+                padding: 0 20px !important;
+              }
+              
+              .hero-title {
+                font-size: 24px !important;
+                line-height: 1.3 !important;
+                margin-bottom: 12px !important;
+              }
+              
+              .hero-description {
+                font-size: 15px !important;
+                line-height: 1.5 !important;
+                margin-bottom: 20px !important;
+              }
+              
+              .hero-buttons {
+                margin-bottom: 25px !important;
+              }
+              
+              .hero-buttons .btn {
+                font-size: 15px !important;
+                padding: 11px 26px !important;
+              }
             }
           `}
         </style>
@@ -427,59 +454,51 @@ const HomePageContent = () => {
           </div>
           
           {/* Text and Button Section */}
-          <div className="text-center hero-text-container" style={{ marginTop: '3px' }}>
+          <div className="text-center hero-text-container" style={{ marginTop: '20px', padding: '0 20px' }}>
             <h1 
               className="fw-bold mb-3 hero-title"
                 style={{
-                width: 'auto',
-                minWidth: '320px',
-                height: '29px',
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
-                fontStyle: 'ExtraBold',
-                fontSize: '25px',
-                lineHeight: '120%',
-                letterSpacing: '0%',
+                fontSize: '34px',
+                lineHeight: '1.3',
                 textAlign: 'center',
-                verticalAlign: 'middle',
-                opacity: 1,
                 color: '#000',
-                margin: '0 auto',
-                whiteSpace: 'nowrap',
-                overflow: 'visible',
+                margin: '0 auto 15px',
+                maxWidth: '380px',
                 marginTop: '-150px',
-
               }}
             >
-              Style Together,Shine Together
+              Style Together, Shine Together
               </h1>
               <p 
-              className="fs-5 mb-4 hero-description"
+              className="mb-4 hero-description"
                 style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 400,
-                lineHeight: '1.4',
-                fontSize: '1.1rem',
+                lineHeight: '1.5',
+                fontSize: '16px',
                 color: '#666',
-                maxWidth: '600px',
-                margin: '0 auto'
+                maxWidth: '380px',
+                margin: '0 auto 25px'
               }}
             >
-              Premium men's fashion for every celebration Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.
+              Premium men's fashion for every celebration. Buy, Rent, or Book in Bulk. Perfect outfits for weddings, parties, squads, and more.
             </p>
-            <div className="d-flex gap-3 justify-content-center mb-5">
+            <div className="d-flex gap-2 justify-content-center mb-4 hero-buttons">
                 <Button 
                   variant="outline-dark" 
-                  size="lg"
-                  className="px-4 py-3 btn-custom"
+                  size="md"
+                  className="btn-custom"
                   style={{
-                    fontFamily: 'Century Gothic',
+                    fontFamily: 'Poppins',
                     fontWeight: 600,
-                    borderRadius: '20px !important',
+                    borderRadius: '20px',
                     border: '2px solid #000',
                     backgroundColor: 'transparent',
-                    fontSize: '1rem',
-                    color: '#000'
+                    fontSize: '14px',
+                    color: '#000',
+                    padding: '10px 24px'
                   }}
                   onClick={handleRentNowClick}
               >
@@ -487,15 +506,16 @@ const HomePageContent = () => {
               </Button>
               <Button 
                 variant="dark" 
-                size="lg"
-                className="px-4 py-3 btn-custom"
+                size="md"
+                className="btn-custom"
                 style={{
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   fontWeight: 600,
-                  borderRadius: '20px !important',
+                  borderRadius: '20px',
                   backgroundColor: '#000',
                   border: 'none',
-                  fontSize: '1rem'
+                  fontSize: '14px',
+                  padding: '10px 24px'
                 }}
                 onClick={handleShopNowClick}
               >
@@ -504,25 +524,26 @@ const HomePageContent = () => {
             </div>
             
             {/* Feature Icons Section */}
-            <div className="d-flex justify-content-center gap-4">
+            <div className="d-flex justify-content-center gap-3">
               {FEATURES.map((feature, index) => (
                 <div key={index} className="text-center">
                   <div 
                     className="rounded-circle bg-dark d-flex align-items-center justify-content-center mx-auto mb-2"
             style={{
-                      width: '50px',
-                      height: '50px'
+                      width: '40px',
+                      height: '40px'
             }}
           >
-                    <feature.icon size={20} className="text-white" />
+                    <feature.icon size={16} className="text-white" />
           </div>
                   <h6 
                     className="fw-medium mb-0"
             style={{
-                      fontFamily: 'Century Gothic',
+                      fontFamily: 'Poppins',
                       fontWeight: 400,
-              fontSize: '12px',
-                      color: '#000'
+              fontSize: '10px',
+                      color: '#000',
+                      lineHeight: '1.3'
             }}
           >
             {feature.title}
@@ -545,7 +566,7 @@ const HomePageContent = () => {
         <Col>
           <h2 
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 700,
               fontSize: '2rem',
               color: '#000',
@@ -556,7 +577,7 @@ const HomePageContent = () => {
           </h2>
           <p 
             style={{ 
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 400,
               fontSize: '1.1rem',
               color: '#666',
@@ -584,7 +605,7 @@ const HomePageContent = () => {
                 </div>
                 <Card.Text 
                 style={{
-                    fontFamily: 'Century Gothic',
+                    fontFamily: 'Poppins',
                     fontWeight: 400,
                     fontSize: '1rem',
                     color: '#333',
@@ -604,7 +625,7 @@ const HomePageContent = () => {
                   <div>
                     <h6 
                 style={{
-                        fontFamily: 'Century Gothic',
+                        fontFamily: 'Poppins',
                         fontWeight: 600,
                         fontSize: '1rem',
                         color: '#000',
@@ -615,7 +636,7 @@ const HomePageContent = () => {
                     </h6>
                     <small 
                       style={{
-                        fontFamily: 'Century Gothic',
+                        fontFamily: 'Poppins',
                         fontWeight: 400,
                         color: '#666'
                       }}
@@ -634,38 +655,68 @@ const HomePageContent = () => {
 
   // Render stats section
   const renderStatsSection = () => (
-    <Container className="py-5" style={{ backgroundColor: '#f8f9fa' }}>
-      <Row className="text-center">
-        {STATS.map((stat, index) => (
-          <Col key={index} xs={6} md={3} className="mb-4">
-            <div>
-              <h3 
+    <div style={{ backgroundColor: '#ffffff', padding: '30px 0' }}>
+      <Container>
+        <Row className="text-center g-2">
+          {STATS.map((stat, index) => (
+            <Col key={index} xs={6} sm={6} md={6} lg={6} style={{ marginBottom: '12px' }}>
+              <div 
                 style={{
-                  fontFamily: 'Century Gothic',
-                  fontWeight: 700,
-                  fontSize: '2.5rem',
-                  color: '#000',
-                  marginBottom: '0.5rem'
+                  padding: '20px 10px',
+                  borderRadius: '14px',
+                  backgroundColor: '#f8f9fa',
+                  transition: 'all 0.3s ease',
+                  border: '1px solid #e9ecef',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: '110px'
                 }}
+                className="stat-card"
               >
-                {stat.number}
-              </h3>
-              <p 
+                <h3 
                   style={{
-                    fontFamily: 'Century Gothic',
-                  fontWeight: 400,
-                  fontSize: '1rem',
-                  color: '#666',
-                  margin: 0
+                    fontFamily: 'Poppins',
+                    fontWeight: 700,
+                    fontSize: '32px',
+                    color: '#000',
+                    marginBottom: '6px',
+                    lineHeight: '1'
                   }}
                 >
-                {stat.label}
-              </p>
+                  {stat.number}
+                </h3>
+                <p 
+                  style={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 500,
+                    fontSize: '12px',
+                    color: '#666',
+                    margin: 0,
+                    lineHeight: '1.3',
+                    textAlign: 'center'
+                  }}
+                >
+                  {stat.label}
+                </p>
               </div>
-          </Col>
-        ))}
-      </Row>
-    </Container>
+            </Col>
+          ))}
+        </Row>
+      </Container>
+      
+      <style>
+        {`
+          .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            background-color: #fff;
+          }
+        `}
+      </style>
+    </div>
   );
 
 
@@ -674,43 +725,44 @@ const HomePageContent = () => {
     <div className="py-5 bg-dark">
       <Container>
         <Row className="justify-content-center">
-          <Col md={8} lg={6} className="text-center">
-            <h3 className="text-white mb-3 fw-bold">
+          <Col md={10} lg={8} xl={6} className="text-center">
+            <h3 className="text-white mb-4 fw-bold" style={{ fontSize: '2rem', fontFamily: 'Poppins' }}>
               Stay in the Loop
             </h3>
-            <p className="text-white-50 mb-4">
+            <p className="text-white-50 mb-5" style={{ fontSize: '1rem', fontFamily: 'Poppins', opacity: 0.8 }}>
               Subscribe to get updates on new arrivals and special offers
             </p>
             
             <form onSubmit={handleNewsletterSubmit} className="mb-3">
-              <Row className="g-2">
-                <Col xs={12} md={8}>
-                  <input
-                    type="email"
-                    value={newsletterEmail}
-                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    disabled={newsletterLoading}
-                    className="form-control form-control-lg"
-                  />
-                </Col>
-                <Col xs={12} md={4}>
-                  <Button
-                    type="submit"
-                    variant="light"
-                    size="lg"
-                    disabled={newsletterLoading || !newsletterEmail.trim()}
-                    className="w-100"
-                  >
-                    {newsletterLoading ? 'Subscribing...' : 'Subscribe'}
-                  </Button>
-                </Col>
-              </Row>
+              <div className="newsletter-form-container">
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  disabled={newsletterLoading}
+                  className="form-control newsletter-input"
+                />
+                <Button
+                  type="submit"
+                  disabled={newsletterLoading || !newsletterEmail.trim()}
+                  className="newsletter-subscribe-btn"
+                >
+                  {newsletterLoading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Subscribing...
+                    </>
+                  ) : (
+                    'Subscribe'
+                  )}
+                </Button>
+              </div>
             </form>
             
             {newsletterSuccess && (
-              <div className="alert alert-success mt-3">
+              <div className="newsletter-success-message">
                 ✓ Successfully subscribed! Welcome to dappr SQUAD!
               </div>
             )}
@@ -733,7 +785,7 @@ const HomePageContent = () => {
           <h3 
             className="h3 fw-bold mb-0"
                   style={{
-                    fontFamily: 'Century Gothic',
+                    fontFamily: 'Poppins',
                     fontWeight: 700,
               letterSpacing: '-0.02em'
             }}
@@ -746,7 +798,7 @@ const HomePageContent = () => {
             variant="link" 
             className="p-0 text-decoration-none text-muted"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 400,
               fontSize: '14px'
             }}
@@ -844,29 +896,6 @@ const HomePageContent = () => {
                     </div>
                   )}
               
-              {/* Navigation Arrow */}
-              <div 
-                className="position-absolute"
-                style={{
-                  bottom: '15px',
-                  right: '15px',
-                  width: '30px',
-                  height: '30px',
-                  backgroundColor: '#000',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                }}
-              >
-                <ChevronRight 
-                  size={14} 
-                  color="white"
-                />
-              </div>
-              
                   {/* Product Name and Price Overlay */}
               <div 
                 className="position-absolute bottom-0 start-0 end-0 text-center p-3"
@@ -879,7 +908,7 @@ const HomePageContent = () => {
                 <h6 
                       className="text-white mb-1 fw-bold"
                   style={{
-                    fontFamily: 'Century Gothic',
+                    fontFamily: 'Poppins',
                     fontWeight: 700,
                         fontSize: '14px',
                         textShadow: '0 1px 2px rgba(0,0,0,0.5)'
@@ -890,7 +919,7 @@ const HomePageContent = () => {
                     <p 
                       className="text-white mb-0"
                       style={{
-                        fontFamily: 'Century Gothic',
+                        fontFamily: 'Poppins',
                         fontWeight: 600,
                         fontSize: '12px',
                         textShadow: '0 1px 2px rgba(0,0,0,0.5)'
@@ -921,7 +950,7 @@ const HomePageContent = () => {
           <h3 
             className="h3 fw-bold mb-0"
                   style={{
-                    fontFamily: 'Century Gothic',
+                    fontFamily: 'Poppins',
                     fontWeight: 700,
                     letterSpacing: '-0.02em'
                   }}
@@ -934,7 +963,7 @@ const HomePageContent = () => {
             variant="link" 
             className="p-0 text-decoration-none text-muted"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 400,
               fontSize: '14px'
               }}
@@ -1032,29 +1061,6 @@ const HomePageContent = () => {
               </div>
               )}
               
-              {/* Navigation Arrow */}
-              <div 
-                className="position-absolute"
-                 style={{
-                  bottom: '15px',
-                  right: '15px',
-                  width: '30px',
-                  height: '30px',
-                  backgroundColor: '#000',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                }}
-              >
-                <ChevronRight 
-                  size={14} 
-                  color="white"
-                />
-    </div>
-              
               {/* Category Name Overlay */}
               <div 
                 className="position-absolute bottom-0 start-0 end-0 text-center p-3"
@@ -1067,7 +1073,7 @@ const HomePageContent = () => {
                 <h6 
                       className="text-white mb-0 fw-bold"
           style={{
-            fontFamily: 'Century Gothic',
+            fontFamily: 'Poppins',
             fontWeight: 700,
                         fontSize: '14px',
                         textShadow: '0 1px 2px rgba(0,0,0,0.5)'
@@ -1079,7 +1085,7 @@ const HomePageContent = () => {
                     <p 
                         className="text-white mb-0"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                           fontWeight: 600,
                           fontSize: '12px',
                           textShadow: '0 1px 2px rgba(0,0,0,0.5)'
@@ -1128,7 +1134,7 @@ const HomePageContent = () => {
           <h3 
             className="display-4 fw-bold mb-4"
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               fontSize: '2.5rem',
@@ -1140,7 +1146,7 @@ const HomePageContent = () => {
           <p 
             className="fs-4 mb-4"
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 400,
               lineHeight: '1.4',
               fontSize: '1.1rem',
@@ -1157,7 +1163,7 @@ const HomePageContent = () => {
                 size="lg"
                 className="px-4 py-3 btn-custom"
                 style={{
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   fontWeight: 600,
                   borderRadius: '20px !important',
                   border: '2px solid #000',
@@ -1174,7 +1180,7 @@ const HomePageContent = () => {
               size="lg"
               className="px-4 py-3 btn-custom"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 600,
                 borderRadius: '20px !important',
                 backgroundColor: '#000',
@@ -1203,6 +1209,135 @@ const HomePageContent = () => {
           }
           .btn-custom:focus {
             border-radius: 50px !important;
+          }
+          
+          /* Newsletter Form Container */
+          .newsletter-form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
+            padding: 0 10px;
+          }
+          
+          /* Newsletter Input */
+          .newsletter-input {
+            width: 100%;
+            border-radius: 50px;
+            padding: 18px 28px;
+            border: none;
+            background-color: #ffffff;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            color: #000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+          }
+          
+          .newsletter-input::placeholder {
+            color: #aaa;
+            font-weight: 400;
+          }
+          
+          .newsletter-input:focus {
+            outline: none;
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+            background-color: #ffffff;
+          }
+          
+          .newsletter-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          
+          /* Newsletter Subscribe Button - Force Black Color */
+          .newsletter-subscribe-btn {
+            width: 100% !important;
+            border-radius: 50px !important;
+            padding: 18px 28px !important;
+            background-color: #000 !important;
+            color: #fff !important;
+            border: none !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            font-family: 'Poppins', sans-serif !important;
+            transition: all 0.3s ease !important;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+          }
+          
+          .newsletter-subscribe-btn:hover:not(:disabled) {
+            background-color: #222 !important;
+            color: #fff !important;
+            border: none !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+          }
+          
+          .newsletter-subscribe-btn:focus:not(:disabled),
+          .newsletter-subscribe-btn:focus-visible:not(:disabled) {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: none !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 0.2rem rgba(0, 0, 0, 0.3) !important;
+          }
+          
+          .newsletter-subscribe-btn:active:not(:disabled) {
+            background-color: #111 !important;
+            color: #fff !important;
+            border: none !important;
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+          }
+          
+          .newsletter-subscribe-btn:disabled {
+            background-color: #000 !important;
+            color: #fff !important;
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+          }
+          
+          /* Newsletter Success Message */
+          .newsletter-success-message {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 18px 28px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 15px;
+            text-align: center;
+            max-width: 420px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            animation: slideInUp 0.4s ease-out;
+          }
+          
+          @keyframes slideInUp {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          /* Keep vertical layout on all screens for consistency */
+          @media (min-width: 769px) {
+            .newsletter-form-container {
+              max-width: 420px;
+              gap: 20px;
+            }
+            
+            .newsletter-success-message {
+              max-width: 420px;
+            }
           }
         `}
       </style>

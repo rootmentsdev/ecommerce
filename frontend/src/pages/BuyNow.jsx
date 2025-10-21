@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Headphones } from 'react-bootstrap-icons';
+import { Headphones } from 'react-bootstrap-icons';
 import SEOService from '../services/seoService';
 import ImageService from '../services/imageService';
 
@@ -14,6 +14,7 @@ import Product2 from '../assets/Product2.png';
 import Product3 from '../assets/Product3.png';
 import Product4 from '../assets/Product4.png';
 import Product5 from '../assets/Product5.png';
+import Aboutus4 from '../assets/Aboutus4.png';
 
 // Import reusable components
 import Header from '../components/Header';
@@ -160,17 +161,34 @@ const BuyNow = () => {
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 !important;
-                margin: 0 !important;
+                margin: 0 0 15px 0 !important;
               }
               .hero-carousel {
                 width: 100% !important;
-                height: 150vw !important;
+                height: 140vw !important;
                 border-radius: 0 !important;
               }
               .hero-image {
                 width: 100% !important;
-                height: 150vw !important;
+                height: 140vw !important;
                 border-radius: 0 !important;
+              }
+              
+              .hero-text-container {
+                margin-top: -200px !important;
+                padding: 0 15px !important;
+              
+              }
+              
+              .hero-title {
+                margin-top: 0 !important;
+                margin-bottom: 10px !important;
+                font-size: 20px !important;
+              }
+              
+              .hero-description {
+                margin-bottom: 15px !important;
+                padding: 0 10px !important;
               }
               
               /* Prevent horizontal scrolling on mobile */
@@ -237,41 +255,33 @@ const BuyNow = () => {
           </div>
           
           {/* Text and Button Section */}
-          <div className="text-center hero-text-container" style={{ marginTop: '3px' }}>
+          <div className="text-center hero-text-container" style={{ marginTop: '0' }}>
             <h1 
-              className="fw-bold mb-3 hero-title"
+              className="fw-bold hero-title"
               style={{
-                width: 'auto',
-                minWidth: '320px',
-                height: '29px',
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
-                fontStyle: 'ExtraBold',
-                fontSize: '28px',
-                lineHeight: '120%',
-                letterSpacing: '0%',
+                fontSize: '20px',
+                lineHeight: '1.3',
                 textAlign: 'center',
-                verticalAlign: 'middle',
-                opacity: 1,
                 color: '#000',
-                margin: '0 auto',
-                whiteSpace: 'nowrap',
-                overflow: 'visible',
-                marginTop: '-140px',
+                margin: '0 auto 10px',
+                maxWidth: '380px'
               }}
             >
               Buy Premium Fashion
             </h1>
             <p 
-              className="fs-5 mb-4 hero-description"
+              className="hero-description"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 400,
-                lineHeight: '1.4',
-                fontSize: '1.1rem',
+                lineHeight: '1.5',
+                fontSize: '14px',
                 color: '#666',
-                maxWidth: '600px',
-                margin: '0 auto'
+                maxWidth: '380px',
+                margin: '0 auto 15px',
+                padding: '0 15px'
               }}
             >
               Own premium men's fashion pieces. Buy high-quality suits, kurtas, and traditional wear for your wardrobe.
@@ -290,28 +300,44 @@ const BuyNow = () => {
             <h1 
               className="h2 fw-bold mb-4"
               style={{
-                fontFamily: 'Century Gothic',
+                fontFamily: 'Poppins',
                 fontWeight: 700,
                 fontSize: '2.5rem',
-                color: '#000'
+                color: '#000',
+                marginBottom: '30px'
               }}
             >
               Buy Now
             </h1>
             
-            <div className="text-start mb-4">
-              <ul className="list-unstyled" style={{ paddingLeft: '0' }}>
+            <div 
+              className="mb-4"
+              style={{
+                maxWidth: '500px',
+                margin: '0 auto 30px'
+              }}
+            >
+              <ul 
+                className="list-unstyled" 
+                style={{ 
+                  paddingLeft: '0',
+                  textAlign: 'left',
+                  display: 'inline-block',
+                  width: '100%',
+                  maxWidth: '450px'
+                }}
+              >
                 {BUY_NOW_FEATURES.map((feature, index) => (
                   <li 
                     key={index}
-                    className="mb-2"
                     style={{
-                      fontFamily: 'Century Gothic',
+                      fontFamily: 'Poppins',
                       fontWeight: 400,
                       fontSize: '16px',
-                      lineHeight: '1.6',
+                      lineHeight: '1.8',
                       color: '#000',
-                      marginTop: '7px'
+                      marginBottom: '12px',
+                      paddingLeft: '0'
                     }}
                   >
                     • {feature}
@@ -320,40 +346,25 @@ const BuyNow = () => {
               </ul>
             </div>
             
-            <div className="d-flex justify-content-center align-items-center gap-3">
+            <div 
+              className="d-flex justify-content-center align-items-center"
+              style={{ marginTop: '30px' }}
+            >
               <Button 
                 variant="dark"
                 size="lg"
                 onClick={handleBrowseProducts}
                 className="btn-custom"
                 style={{
-                  borderRadius: '50px !important',
-                  padding: '12px 30px',
+                  borderRadius: '50px',
+                  padding: '14px 32px',
                   fontSize: '16px',
-                  fontFamily: 'Century Gothic',
+                  fontFamily: 'Poppins',
                   fontWeight: 600
                 }}
               >
                 Browse Products
               </Button>
-              
-              <div 
-                style={{
-                  width: '50px',
-                  height: '50px',
-                  backgroundColor: '#000',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer'
-                }}
-              >
-                <Headphones 
-                  size={20} 
-                  color="white"
-                />
-              </div>
             </div>
           </Col>
         </Row>
@@ -368,7 +379,7 @@ const BuyNow = () => {
           <h2 
             className="h3 fw-bold mb-0"
             style={{
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 700,
               letterSpacing: '-0.02em'
             }}
@@ -381,7 +392,7 @@ const BuyNow = () => {
             variant="link" 
             className="p-0 text-decoration-none text-muted"
             style={{ 
-              fontFamily: 'Century Gothic',
+              fontFamily: 'Poppins',
               fontWeight: 400,
               fontSize: '14px'
             }}
@@ -412,28 +423,6 @@ const BuyNow = () => {
                 }}
               />
               
-              {/* Navigation Arrow */}
-              <div 
-                className="position-absolute"
-                style={{
-                  bottom: '15px',
-                  right: '15px',
-                  width: '30px',
-                  height: '30px',
-                  backgroundColor: '#000',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer'
-                }}
-              >
-                <ChevronRight 
-                  size={14} 
-                  color="white"
-                />
-              </div>
-              
               {/* Category Name Overlay */}
               <div 
                 className="position-absolute bottom-0 start-0 end-0 text-center p-3"
@@ -457,70 +446,67 @@ const BuyNow = () => {
   const renderFinalCTASection = () => (
     <div className="py-5">
       <Container>
-        <Row className="justify-content-center">
-          <Col lg={8} className="text-center">
-            {/* Image Section - Using backend image */}
-            {buyImages.length > 0 && (
-              <div className="mb-4">
-                <img 
-                  src={buyImages[0]?.imageUrl} 
-                  alt="Celebration"
-                  className="img-fluid rounded"
-                  loading="lazy"
-                  style={{
-                    maxWidth: '800px',
-                    height: '400px',
-                    objectFit: 'cover'
-                  }}
-                />
-              </div>
-            )}
-            
-            {/* Text Content */}
-            <h2 
-              className="h3 fw-bold mb-3"
-              style={{
-                fontFamily: 'Century Gothic',
-                fontWeight: 700,
-                fontSize: '2rem',
-                color: '#000'
-              }}
-            >
-              Your Celebration, Your Style The Dappr Way.
-            </h2>
-            
-            <p 
-              className="mb-4"
-              style={{
-                fontFamily: 'Century Gothic',
-                fontWeight: 400,
-                fontSize: '16px',
-                lineHeight: '1.6',
-                color: '#666',
-                maxWidth: '600px',
-                margin: '0 auto'
-              }}
-            >
-              Shop, rent, or book in bulk and make every event unforgettable.
-            </p>
-            
-            <Button 
-              variant="outline-dark"
-              size="lg"
-              onClick={handleEnquireNow}
-              className="btn-custom"
-              style={{
-                borderRadius: '20px !important',
-                padding: '12px 30px',
-                fontSize: '16px',
-                fontFamily: 'Century Gothic',
-                fontWeight: 600
-              }}
-            >
-              Enquire Now
-            </Button>
-          </Col>
-        </Row>
+        {/* Image Section - Using same image as homepage */}
+        <div className="text-center mb-5">
+          <img 
+            src={Aboutus4} 
+            alt="Your Celebration, Your Style"
+            className="img-fluid rounded"
+            style={{
+              width: '100%',
+              maxWidth: '800px',
+              height: '400px',
+              objectFit: 'cover',
+              borderRadius: '15px'
+            }}
+          />
+        </div>
+        
+        {/* Text and Button Section */}
+        <div className="text-center">
+          <h2 
+            className="h3 fw-bold mb-3"
+            style={{
+              fontFamily: 'Poppins',
+              fontWeight: 700,
+              fontSize: '2rem',
+              color: '#000'
+            }}
+          >
+            Your Celebration, Your Style The Dappr Way.
+          </h2>
+          
+          <p 
+            className="mb-4"
+            style={{
+              fontFamily: 'Poppins',
+              fontWeight: 400,
+              fontSize: '16px',
+              lineHeight: '1.6',
+              color: '#666',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}
+          >
+            Shop, rent, or book in bulk and make every event unforgettable.
+          </p>
+          
+          <Button 
+            variant="outline-dark"
+            size="lg"
+            onClick={handleEnquireNow}
+            className="btn-custom"
+            style={{
+              borderRadius: '50px',
+              padding: '12px 30px',
+              fontSize: '16px',
+              fontFamily: 'Poppins',
+              fontWeight: 600
+            }}
+          >
+            Enquire Now
+          </Button>
+        </div>
       </Container>
     </div>
   );

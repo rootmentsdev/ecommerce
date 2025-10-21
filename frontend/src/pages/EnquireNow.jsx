@@ -285,7 +285,7 @@ const EnquireNow = () => {
   const renderForm = () => (
     <Container className="py-4">
       <Row className="justify-content-center">
-        <Col xs={12} md={8} lg={6}>
+        <Col xs={12}>
           <div className="text-center mb-4">
             <h1 
               className="h3 fw-bold mb-0"

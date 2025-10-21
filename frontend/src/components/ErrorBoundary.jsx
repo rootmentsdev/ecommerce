@@ -23,16 +23,16 @@ class ErrorBoundary extends React.Component {
       return (
         <Container className="py-5">
           <div className="text-center">
-            <h2 style={{ fontFamily: 'Century Gothic', color: '#dc3545' }}>
+            <h2 style={{ fontFamily: 'Poppins', color: '#dc3545' }}>
               Something went wrong
             </h2>
-            <p style={{ fontFamily: 'Century Gothic' }}>
+            <p style={{ fontFamily: 'Poppins' }}>
               Please refresh the page or try again later.
             </p>
             <button 
               className="btn btn-primary"
               onClick={() => window.location.reload()}
-              style={{ fontFamily: 'Century Gothic' }}
+              style={{ fontFamily: 'Poppins' }}
             >
               Refresh Page
             </button>

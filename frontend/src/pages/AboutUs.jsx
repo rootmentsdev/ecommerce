@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { List, Search, Bag, ArrowClockwise, Lock } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
 import SEOService from '../services/seoService';
 import Header from '../components/Header';
 import SideMenu from '../components/SideMenu';
@@ -12,6 +13,7 @@ import Aboutus4 from '../assets/Aboutus4.png';
 
 const AboutUs = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
+  const navigate = useNavigate();
 
   // Initialize SEO for about page
   useEffect(() => {
@@ -20,6 +22,14 @@ const AboutUs = () => {
 
   const handleShowSideMenu = () => setShowSideMenu(true);
   const handleCloseSideMenu = () => setShowSideMenu(false);
+
+  const handleRentNowClick = () => {
+    navigate('/rent-products');
+  };
+
+  const handleShopClick = () => {
+    navigate('/buy-products');
+  };
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -44,7 +54,7 @@ const AboutUs = () => {
           }
 
           .about-title {
-            font-family: 'Century Gothic', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-weight: 400;
             font-size: 22px;
             line-height: 120%;
@@ -118,7 +128,7 @@ const AboutUs = () => {
           }
 
           .section-title {
-            font-family: 'Century Gothic', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-weight: 400;
             font-size: 22px;
             line-height: 120%;
@@ -155,7 +165,7 @@ const AboutUs = () => {
           }
 
           .service-title {
-            font-family: 'Century Gothic', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-weight: 400;
             font-size: 16px;
             color: #333;
@@ -227,6 +237,7 @@ const AboutUs = () => {
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
           }
 
           .cta-button-outline {
@@ -436,8 +447,18 @@ const AboutUs = () => {
           Shop, rent, or book in bulk and make every event unforgettable.
         </p>
         <div className="cta-buttons">
-          <button className="cta-button cta-button-outline">RENT NOW</button>
-          <button className="cta-button cta-button-filled">Start shopping</button>
+          <button 
+            className="cta-button cta-button-outline"
+            onClick={handleRentNowClick}
+          >
+            RENT NOW
+          </button>
+          <button 
+            className="cta-button cta-button-filled"
+            onClick={handleShopClick}
+          >
+            BUY NOW
+          </button>
         </div>
         </div>
       </div>

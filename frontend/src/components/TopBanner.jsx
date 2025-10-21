@@ -44,7 +44,7 @@ const TopBanner = () => {
         color: '#ffffff', // White text
         padding: '12px 0',
         fontSize: '14px',
-        fontFamily: 'Century Gothic',
+        fontFamily: 'Poppins',
         fontWeight: 600,
         overflow: 'hidden',
         borderBottom: '1px solid rgba(255,255,255,0.1)',

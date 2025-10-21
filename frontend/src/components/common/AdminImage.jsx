@@ -113,7 +113,7 @@ const AdminImage = ({
         <div style={{ padding: '8px 0' }}>
           {showTitle && image.title && (
             <h6 style={{ 
-              fontFamily: 'Century Gothic, sans-serif',
+              fontFamily: 'Poppins, sans-serif',
               fontSize: '14px',
               fontWeight: '600',
               margin: '0 0 4px 0',

@@ -78,7 +78,7 @@ const ProductGrid = ({
     <Container className="py-4">
       {title && (
         <div className="text-center mb-5">
-          <h2 className="fw-bold mb-3" style={{ fontFamily: 'Century Gothic' }}>
+          <h2 className="fw-bold mb-3" style={{ fontFamily: 'Poppins' }}>
             {title}
           </h2>
           <p className="text-muted">
@@ -163,7 +163,7 @@ const ProductGrid = ({
                 <Card.Title 
                   className="fw-bold mb-2"
                   style={{ 
-                    fontFamily: 'Century Gothic',
+                    fontFamily: 'Poppins',
                     fontSize: '1.1rem',
                     lineHeight: '1.3'
                   }}
@@ -239,7 +239,7 @@ const ProductGrid = ({
                   <Button
                     variant="outline-primary"
                     className="flex-grow-1"
-                    style={{ fontFamily: 'Century Gothic', fontWeight: '500' }}
+                    style={{ fontFamily: 'Poppins', fontWeight: '500' }}
                   >
                     View Details
                   </Button>
