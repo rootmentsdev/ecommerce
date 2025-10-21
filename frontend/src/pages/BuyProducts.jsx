@@ -118,6 +118,7 @@ const BuyProducts = () => {
       style: image.style
     };
     
+    
     navigate('/product-details', { 
       state: { 
         product,
