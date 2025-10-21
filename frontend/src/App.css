@@ -32,6 +32,40 @@
   overflow-x: hidden;
   overflow-y: auto; /* Allow vertical scrolling */
   transition: box-shadow 0.3s ease;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Mobile specific fixes for scrolling */
+@media (max-width: 768px) {
+  .mobile-view-container {
+    min-height: 100vh;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: scroll !important;
+    -webkit-overflow-scrolling: touch;
+    position: relative !important;
+  }
+  
+  body, html {
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    position: relative;
+  }
+  
+  .app-wrapper {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
+  
+  /* Ensure content pages can scroll */
+  .page-transition {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
 }
 
 .mobile-view-container:hover {
