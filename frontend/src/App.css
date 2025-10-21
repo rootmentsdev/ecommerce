@@ -66,6 +66,48 @@
     min-height: 100vh;
     overflow: visible !important;
   }
+  
+  /* Fix carousel touch scrolling on mobile */
+  .hero-carousel-container,
+  .hero-carousel,
+  .carousel,
+  .carousel-inner,
+  .carousel-item {
+    touch-action: pan-y !important;
+    pointer-events: none !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .hero-image,
+  .carousel-item img {
+    touch-action: pan-y !important;
+    pointer-events: auto !important;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+  }
+  
+  /* Prevent carousel from capturing vertical scroll */
+  .carousel-inner {
+    touch-action: pan-y !important;
+    pointer-events: none !important;
+  }
+  
+  /* Disable Bootstrap carousel touch events completely */
+  .carousel.slide {
+    touch-action: pan-y !important;
+  }
+  
+  .carousel-item.active {
+    pointer-events: none !important;
+  }
+  
+  /* Ensure text sections don't interfere with scrolling */
+  .hero-text-container {
+    touch-action: pan-y !important;
+    pointer-events: auto !important;
+  }
 }
 
 .mobile-view-container:hover {

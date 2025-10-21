@@ -247,7 +247,9 @@ const RentNow = () => {
                  maxWidth: '500px',
                  height: '800px',
                  position: 'relative',
-                 margin: '0 auto'
+                 margin: '0 auto',
+                 touchAction: 'pan-y',
+                 WebkitOverflowScrolling: 'touch'
                }}
              >
               <Carousel 
@@ -256,12 +258,15 @@ const RentNow = () => {
                 indicators={false}
                 controls={false}
                 interval={3000}
+                touch={false}
+                slide={false}
                 className="hero-carousel"
                 style={{
                   borderRadius: '20px',
                   overflow: 'hidden',
                   width: '100%',
-                  height: '100%'
+                  height: '100%',
+                  touchAction: 'pan-y'
                 }}
               >
                 {heroImages.map((image, index) => (
@@ -270,12 +275,23 @@ const RentNow = () => {
                       src={image} 
                       alt={`dappr SQUAD Rent Now - Hero Image ${index + 1}`}
                       className="hero-image"
+                      draggable={false}
                       style={{
                         width: '100%',
                         height: '800px',
                         objectFit: 'cover',
                         borderRadius: '20px',
-                        opacity: 1
+                        opacity: 1,
+                        pointerEvents: 'auto',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                        touchAction: 'pan-y'
+                      }}
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                      }}
+                      onTouchMove={(e) => {
+                        e.stopPropagation();
                       }}
                     />
                   </Carousel.Item>
