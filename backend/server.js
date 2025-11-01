@@ -31,7 +31,9 @@ app.use(cors({
       'http://localhost:3000',
       'https://ecommerce-pi-six-17.vercel.app',
       'https://ecommerce-q0bg.onrender.com',
-      'https://ecommerce-git-master-rootments-test-envs-projects.vercel.app'
+      'https://ecommerce-git-master-rootments-test-envs-projects.vercel.app',
+      'https://www.dapprsquad.com',
+      'https://dapprsquad.com'
     ];
     
     // Allow any Vercel subdomain
@@ -52,22 +54,6 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-
-// Additional CORS headers for preflight requests
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  
-  next();
-});
 
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));

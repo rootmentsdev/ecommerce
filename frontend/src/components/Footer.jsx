@@ -98,7 +98,7 @@ const Footer = () => {
                   <div 
                     key={index}
                     className="mb-2 footer-link"
-                    style={{ fontSize: '0.9rem', color: 'white', opacity: 0.8, cursor: 'pointer' }}
+                    style={{ fontSize: '0.9rem', color: 'pink', opacity: 0.8, cursor: 'pointer' }}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(link.href);
@@ -115,7 +115,7 @@ const Footer = () => {
         {/* Policies Section */}
         {policies.length > 0 && (
           <>
-            <hr style={{ borderColor: '#555', margin: '1rem 0' }} />
+            <hr style={{ borderColor: '#5555', margin: '1rem 0' }} />
             <Row className="mb-3">
               <Col>
                 <div 
@@ -128,7 +128,7 @@ const Footer = () => {
                     size={16} 
                     style={{ 
                       transform: policiesOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                      transition: 'transform 0.3s ease'
+                      transition: 'transform 0.6s ease'
                     }}
                   />
                 </div>
@@ -169,7 +169,7 @@ const Footer = () => {
                     href={social.href}
                     className="social-link"
                     aria-label={social.label}
-                    style={{ color: 'white' }}
+                    style={{ color: 'pink' }}
                   >
                     <IconComponent size={20} />
                   </a>
@@ -181,7 +181,7 @@ const Footer = () => {
           <Col md={6} className="text-center text-md-end">
             <p 
               className="mb-0"
-              style={{ fontSize: '0.8rem', color: 'white', opacity: 0.8, lineHeight: '1.5' }}
+              style={{ fontSize: '0.8rem', color: 'blue', opacity: 0.6, lineHeight: '1.5' }}
             >
               © {new Date().getFullYear()} Dappr Squad. All Rights Reserved.<br className="d-md-none" />
               <span className="d-none d-md-inline"> | </span>Premium Men's Fashion
@@ -218,7 +218,10 @@ const Footer = () => {
           }
           
           .social-link {
-            color: white;
+            color : white;
+            background-color: #000;
+            border:1 px;
+            margin left: 5px;
             transition: all 0.3s ease;
             padding: 8px;
             border-radius: 50%;
@@ -230,6 +233,7 @@ const Footer = () => {
           .social-link:hover {
             background-color: #000;
             color: white;
+            background-color:#ffff;
             transform: scale(1.1);
           }
           
