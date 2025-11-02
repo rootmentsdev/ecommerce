@@ -24,7 +24,7 @@ const FloatingWhatsAppButton = () => {
 
   const handleWhatsAppClick = () => {
     // Replace with your actual WhatsApp number
-    const phoneNumber = '+1234567890'; // Replace with actual number
+    const phoneNumber = '+9745005666'; // Replace with actual number
     const message = 'Hello! I would like to know more about your services.';
     const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');

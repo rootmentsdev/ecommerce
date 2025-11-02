@@ -26,8 +26,11 @@ const Footer = () => {
     { label: 'Shipping Policy', href: '/shipping' }
   ];
 
+  const phoneNumber = '+9745005666';
+  const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`;
+  
   const socialLinks = [
-    { icon: Whatsapp, href: '#', label: 'WhatsApp' },
+    { icon: Whatsapp, href: whatsappUrl, label: 'WhatsApp' },
     { icon: Facebook, href: '#', label: 'Facebook' },
     { icon: Instagram, href: '#', label: 'Instagram' }
   ];
