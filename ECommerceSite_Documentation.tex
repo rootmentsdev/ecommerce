@@ -1,0 +1,1057 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+
+% Page Setup
+\geometry{margin=1in}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{dappr SQUAD E-Commerce Platform Documentation}
+
+% Colors for code listings
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Code listing style
+\lstset{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=JavaScript
+}
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={dappr SQUAD E-Commerce Platform Documentation},
+    pdfauthor={Rootments Development Team},
+    pdfsubject={E-Commerce Platform Technical Documentation}
+}
+
+% Title formatting
+\titleformat{\section}
+{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+
+% Title Page
+\title{
+    \vspace{-2cm}
+    \textbf{dappr SQUAD}\\
+    \large E-Commerce Platform\\
+    \large Technical Documentation
+}
+\author{Rootments Development Team}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive technical documentation for the dappr SQUAD E-Commerce Platform, a full-stack web application designed for premium men's fashion retail and rental services. The platform features a React-based frontend with Vite build system and a Node.js/Express backend API with MongoDB database. The system supports product browsing, user authentication, enquiry management, image management, newsletter subscriptions, and administrative dashboard functionalities. This documentation covers architecture, API specifications, database schemas, deployment procedures, and maintenance guidelines.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\subsection{Project Overview}
+The dappr SQUAD E-Commerce Platform is a modern, full-stack web application designed to provide premium men's fashion retail and rental services. The platform enables customers to browse, rent, and purchase formal wear including suits, kurtas, bandhgalas, and traditional attire. The system is built with a focus on user experience, performance, security, and SEO optimization.
+
+\subsection{Key Features}
+\begin{itemize}
+    \item User authentication and authorization (JWT-based)
+    \item Product browsing and filtering (Buy/Rent categories)
+    \item Enquiry management system
+    \item Image management with SEO optimization
+    \item Newsletter subscription system
+    \item Administrative dashboard
+    \item City-based landing pages for local SEO
+    \item Responsive mobile-first design
+    \item Search engine optimization (SEO) features
+    \item WhatsApp integration for customer support
+\end{itemize}
+
+\subsection{Technology Stack}
+\begin{description}
+    \item[Frontend:] React 19.1.1, Vite 7.1.2, React Router DOM 7.8.2, Bootstrap 5.3.8
+    \item[Backend:] Node.js, Express.js 5.1.0, MongoDB 8.18.0 (Mongoose)
+    \item[Authentication:] JSON Web Tokens (JWT), bcryptjs
+    \item[Documentation:] Swagger/OpenAPI
+    \item[Deployment:] Vercel (Frontend), Render (Backend)
+    \item[Additional:] Axios, React Hook Form, Redux Toolkit, Nodemailer, Twilio
+\end{description}
+
+\section{System Architecture}
+
+\subsection{High-Level Architecture}
+The system follows a three-tier architecture pattern:
+
+\begin{enumerate}
+    \item \textbf{Presentation Layer:} React-based single-page application (SPA) deployed on Vercel
+    \item \textbf{Application Layer:} Node.js/Express REST API deployed on Render
+    \item \textbf{Data Layer:} MongoDB database hosted on MongoDB Atlas or Render
+\end{enumerate}
+
+\subsection{Frontend Architecture}
+The frontend is organized using a component-based architecture:
+
+\begin{lstlisting}[caption=Frontend Directory Structure]
+frontend/
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── common/          # Common components (ProductCard, etc.)
+│   │   ├── Header.jsx       # Navigation header
+│   │   ├── Footer.jsx       # Site footer
+│   │   └── ...
+│   ├── pages/              # Page components
+│   │   ├── HomePage.jsx
+│   │   ├── ProductListing.jsx
+│   │   ├── ProductDetails.jsx
+│   │   ├── AdminDashboard.jsx
+│   │   └── ...
+│   ├── services/           # API service layer
+│   │   ├── authService.js
+│   │   ├── enquiryService.js
+│   │   ├── imageService.js
+│   │   └── ...
+│   ├── config/             # Configuration files
+│   │   ├── api.js          # API endpoints configuration
+│   │   └── seo.js          # SEO configuration
+│   ├── utils/              # Utility functions
+│   ├── constants/          # Application constants
+│   └── App.jsx             # Main application component
+├── public/                 # Static assets
+└── package.json
+\end{lstlisting}
+
+\subsection{Backend Architecture}
+The backend follows a modular MVC pattern:
+
+\begin{lstlisting}[caption=Backend Directory Structure]
+backend/
+├── config/
+│   ├── config.js           # Environment configuration
+│   ├── database.js          # MongoDB connection
+│   └── swagger.js           # API documentation setup
+├── controllers/             # Business logic
+│   ├── authController.js
+│   ├── enquiryController.js
+│   ├── imageController.js
+│   └── newsletterController.js
+├── models/                  # Database models
+│   ├── User.js
+│   ├── Enquiry.js
+│   ├── Image.js
+│   └── Newsletter.js
+├── routes/                  # API routes
+│   ├── authRoutes.js
+│   ├── enquiryRoutes.js
+│   ├── imageRoutes.js
+│   └── newsletterRoutes.js
+├── middleware/              # Custom middleware
+│   ├── auth.js              # Authentication middleware
+│   ├── adminAuth.js         # Admin authentication
+│   ├── validation.js        # Input validation
+│   └── errorHandler.js      # Error handling
+├── uploads/                 # File uploads directory
+└── server.js                # Application entry point
+\end{lstlisting}
+
+\section{Database Schema}
+
+\subsection{User Model}
+The User model handles user authentication and profile information.
+
+\begin{lstlisting}[caption=User Schema]
+{
+  fullName: String (required, max: 50),
+  email: String (required, unique, lowercase, email format),
+  phone: String (required, unique, 10-digit pattern),
+  password: String (required, min: 6, hashed with bcrypt),
+  isActive: Boolean (default: true),
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+  createdAt: Date (auto),
+  updatedAt: Date (auto)
+}
+\end{lstlisting}
+
+\textbf{Indexes:}
+\begin{itemize}
+    \item Unique index on \texttt{email}
+    \item Unique index on \texttt{phone}
+\end{itemize}
+
+\textbf{Methods:}
+\begin{itemize}
+    \item \texttt{comparePassword(candidatePassword)} - Compare password with hash
+    \item \texttt{generateResetToken()} - Generate password reset token
+    \item \texttt{clearResetToken()} - Clear reset token
+\end{itemize}
+
+\subsection{Enquiry Model}
+The Enquiry model manages customer enquiries for product rental or purchase.
+
+\begin{lstlisting}[caption=Enquiry Schema]
+{
+  // User Information
+  fullName: String (required, max: 100),
+  mobileNumber: String (required, pattern: /^[6-9]\d{9}$/),
+  email: String (required, email format),
+  
+  // Enquiry Type
+  enquiryType: String (enum: ['rent', 'buy'], default: 'rent'),
+  
+  // Booking Information
+  preferredBookingDate: Date,
+  selectedSize: String,
+  selectedQuantity: Number (min: 1, default: 1),
+  pickupDate: Date,
+  returnDate: Date,
+  city: String (required, enum: Kerala districts),
+  specialNotes: String (max: 500),
+  
+  // Product Information
+  productId: String,
+  productName: String (max: 200),
+  
+  // Status Management
+  status: String (enum: ['new', 'contacted', 'interested', 
+                          'converted', 'cancelled'], 
+                   default: 'new'),
+  priority: String (enum: ['low', 'medium', 'high'], 
+                    default: 'medium'),
+  adminNotes: String (max: 1000),
+  
+  // Contact Tracking
+  contactedAt: Date,
+  contactedBy: String,
+  
+  // Timestamps
+  createdAt: Date (auto),
+  updatedAt: Date (auto)
+}
+\end{lstlisting}
+
+\textbf{Indexes:}
+\begin{itemize}
+    \item \texttt{\{status: 1, createdAt: -1\}} - Status-based queries
+    \item \texttt{\{city: 1\}} - City-based filtering
+    \item \texttt{\{preferredBookingDate: 1\}} - Date-based queries
+    \item \texttt{\{email: 1\}} - Email lookups
+\end{itemize}
+
+\textbf{Virtual Fields:}
+\begin{itemize}
+    \item \texttt{formattedBookingDate} - Human-readable booking date
+    \item \texttt{enquiryAge} - Days since enquiry creation
+\end{itemize}
+
+\subsection{Image Model}
+The Image model manages product images with SEO optimization features.
+
+\begin{lstlisting}[caption=Image Schema]
+{
+  // Basic Information
+  title: String (required, max: 100),
+  description: String (required, max: 500),
+  imageUrl: String (required),
+  altText: String (required, max: 125),
+  
+  // SEO Fields
+  seoTitle: String (max: 60),
+  seoDescription: String (max: 160),
+  focusKeyword: String (max: 50, lowercase),
+  
+  // Categorization
+  category: String (enum: ['buy', 'rent', 'featured', 'trending', 
+                           'topCategories', 'suits', 'kurtas', 
+                           'bandhgalas', 'formal', 'traditional', ...],
+                    default: 'rent'),
+  categories: [String] (array of categories),
+  tags: [String] (lowercase),
+  
+  // Status
+  isActive: Boolean (default: true),
+  displayOrder: Number (default: 0),
+  
+  // Product Information
+  price: Number (min: 0),
+  rentalPrice: Number (min: 0),
+  actualPrice: Number (min: 0),
+  securityDeposit: Number (min: 0),
+  fabric: String,
+  color: String,
+  style: String,
+  inclusions: String,
+  inStock: Boolean (default: true),
+  
+  // Metadata
+  metadata: {
+    fileSize: Number (min: 0),
+    dimensions: {
+      width: Number (min: 1),
+      height: Number (min: 1)
+    },
+    format: String (enum: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'svg']),
+    originalFormat: String,
+    compressionQuality: Number (min: 1, max: 100, default: 85),
+    isOptimized: Boolean (default: false)
+  },
+  
+  uploadedBy: String (required, default: 'admin'),
+  createdAt: Date (auto),
+  updatedAt: Date (auto)
+}
+\end{lstlisting}
+
+\textbf{Indexes:}
+\begin{itemize}
+    \item \texttt{\{category: 1, isActive: 1, displayOrder: 1\}} - Category queries
+    \item \texttt{\{tags: 1\}} - Tag-based search
+    \item \texttt{\{createdAt: -1\}} - Recent images
+\end{itemize}
+
+\textbf{Virtual Fields:}
+\begin{itemize}
+    \item \texttt{formattedFileSize} - Human-readable file size
+    \item \texttt{formattedDimensions} - Formatted dimensions string
+    \item \texttt{seoScore} - Calculated SEO score (0-100)
+    \item \texttt{seoRecommendations} - Array of SEO improvement suggestions
+\end{itemize}
+
+\subsection{Newsletter Model}
+The Newsletter model manages email newsletter subscriptions.
+
+\begin{lstlisting}[caption=Newsletter Schema]
+{
+  email: String (required, unique, lowercase, email format),
+  status: String (enum: ['active', 'unsubscribed', 'bounced'], 
+                  default: 'active'),
+  subscriptionDate: Date (default: Date.now),
+  source: String (enum: ['homepage', 'footer', 'popup', 'checkout'],
+                  default: 'homepage'),
+  preferences: {
+    fashionUpdates: Boolean (default: true),
+    exclusiveOffers: Boolean (default: true),
+    newProducts: Boolean (default: true),
+    styleTips: Boolean (default: true)
+  },
+  metadata: {
+    ipAddress: String,
+    userAgent: String,
+    referrer: String,
+    country: String,
+    city: String
+  },
+  createdAt: Date (auto),
+  updatedAt: Date (auto)
+}
+\end{lstlisting}
+
+\textbf{Indexes:}
+\begin{itemize}
+    \item Unique index on \texttt{email}
+    \item \texttt{\{status: 1\}} - Status filtering
+    \item \texttt{\{subscriptionDate: -1\}} - Recent subscriptions
+\end{itemize}
+
+\textbf{Methods:}
+\begin{itemize}
+    \item \texttt{getStats()} - Get subscription statistics
+    \item \texttt{unsubscribe()} - Mark as unsubscribed
+    \item \texttt{resubscribe()} - Reactivate subscription
+\end{itemize}
+
+\section{API Documentation}
+
+\subsection{Authentication Endpoints}
+
+\subsubsection{POST /api/auth/register}
+Register a new user account.
+
+\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "fullName": "John Doe",
+  "email": "john@example.com",
+  "phone": "9876543210",
+  "password": "securepassword123"
+}
+\end{lstlisting}
+
+\textbf{Response (201 Created):}
+\begin{lstlisting}[language=json]
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "_id": "...",
+      "fullName": "John Doe",
+      "email": "john@example.com",
+      "phone": "9876543210"
+    },
+    "token": "jwt_token_here"
+  }
+}
+\end{lstlisting}
+
+\textbf{Validation Rules:}
+\begin{itemize}
+    \item Full name: Required, max 50 characters
+    \item Email: Required, valid email format, unique
+    \item Phone: Required, exactly 10 digits, unique
+    \item Password: Required, minimum 6 characters
+\end{itemize}
+
+\subsubsection{POST /api/auth/login}
+Authenticate user and receive JWT token.
+
+\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "emailOrPhone": "john@example.com",
+  "password": "securepassword123"
+}
+\end{lstlisting}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[language=json]
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {...},
+    "token": "jwt_token_here"
+  }
+}
+\end{lstlisting}
+
+\subsection{Enquiry Endpoints}
+
+\subsubsection{POST /api/enquiries}
+Create a new enquiry (Public endpoint).
+
+\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "fullName": "John Doe",
+  "mobileNumber": "9876543210",
+  "email": "john@example.com",
+  "enquiryType": "rent",
+  "preferredBookingDate": "2024-02-15",
+  "city": "Ernakulam",
+  "selectedSize": "Large",
+  "selectedQuantity": 2,
+  "productId": "product_id_here",
+  "productName": "Premium Black Suit",
+  "specialNotes": "Need for wedding"
+}
+\end{lstlisting}
+
+\textbf{Response (201 Created):}
+\begin{lstlisting}[language=json]
+{
+  "success": true,
+  "message": "Enquiry submitted successfully",
+  "data": {
+    "enquiry": {...}
+  }
+}
+\end{lstlisting}
+
+\subsubsection{GET /api/enquiries}
+Get all enquiries with pagination and filtering (Admin only).
+
+\textbf{Query Parameters:}
+\begin{itemize}
+    \item \texttt{page} - Page number (default: 1)
+    \item \texttt{limit} - Items per page (default: 10, max: 100)
+    \item \texttt{status} - Filter by status
+    \item \texttt{city} - Filter by city
+    \item \texttt{priority} - Filter by priority
+    \item \texttt{sortBy} - Sort field (default: createdAt)
+    \item \texttt{sortOrder} - Sort direction (asc/desc)
+\end{itemize}
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[language=json]
+{
+  "success": true,
+  "data": {
+    "enquiries": [...],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 5,
+      "totalItems": 50,
+      "itemsPerPage": 10
+    }
+  }
+}
+\end{lstlisting}
+
+\subsubsection{GET /api/enquiries/stats}
+Get enquiry statistics for dashboard (Admin only).
+
+\textbf{Response (200 OK):}
+\begin{lstlisting}[language=json]
+{
+  "success": true,
+  "data": {
+    "overview": {
+      "totalEnquiries": 150,
+      "pendingEnquiries": 45,
+      "contactedEnquiries": 60,
+      "confirmedEnquiries": 35,
+      "cancelledEnquiries": 10
+    },
+    "cityStats": [
+      {"_id": "Ernakulam", "count": 45},
+      {"_id": "Thrissur", "count": 38}
+    ],
+    "monthlyStats": [...]
+  }
+}
+\end{lstlisting}
+
+\subsection{Image Management Endpoints}
+
+\subsubsection{GET /api/images}
+Get all images with filtering (Public/Admin).
+
+\textbf{Query Parameters:}
+\begin{itemize}
+    \item \texttt{category} - Filter by category
+    \item \texttt{isActive} - Filter by active status
+    \item \texttt{tags} - Filter by tags
+    \item \texttt{page} - Page number
+    \item \texttt{limit} - Items per page
+\end{itemize}
+
+\subsubsection{POST /api/images}
+Upload new image (Admin only).
+
+\textbf{Request:} Multipart/form-data with image file and metadata.
+
+\subsubsection{PUT /api/images/:id}
+Update image information (Admin only).
+
+\subsubsection{DELETE /api/images/:id}
+Delete image (Admin only).
+
+\subsection{Newsletter Endpoints}
+
+\subsubsection{POST /api/newsletter/subscribe}
+Subscribe to newsletter (Public).
+
+\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "email": "user@example.com",
+  "source": "homepage"
+}
+\end{lstlisting}
+
+\subsubsection{POST /api/newsletter/unsubscribe}
+Unsubscribe from newsletter (Public).
+
+\subsubsection{GET /api/newsletter/stats}
+Get subscription statistics (Admin only).
+
+\section{Security Features}
+
+\subsection{Authentication \& Authorization}
+\begin{itemize}
+    \item JWT-based authentication with configurable expiration
+    \item Password hashing using bcryptjs with salt rounds of 12
+    \item Separate admin authentication middleware
+    \item Token-based authorization for protected routes
+\end{itemize}
+
+\subsection{Input Validation}
+\begin{itemize}
+    \item Server-side validation using express-validator
+    \item Client-side validation with React Hook Form
+    \item Input sanitization and XSS protection
+    \item MongoDB schema validation
+\end{itemize}
+
+\subsection{Security Middleware}
+\begin{itemize}
+    \item Helmet.js for HTTP header security
+    \item CORS configuration with whitelist
+    \item Rate limiting using express-rate-limit
+    \item Compression middleware for performance
+    \item Request size limits (10MB for JSON)
+\end{itemize}
+
+\subsection{Error Handling}
+\begin{itemize}
+    \item Centralized error handling middleware
+    \item Standardized error response format
+    \item Detailed error logging for debugging
+    \item User-friendly error messages
+\end{itemize}
+
+\section{Frontend Features}
+
+\subsection{Pages}
+\begin{description}
+    \item[HomePage] Landing page with featured products and categories
+    \item[ProductListing] Browse all products with filtering
+    \item[ProductDetails] Individual product information and enquiry form
+    \item[BuyProducts] Browse products available for purchase
+    \item[RentProducts] Browse products available for rental
+    \item[CategoryPage] Category-specific product listings
+    \item[CityLandingPage] City-specific landing pages for local SEO
+    \item[EnquireNow] Enquiry submission form
+    \item[LoginPage] User authentication
+    \item[AdminDashboard] Administrative dashboard
+    \item[AdminImageManagement] Image upload and management
+    \item[Favorites] User's favorite products
+    \item[AboutUs] Company information page
+\end{description}
+
+\subsection{Components}
+\begin{description}
+    \item[ProductCard] Product display card component
+    \item[ProductGrid] Grid layout for products
+    \item[FilterSidebar] Product filtering sidebar
+    \item[ModernSearchBar] Search functionality
+    \item[ImageGallery] Product image gallery
+    \item[SizeSelector] Size selection component
+    \item[Breadcrumb] Navigation breadcrumbs
+    \item[FloatingWhatsAppButton] WhatsApp integration
+    \item[SEOHead] Dynamic SEO meta tags
+    \item[ErrorBoundary] Error boundary component
+    \item[PageTransition] Page transition animations
+\end{description}
+
+\subsection{SEO Optimization}
+\begin{itemize}
+    \item Dynamic meta tags using react-helmet-async
+    \item Structured data (JSON-LD) for schema markup
+    \item Open Graph tags for social sharing
+    \item Twitter Card tags
+    \item Breadcrumb navigation
+    \item City-specific landing pages
+    \item Sitemap generation
+    \item Robots.txt configuration
+    \item Image optimization with alt text
+\end{itemize}
+
+\section{Deployment}
+
+\subsection{Backend Deployment (Render)}
+\begin{enumerate}
+    \item Connect GitHub repository to Render
+    \item Set build command: \texttt{npm install}
+    \item Set start command: \texttt{npm start}
+    \item Configure environment variables:
+    \begin{itemize}
+        \item \texttt{MONGODB\_URI}
+        \item \texttt{JWT\_SECRET}
+        \item \texttt{JWT\_EXPIRE}
+        \item \texttt{NODE\_ENV}
+        \item \texttt{FRONTEND\_URL}
+        \item Email service credentials (if using)
+    \end{itemize}
+    \item Deploy and verify health endpoint
+\end{enumerate}
+
+\subsection{Frontend Deployment (Vercel)}
+\begin{enumerate}
+    \item Connect GitHub repository to Vercel
+    \item Configure build settings:
+    \begin{itemize}
+        \item Framework: Vite
+        \item Build command: \texttt{npm run build}
+        \item Output directory: \texttt{dist}
+    \end{itemize}
+    \item Set environment variables:
+    \begin{itemize}
+        \item \texttt{VITE\_API\_URL} (if using)
+    \end{itemize}
+    \item Deploy and configure custom domain
+    \item Update backend CORS whitelist with Vercel URL
+\end{enumerate}
+
+\subsection{Database Setup}
+\begin{enumerate}
+    \item Create MongoDB Atlas account or use Render MongoDB
+    \item Create database cluster
+    \item Configure network access (whitelist IPs)
+    \item Create database user
+    \item Obtain connection string
+    \item Update backend \texttt{MONGODB\_URI} environment variable
+\end{enumerate}
+
+\section{Configuration}
+
+\subsection{Environment Variables}
+
+\subsubsection{Backend (.env)}
+\begin{lstlisting}
+PORT=5000
+NODE_ENV=production
+MONGODB_URI=mongodb://...
+JWT_SECRET=your_secret_key
+JWT_EXPIRE=7d
+FRONTEND_URL=https://your-frontend.com
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_password
+\end{lstlisting}
+
+\subsubsection{Frontend}
+Frontend configuration is handled through \texttt{src/config/api.js} which automatically detects environment and uses appropriate API endpoints.
+
+\subsection{API Configuration}
+The API configuration file (\texttt{frontend/src/config/api.js}) handles:
+\begin{itemize}
+    \item Environment detection (development/production)
+    \item Vercel deployment detection
+    \item API endpoint URLs
+    \item Request headers configuration
+    \item Authentication token management
+\end{itemize}
+
+\section{Development Guide}
+
+\subsection{Prerequisites}
+\begin{itemize}
+    \item Node.js 18+ and npm
+    \item MongoDB database (local or cloud)
+    \item Git
+    \item Code editor (VS Code recommended)
+\end{itemize}
+
+\subsection{Local Development Setup}
+\begin{enumerate}
+    \item Clone repository:
+    \begin{lstlisting}[language=bash]
+    git clone <repository-url>
+    cd ECommerceSite
+    \end{lstlisting}
+    
+    \item Backend setup:
+    \begin{lstlisting}[language=bash]
+    cd backend
+    npm install
+    cp .env.example .env
+    # Edit .env with your configuration
+    npm run dev
+    \end{lstlisting}
+    
+    \item Frontend setup:
+    \begin{lstlisting}[language=bash]
+    cd frontend
+    npm install
+    npm run dev
+    \end{lstlisting}
+    
+    \item Access applications:
+    \begin{itemize}
+        \item Frontend: \texttt{http://localhost:5173}
+        \item Backend API: \texttt{http://localhost:5000}
+        \item API Docs: \texttt{http://localhost:5000/api-docs}
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Code Structure Guidelines}
+\begin{itemize}
+    \item Follow existing code structure and naming conventions
+    \item Use ESLint for code quality
+    \item Write descriptive commit messages
+    \item Add comments for complex logic
+    \item Maintain separation of concerns
+    \item Use environment variables for sensitive data
+\end{itemize}
+
+\section{Testing}
+
+\subsection{Backend Testing}
+\begin{itemize}
+    \item Unit tests for controllers and models
+    \item Integration tests for API endpoints
+    \item Validation tests for input handling
+    \item Error handling tests
+\end{itemize}
+
+\subsection{Frontend Testing}
+\begin{itemize}
+    \item Component rendering tests
+    \item Form validation tests
+    \item API integration tests
+    \item User interaction tests
+    \item Cross-browser compatibility tests
+\end{itemize}
+
+\subsection{Manual Testing Checklist}
+\begin{itemize}
+    \item User registration and login
+    \item Product browsing and filtering
+    \item Enquiry submission
+    \item Image upload and management
+    \item Newsletter subscription
+    \item Admin dashboard functionality
+    \item Responsive design on mobile devices
+    \item SEO meta tags verification
+\end{itemize}
+
+\section{Performance Optimization}
+
+\subsection{Backend Optimizations}
+\begin{itemize}
+    \item Database indexing on frequently queried fields
+    \item Response compression (gzip)
+    \item Connection pooling for MongoDB
+    \item Pagination for large datasets
+    \item Caching strategies (can be added)
+\end{itemize}
+
+\subsection{Frontend Optimizations}
+\begin{itemize}
+    \item Code splitting and lazy loading
+    \item Image optimization (WebP format)
+    \item Bundle size optimization
+    \item React.memo for expensive components
+    \item CDN for static assets
+    \item Service worker for caching (can be added)
+\end{itemize}
+
+\section{Monitoring \& Maintenance}
+
+\subsection{Logging}
+\begin{itemize}
+    \item Backend uses console.log for logging
+    \item Morgan middleware for HTTP request logging
+    \item Error logging in error handler middleware
+    \item Consider implementing Winston or similar for production
+\end{itemize}
+
+\subsection{Monitoring Recommendations}
+\begin{itemize}
+    \item Set up Google Analytics 4
+    \item Configure Google Search Console
+    \item Monitor API response times
+    \item Track error rates
+    \item Monitor database performance
+    \item Set up uptime monitoring
+\end{itemize}
+
+\subsection{Regular Maintenance Tasks}
+\begin{itemize}
+    \item Weekly: Review error logs
+    \item Monthly: Update dependencies
+    \item Quarterly: Security audit
+    \item Quarterly: Performance review
+    \item Quarterly: SEO audit
+    \item Annually: Database optimization
+\end{itemize}
+
+\section{Troubleshooting}
+
+\subsection{Common Issues}
+
+\subsubsection{Database Connection Errors}
+\begin{itemize}
+    \item Verify MongoDB URI in environment variables
+    \item Check network access whitelist in MongoDB Atlas
+    \item Ensure database server is running
+    \item Verify credentials
+\end{itemize}
+
+\subsubsection{CORS Errors}
+\begin{itemize}
+    \item Add frontend URL to backend CORS whitelist
+    \item Verify CORS configuration in \texttt{server.js}
+    \item Check for trailing slashes in URLs
+\end{itemize}
+
+\subsubsection{Authentication Issues}
+\begin{itemize}
+    \item Verify JWT\_SECRET is set correctly
+    \item Check token expiration time
+    \item Verify token is being sent in Authorization header
+    \item Clear browser localStorage and cookies
+\end{itemize}
+
+\subsubsection{Image Upload Issues}
+\begin{itemize}
+    \item Verify uploads directory exists
+    \item Check file size limits
+    \item Verify file permissions
+    \item Check disk space
+\end{itemize}
+
+\section{Future Enhancements}
+
+\subsection{Planned Features}
+\begin{itemize}
+    \item Payment gateway integration
+    \item Order management system
+    \item Email notification system
+    \item SMS notifications (Twilio integration)
+    \item Advanced analytics dashboard
+    \item Multi-language support
+    \item Mobile application (React Native)
+    \item Real-time chat support
+    \item Advanced search with Elasticsearch
+    \item Recommendation engine
+\end{itemize}
+
+\subsection{Technical Improvements}
+\begin{itemize}
+    \item Implement Redis caching
+    \item GraphQL API option
+    \item WebSocket for real-time updates
+    \item Microservices architecture
+    \item CI/CD pipeline automation
+    \item Comprehensive test coverage
+    \item API rate limiting per user
+    \item Advanced monitoring with APM tools
+\end{itemize}
+
+\section{API Reference Summary}
+
+\subsection{Public Endpoints}
+\begin{longtable}{|p{3cm}|p{2cm}|p{8cm}|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
+\hline
+POST & /api/auth/register & Register new user \\
+POST & /api/auth/login & User login \\
+POST & /api/enquiries & Submit enquiry \\
+POST & /api/newsletter/subscribe & Subscribe to newsletter \\
+POST & /api/newsletter/unsubscribe & Unsubscribe from newsletter \\
+GET & /api/images & Get images (filtered) \\
+GET & /health & Health check \\
+\hline
+\end{longtable}
+
+\subsection{Admin Endpoints (Authentication Required)}
+\begin{longtable}{|p{3cm}|p{2cm}|p{8cm}|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
+\hline
+GET & /api/enquiries & Get all enquiries \\
+GET & /api/enquiries/:id & Get enquiry by ID \\
+PUT & /api/enquiries/:id & Update enquiry \\
+DELETE & /api/enquiries/:id & Delete enquiry \\
+GET & /api/enquiries/stats & Get enquiry statistics \\
+POST & /api/images & Upload image \\
+PUT & /api/images/:id & Update image \\
+DELETE & /api/images/:id & Delete image \\
+GET & /api/newsletter/stats & Get newsletter stats \\
+\hline
+\end{longtable}
+
+\section{Conclusion}
+
+This documentation provides comprehensive coverage of the dappr SQUAD E-Commerce Platform architecture, implementation, and deployment procedures. The system is designed with scalability, security, and user experience in mind. Regular updates to this documentation should be made as the platform evolves.
+
+For additional support or questions, please refer to:
+\begin{itemize}
+    \item API Documentation: \texttt{/api-docs} endpoint when server is running
+    \item GitHub Repository: (Add repository URL)
+    \item Issue Tracker: (Add issue tracker URL)
+\end{itemize}
+
+\appendix
+
+\section{Appendix A: Technology Versions}
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Technology} & \textbf{Version} \\
+\midrule
+Node.js & 18+ \\
+React & 19.1.1 \\
+Express & 5.1.0 \\
+MongoDB/Mongoose & 8.18.0 \\
+Vite & 7.1.2 \\
+React Router & 7.8.2 \\
+Bootstrap & 5.3.8 \\
+\bottomrule
+\end{tabular}
+\caption{Technology Stack Versions}
+\end{table}
+
+\section{Appendix B: Kerala Districts}
+The following districts are supported in the enquiry system:
+\begin{itemize}
+    \item Thiruvananthapuram
+    \item Kollam
+    \item Pathanamthitta
+    \item Alappuzha
+    \item Kottayam
+    \item Idukki
+    \item Ernakulam
+    \item Thrissur
+    \item Palakkad
+    \item Malappuram
+    \item Kozhikode
+    \item Wayanad
+    \item Kannur
+    \item Kasaragod
+\end{itemize}
+
+\section{Appendix C: Image Categories}
+Supported image categories:
+\begin{itemize}
+    \item buy - Products available for purchase
+    \item rent - Products available for rental
+    \item featured - Featured products
+    \item trending - Trending products
+    \item topCategories - Top category displays
+    \item suits - Suit category
+    \item kurtas - Kurta category
+    \item bandhgalas - Bandhgala category
+    \item formal - Formal wear category
+    \item traditional - Traditional wear category
+\end{itemize}
+
+\end{document}
+
