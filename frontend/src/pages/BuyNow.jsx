@@ -9,10 +9,10 @@ import ImageService from '../services/imageService';
 import Home1 from '../assets/Home1.jpg';
 import Home2 from '../assets/Home2.jpg';
 import Home3 from '../assets/Home3.jpg';
-import Product1 from '../assets/Product1.png';
+import Product1 from '../assets/Product1.jpg';
 import Product2 from '../assets/Product2.png';
-import Product3 from '../assets/Product3.png';
-import Product4 from '../assets/Product4.png';
+import Product3 from '../assets/Product3.jpg';
+import Product4 from '../assets/Product4.jpg';
 import Product5 from '../assets/Product5.png';
 import Aboutus4 from '../assets/Aboutus4.png';
 

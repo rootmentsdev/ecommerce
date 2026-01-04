@@ -1,8 +1,8 @@
 // Sample product data for the e-commerce site
-import Product1 from '../assets/Product1.png';
+import Product1 from '../assets/Product1.jpg';
 import Product2 from '../assets/Product2.png';
-import Product3 from '../assets/Product3.png';
-import Product4 from '../assets/Product4.png';
+import Product3 from '../assets/Product3.jpg';
+import Product4 from '../assets/Product4.jpg';
 import Product5 from '../assets/Product5.png';
 
 export const PRODUCTS_DATA = [

@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import Header from '../components/Header';
 import SideMenu from '../components/SideMenu';
-import Footer from '../components/Footer';
 import HomePageContent from '../components/HomePageContent';
 
 const HomePage = () => {
@@ -23,9 +21,6 @@ const HomePage = () => {
       <main className="flex-grow-1">
         <HomePageContent />
       </main>
-      
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

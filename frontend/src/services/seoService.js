@@ -315,7 +315,7 @@ class SEOService {
     this.setPageDescription('Buy premium men\'s suits online in Kerala at Dappr Squad. Designer formal wear with free delivery. Perfect for weddings and special occasions.');
     this.setPageKeywords('buy suits kerala, mens suits online kochi, wedding suits kerala, designer suits kerala, formal wear online india');
     this.setCanonicalUrl('/buy-now');
-    this.setPageImage('/assets/Product1.png', 'Buy Men\'s Suits Kerala');
+    this.setPageImage('/assets/Product1.jpg', 'Buy Men\'s Suits Kerala');
   }
 
   /**

@@ -25,7 +25,7 @@ const CityLandingPage = () => {
       description: 'Kerala\'s commercial capital',
       popularAreas: ['MG Road', 'Fort Kochi', 'Edappally', 'Kakkanad', 'Marine Drive'],
       keywords: 'suits in Kochi, Kochi wedding suits, formal wear Kochi, mens fashion Kochi',
-      image: '/assets/Product1.png'
+      image: '/assets/Product1.jpg'
     },
     thrissur: {
       name: 'Thrissur',
@@ -41,7 +41,7 @@ const CityLandingPage = () => {
       description: 'Historic port city',
       popularAreas: ['SM Street', 'Beach Road', 'Mavoor Road', 'Hilite City'],
       keywords: 'suits in Kozhikode, Calicut wedding suits, formal wear Kozhikode, mens fashion Kozhikode',
-      image: '/assets/Product3.png'
+      image: '/assets/Product3.jpg'
     },
     trivandrum: {
       name: 'Trivandrum',

@@ -33,7 +33,7 @@ export const SEO_CONFIG = {
       description: 'Browse our premium collection of men\'s fashion including suits, kurtas, bandhgalas, and formal wear for all occasions.',
       keywords: 'mens suits, formal wear, designer clothing, premium fashion, wedding suits',
       image: {
-        src: '/assets/Product1.png',
+        src: '/assets/Product1.jpg',
         alt: 'Premium Men\'s Fashion Collection'
       }
     },
@@ -83,7 +83,7 @@ export const SEO_CONFIG = {
       description: 'Purchase premium men\'s fashion items. High-quality suits, kurtas, and formal wear for every occasion.',
       keywords: 'buy mens fashion, purchase suits, formal wear shopping',
       image: {
-        src: '/assets/Product3.png',
+        src: '/assets/Product3.jpg',
         alt: 'Buy Premium Men\'s Fashion'
       }
     },

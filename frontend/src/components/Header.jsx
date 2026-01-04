@@ -1,32 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar, Container } from 'react-bootstrap';
-import { List, Heart } from 'react-bootstrap-icons';
+import { Navbar, Nav, Form, InputGroup, Row, Col, Button } from 'react-bootstrap';
+import { Heart, Bag, Person, Search, ChevronDown, List } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
 import { APP_CONFIG } from '../constants';
 import FavoritesService from '../services/favoritesService';
 
 const Header = ({ onMenuClick }) => {
+  const navigate = useNavigate();
   const [favoritesCount, setFavoritesCount] = useState(0);
+  const [showCategories, setShowCategories] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Categories list
+  const categories = [
+    'Lehangas',
+    'Blazers',
+    'Suits',
+    'Western',
+    'Ethnic',
+    'Accessories',
+    'Jewellery'
+  ];
 
   // Update favorites count when component mounts
   useEffect(() => {
     const updateFavoritesCount = () => {
       const count = FavoritesService.getTotalFavoritesCount();
-      console.log('💖 Header - Updating favorites count to:', count);
       setFavoritesCount(count);
     };
 
-    // Initial update
     updateFavoritesCount();
 
-    // Listen for storage changes to update count in real-time
     const handleStorageChange = (event) => {
-      console.log('💖 Header - Storage/Favorites updated event received', event.type);
       updateFavoritesCount();
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for custom events when favorites are updated
     window.addEventListener('favoritesUpdated', handleStorageChange);
 
     return () => {
@@ -35,334 +45,454 @@ const Header = ({ onMenuClick }) => {
     };
   }, []);
 
-  // Event handlers following clean code principles
-  const handleMenuClick = () => {
-    if (onMenuClick) {
-      onMenuClick();
-    }
-  };
+  // Check if mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleFavoritesClick = () => {
-    window.location.href = '/favorites';
+    navigate('/favorites');
   };
 
-  const handleLogoClick = () => {
-    console.log('Logo clicked');
-    // TODO: Navigate to home page
+  const handleCartClick = () => {
+    // Navigate to cart page when implemented
+    console.log('Cart clicked');
   };
 
-  // Style objects following clean code principles
-  const navbarStyles = {
-    backgroundColor: APP_CONFIG.COLORS.WHITE,
-    borderBottom: '1px solid #e9ecef'
+  const handleProfileClick = () => {
+    // Navigate to profile page when implemented
+    console.log('Profile clicked');
   };
 
-  const logoStyles = {
-    color: '#000',
-    fontFamily: 'Poppins'
+  const handleCategoryClick = (category) => {
+    // Navigate to category page
+    navigate('/products', { state: { category } });
+    setShowCategories(false);
   };
 
-  const buttonStyles = {
-    border: 'none',
-    background: 'none',
-    color: APP_CONFIG.COLORS.SECONDARY
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate('/products', { state: { search: searchQuery } });
+    }
   };
-
-  const badgeStyles = {
-    fontSize: '0.6rem'
-  };
-
-  // Render methods following single responsibility principle
-  const renderMenuButton = () => (
-    <button
-      onClick={handleMenuClick}
-      className="btn btn-link me-3 header-btn"
-      style={buttonStyles}
-      aria-label="Open menu"
-    >
-      <List size={24} />
-    </button>
-  );
-
-  const renderLogo = () => (
-    <Navbar.Brand 
-      href="/" 
-      className="mx-auto fw-bold header-logo"
-      style={logoStyles}
-      onClick={handleLogoClick}
-    >
-      <div style={{ textAlign: 'center', lineHeight: '1.1' }}>
-        <div style={{ 
-          fontFamily: 'Poppins',
-          fontWeight: 700,
-          fontSize: '1.4rem',
-          color: '#000'
-        }}>
-          dappr
-        </div>
-        <div style={{ 
-          fontFamily: 'Poppins',
-          fontWeight: 400,
-          fontSize: '1rem',
-          color: '#000'
-        }}>
-          SQUAD
-        </div>
-      </div>
-    </Navbar.Brand>
-  );
-
-  const renderFavoritesButton = () => (
-    <button
-      onClick={handleFavoritesClick}
-      className="btn btn-link header-btn position-relative"
-      style={buttonStyles}
-      aria-label="Favorites"
-    >
-      <Heart size={24} />
-      {favoritesCount > 0 && (
-        <span 
-          className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-          style={{
-            fontSize: '10px',
-            minWidth: '20px',
-            height: '20px',
-            lineHeight: '20px',
-            marginTop: '-10px',
-            marginLeft: '-10px',
-            border: '2px solid white',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-          }}
-          aria-label={`${favoritesCount} favorites`}
-        >
-          {favoritesCount}
-        </span>
-      )}
-    </button>
-  );
-
-  const renderRightIcons = () => (
-    <div className="d-flex align-items-center">
-      {renderFavoritesButton()}
-    </div>
-  );
 
   return (
     <>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-          
-          .header-btn {
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            padding: 8px 12px;
-            -webkit-tap-highlight-color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 44px;
-            min-height: 44px;
+          * {
+            box-sizing: border-box;
           }
-          
-          .header-btn:hover,
-          .header-btn:active,
-          .header-btn:focus {
-            background-color: #000 !important;
-            color: white !important;
-            transform: scale(1.05);
+
+          .header-wrapper {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #fff;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            left: 0;
+            right: 0;
           }
-          
-          .header-logo {
-            transition: all 0.3s ease;
-            padding: 8px 16px;
-            border-radius: 8px;
-            -webkit-tap-highlight-color: transparent;
+
+          .top-black-bar {
+            background-color: #000;
+            height: 2px;
+            width: 100%;
+            margin: 0;
+            padding: 0;
           }
-          
-          .header-logo:hover,
-          .header-logo:active,
-          .header-logo:focus {
-            background-color: #f8f9fa !important;
-            transform: scale(1.02);
+
+          .header-main {
+            background-color: #fff;
+            padding: 12px 0;
+            width: 100%;
+            margin: 0;
+            border-bottom: 1px solid #f0f0f0;
           }
-          
-          .header-logo:hover div,
-          .header-logo:active div,
-          .header-logo:focus div {
-            color: #000 !important;
+
+          .header-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
           }
-          
-          .cart-badge {
-            transition: all 0.3s ease;
-            min-width: 18px;
-            min-height: 18px;
-            font-size: 10px;
-            font-weight: 600;
-          }
-          
-          /* Desktop header optimizations */
-          @media (min-width: 992px) {
-            .navbar {
-              padding: 12px 0;
+
+          /* On very large screens, center content with max-width */
+          @media (min-width: 1400px) {
+            .header-container {
+              max-width: 1400px;
+              margin: 0 auto;
             }
-            
-            .navbar .container-fluid {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              flex-wrap: nowrap;
-              min-height: 70px;
-              padding: 0 24px;
-            }
-            
-            .navbar .container-fluid > * {
-              flex-shrink: 0;
-            }
-            
-            .navbar .container-fluid > div {
-              display: flex;
-              align-items: center;
-            }
-            
-            .header-btn {
-              padding: 12px 16px;
-              min-width: 48px;
-              min-height: 48px;
-              margin: 0 8px;
-            }
-            
-            .header-logo {
-              padding: 12px 20px;
-              min-height: 48px;
-            }
-            
-            .header-logo div:first-child {
-              font-size: 1.6rem;
-            }
-            
-            .header-logo div:last-child {
-              font-size: 1.1rem;
+
+            .categories-container {
+              max-width: 1400px;
+              margin: 0 auto;
             }
           }
 
-          /* Mobile header optimizations */
+          @media (max-width: 768px) {
+            .header-container {
+              padding: 0 16px;
+            }
+
+            .categories-container {
+              padding: 0 16px;
+            }
+          }
+
+          .header-logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #000;
+            text-decoration: none;
+            font-family: ${APP_CONFIG.FONTS.PRIMARY};
+          }
+
+          .header-logo:hover {
+            color: #000;
+            text-decoration: none;
+          }
+
+          .header-nav-link {
+            color: #4a4a4a;
+            font-size: 0.875rem;
+            text-decoration: none;
+            padding: 6px 14px;
+            font-family: ${APP_CONFIG.FONTS.PRIMARY};
+            transition: color 0.2s;
+            font-weight: 400;
+          }
+
+          .header-nav-link:hover {
+            color: #000;
+            text-decoration: none;
+          }
+
+          .header-search {
+            max-width: 350px;
+            width: 100%;
+          }
+
+          .header-search-input {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 7px 12px 7px 36px;
+            font-size: 0.875rem;
+            color: #666;
+            width: 100%;
+            background-color: #fafafa;
+          }
+
+          .header-search-input:focus {
+            border-color: #d0d0d0;
+            box-shadow: none;
+            outline: none;
+            background-color: #fff;
+          }
+
+          .header-search-input::placeholder {
+            color: #999;
+          }
+
+          .header-icon-btn {
+            background: none;
+            border: none;
+            color: #4a4a4a;
+            padding: 6px 10px;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+          }
+
+          .header-icon-btn:hover {
+            color: #000;
+          }
+
+          .header-icon-btn .icon {
+            font-size: 1.1rem;
+          }
+
+          .header-profile-icon {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            padding: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .header-profile-icon .icon {
+            color: #000;
+            font-size: 1rem;
+          }
+
+          .categories-row {
+            background-color: #fff;
+            border-top: 1px solid #e9ecef;
+            padding: 12px 0;
+            width: 100%;
+            margin: 0;
+          }
+
+          .categories-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 24px;
+          }
+
+          .category-link {
+            color: #666;
+            font-size: 0.9rem;
+            text-decoration: none;
+            padding: 4px 12px;
+            font-family: ${APP_CONFIG.FONTS.PRIMARY};
+            transition: color 0.2s;
+          }
+
+          .category-link:hover {
+            color: #000;
+            text-decoration: none;
+          }
+
+          .dropdown-toggle::after {
+            margin-left: 8px;
+          }
+
+          .nav-dropdown-menu {
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 8px;
+          }
+
+          .nav-dropdown-item {
+            color: #666;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            font-family: ${APP_CONFIG.FONTS.PRIMARY};
+          }
+
+          .nav-dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #000;
+          }
+
+          .favorites-badge {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+          }
+
           @media (max-width: 991px) {
-            .navbar {
+            .header-main {
+              padding: 12px 0;
+            }
+
+            .header-nav-link {
+              padding: 6px 12px;
+              font-size: 0.85rem;
+            }
+
+            .header-search {
+              max-width: 100%;
+              margin: 12px 0;
+            }
+
+            .categories-row {
               padding: 8px 0;
             }
-            
-            .navbar .container-fluid {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              flex-wrap: nowrap;
-              min-height: 60px;
-            }
-            
-            .navbar .container-fluid > * {
-              flex-shrink: 0;
-            }
-            
-            .navbar .container-fluid > div {
-              display: flex;
-              align-items: center;
-            }
-          }
-          
-          /* iPhone 13 specific optimizations */
-          @media screen and (max-width: 428px) {
-            .navbar {
-              padding: 6px 0;
-            }
-            
-            .navbar .container-fluid {
-              padding: 0 12px;
-            }
-            
-            .header-btn {
-              padding: 8px;
-              margin: 0 1px;
-              min-width: 40px;
-              min-height: 40px;
-            }
-            
-            .header-logo {
-              padding: 8px 10px;
-              min-height: 40px;
-            }
-            
-            .header-logo div:first-child {
-              font-size: 1.1rem;
-            }
-            
-            .header-logo div:last-child {
-              font-size: 0.8rem;
-            }
-            
-            .cart-badge {
-              font-size: 9px;
-              min-width: 16px;
-              min-height: 16px;
-            }
-          }
-          
-          .header-btn:hover .cart-badge,
-          .header-btn:active .cart-badge,
-          .header-btn:focus .cart-badge {
-            background-color: white !important;
-            color: #000 !important;
-          }
-          
-          @media (hover: none) and (pointer: coarse) {
-            .header-btn:active {
-              background-color: #000 !important;
-              color: white !important;
-              transform: scale(1.05);
-            }
-            
-            .header-logo:active {
-              background-color: #f8f9fa !important;
-              transform: scale(1.02);
-            }
-            
-            .header-logo:active div {
-              color: #000 !important;
-            }
-            
-            .header-btn:active .cart-badge {
-              background-color: white !important;
-              color: #000 !important;
+
+            .category-link {
+              font-size: 0.85rem;
+              padding: 4px 8px;
             }
           }
         `}
       </style>
-      <Navbar 
-        bg="white" 
-        expand="lg" 
-        className="shadow-sm border-bottom"
-        style={{
-          ...navbarStyles,
-          position: 'sticky',
-          top: 0,
-          zIndex: 1000
-        }}
-      >
-        <Container fluid className="px-3">
-          <div className="d-flex align-items-center w-100" style={{ minHeight: '60px', position: 'relative' }}>
-            <div className="d-flex align-items-center" style={{ flex: '1 1 0', justifyContent: 'flex-start' }}>
-              {renderMenuButton()}
+      
+      <div className="header-wrapper">
+        {/* Top Black Bar */}
+        <div className="top-black-bar"></div>
+
+        {/* Main Header */}
+        <div className="header-main">
+        <div className="header-container">
+          {isMobile ? (
+            // Mobile Layout: Hamburger | Logo | Search + Bag
+            <div className="d-flex align-items-center justify-content-between position-relative">
+              {/* Hamburger Menu */}
+              <Button
+                variant="link"
+                className="p-0 text-dark border-0"
+                onClick={onMenuClick}
+                aria-label="Menu"
+                style={{ zIndex: 1 }}
+              >
+                <List size={24} />
+              </Button>
+
+              {/* Logo - Centered */}
+              <Navbar.Brand 
+                href="/" 
+                className="header-logo position-absolute start-50 translate-middle-x"
+                style={{ zIndex: 0 }}
+              >
+                Logo
+              </Navbar.Brand>
+
+              {/* Right Icons - Search and Bag */}
+              <div className="d-flex align-items-center gap-3" style={{ zIndex: 1 }}>
+                <Button
+                  variant="link"
+                  className="p-0 text-dark border-0"
+                  onClick={() => {/* Handle search click */}}
+                  aria-label="Search"
+                >
+                  <Search size={20} />
+                </Button>
+                <Button
+                  variant="link"
+                  className="p-0 text-dark border-0 position-relative"
+                  onClick={handleCartClick}
+                  aria-label="Shopping Cart"
+                >
+                  <Bag size={20} />
+                </Button>
+              </div>
             </div>
-            <div className="d-flex align-items-center justify-content-center" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-              {renderLogo()}
-            </div>
-            <div className="d-flex align-items-center justify-content-end" style={{ flex: '1 1 0' }}>
-              {renderRightIcons()}
-            </div>
+          ) : (
+            // Desktop Layout
+            <Row className="align-items-center g-0">
+              {/* Logo */}
+              <Col xs={12} lg={2} className="mb-3 mb-lg-0">
+                <Navbar.Brand href="/" className="header-logo">
+                  Logo
+                </Navbar.Brand>
+              </Col>
+
+              {/* Navigation Links */}
+              <Col xs={12} lg={4} className="mb-3 mb-lg-0">
+                <Nav className="d-flex flex-wrap align-items-center">
+                  <Nav.Link href="/" className="header-nav-link">Home</Nav.Link>
+                  <Nav.Link
+                    href="#"
+                    className="header-nav-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowCategories(!showCategories);
+                    }}
+                  >
+                    Categories <ChevronDown size={12} />
+                  </Nav.Link>
+                  <Nav.Link href="/how-it-works" className="header-nav-link">How It Works</Nav.Link>
+                  <Nav.Link href="/new-arrivals" className="header-nav-link">New Arrivals</Nav.Link>
+                </Nav>
+              </Col>
+
+              {/* Search Bar */}
+              <Col xs={12} lg={4} className="mb-3 mb-lg-0">
+                <Form onSubmit={handleSearchSubmit} className="header-search">
+                  <InputGroup>
+                    <InputGroup.Text style={{ 
+                      position: 'absolute', 
+                      left: 0, 
+                      zIndex: 10, 
+                      background: 'none', 
+                      border: 'none',
+                      paddingLeft: '10px'
+                    }}>
+                      <Search size={14} color="#999" />
+                    </InputGroup.Text>
+                    <Form.Control
+                      type="text"
+                      placeholder="Search for products..."
+                      className="header-search-input"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{ paddingLeft: '36px' }}
+                    />
+                  </InputGroup>
+                </Form>
+              </Col>
+
+              {/* Right Icons */}
+              <Col xs={12} lg={2} className="d-flex justify-content-end align-items-center gap-2">
+                <button
+                  onClick={handleFavoritesClick}
+                  className="header-icon-btn position-relative"
+                  aria-label="Favorites"
+                >
+                  <Heart className="icon" />
+                  {favoritesCount > 0 && (
+                    <span className="favorites-badge">{favoritesCount}</span>
+                  )}
+                </button>
+                <button
+                  onClick={handleCartClick}
+                  className="header-icon-btn"
+                  aria-label="Shopping Cart"
+                >
+                  <Bag className="icon" />
+                </button>
+                <button
+                  onClick={handleProfileClick}
+                  className="header-icon-btn header-profile-icon"
+                  aria-label="Profile"
+                >
+                  <Person className="icon" />
+                </button>
+              </Col>
+            </Row>
+          )}
+        </div>
+      </div>
+
+      {/* Categories Row - Shows when Categories is clicked */}
+      {showCategories && (
+        <div className="categories-row">
+          <div className="categories-container">
+            <Row className="g-0">
+              <Col>
+                <div className="d-flex flex-wrap align-items-center">
+                  {categories.map((category) => (
+                    <a
+                      key={category}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleCategoryClick(category);
+                      }}
+                      className="category-link"
+                    >
+                      {category}
+                    </a>
+                  ))}
+                </div>
+              </Col>
+            </Row>
           </div>
-        </Container>
-      </Navbar>
+        </div>
+      )}
+      </div>
     </>
   );
 };
