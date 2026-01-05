@@ -117,7 +117,13 @@ const AdminImageManagement = () => {
     { value: 'kurtas', label: '👕 Kurtas - Traditional Kurtas Collection' },
     { value: 'bandhgalas', label: '🎩 Bandhgalas - Bandhgala Collection' },
     { value: 'formal', label: '👨‍💼 Formal Wear - Business Formal Collection' },
-    { value: 'traditional', label: '🏛️ Traditional - Traditional Wear Collection' }
+    { value: 'traditional', label: '🏛️ Traditional - Traditional Wear Collection' },
+    { value: 'lehangas', label: '👗 Lehangas - Lehenga Collection' },
+    { value: 'blazers', label: '🧥 Blazers - Blazer Collection' },
+    { value: 'western', label: '🌍 Western - Western Wear Collection' },
+    { value: 'ethnic', label: '🎨 Ethnic - Ethnic Wear Collection' },
+    { value: 'accessories', label: '💼 Accessories - Accessories Collection' },
+    { value: 'jewellery', label: '💎 Jewellery - Jewellery Collection' }
   ];
 
   // Load images on component mount and when filters change

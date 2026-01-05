@@ -21,9 +21,11 @@ const Footer = () => {
     <footer style={{ backgroundColor: '#1a1a1a' }}>
       {/* Main Footer Content */}
       <div style={{ 
-        padding: '60px 100px 40px', 
+        padding: '60px 0 40px', 
         maxWidth: '1440px', 
-        margin: '0 auto'
+        margin: '0 auto',
+        paddingLeft: '100px',
+        paddingRight: '100px'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -178,9 +180,11 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div style={{ 
         borderTop: '1px solid #2a2a2a',
-        padding: '20px 100px', 
+        padding: '20px 0', 
         maxWidth: '1440px', 
-        margin: '0 auto'
+        margin: '0 auto',
+        paddingLeft: '100px',
+        paddingRight: '100px'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -392,8 +396,12 @@ const Footer = () => {
             }
             footer > div:last-child > div {
               flex-direction: column !important;
-              text-align: center;
+              text-align: center !important;
+              align-items: center !important;
               gap: 14px !important;
+            }
+            footer > div:last-child > div > p {
+              text-align: center !important;
             }
             footer > div:last-child > div > div {
               justify-content: center !important;
@@ -418,8 +426,12 @@ const Footer = () => {
             }
             footer > div:last-child > div {
               flex-direction: column !important;
-              text-align: center;
+              text-align: center !important;
+              align-items: center !important;
               gap: 12px !important;
+            }
+            footer > div:last-child > div > p {
+              text-align: center !important;
             }
             footer > div:last-child > div > div {
               justify-content: center !important;
@@ -457,8 +469,12 @@ const Footer = () => {
             }
             footer > div:last-child > div {
               flex-direction: column !important;
-              text-align: center;
+              text-align: center !important;
+              align-items: center !important;
               gap: 10px !important;
+            }
+            footer > div:last-child > div > p {
+              text-align: center !important;
             }
             footer > div:last-child > div > div {
               justify-content: center !important;

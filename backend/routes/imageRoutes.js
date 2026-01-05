@@ -59,8 +59,8 @@ const imageValidation = [
   body('category')
     .notEmpty()
     .withMessage('Category is required')
-    .isIn(['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'])
-    .withMessage('Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional, product, hero, banner, gallery, testimonial, about'),
+    .isIn(['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'lehangas', 'blazers', 'western', 'ethnic', 'accessories', 'jewellery', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'])
+    .withMessage('Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional, lehangas, blazers, western, ethnic, accessories, jewellery, product, hero, banner, gallery, testimonial, about'),
     
   body('categories')
     .optional()
@@ -68,7 +68,7 @@ const imageValidation = [
     .withMessage('Categories must be an array')
     .custom((categories) => {
       if (!Array.isArray(categories)) return true;
-      const validCategories = ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional'];
+      const validCategories = ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'lehangas', 'blazers', 'western', 'ethnic', 'accessories', 'jewellery'];
       const invalidCategories = categories.filter(cat => !validCategories.includes(cat));
       if (invalidCategories.length > 0) {
         throw new Error(`Invalid categories: ${invalidCategories.join(', ')}. Valid categories are: ${validCategories.join(', ')}`);

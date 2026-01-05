@@ -25,6 +25,7 @@ import RentNow from './pages/RentNow';
 import BuyProducts from './pages/BuyProducts';
 import RentProducts from './pages/RentProducts';
 import CityLandingPage from './pages/CityLandingPage';
+import AllProductsPage from './pages/AllProductsPage';
 import './App.css';
 import './fonts.css';
 
@@ -91,7 +92,7 @@ function App() {
               <Route path="/products" element={
                 <PageTransition>
                   <ErrorBoundary>
-                    <ProductListing />
+                    <AllProductsPage />
                   </ErrorBoundary>
                 </PageTransition>
               } />

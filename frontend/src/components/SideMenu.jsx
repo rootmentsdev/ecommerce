@@ -84,7 +84,9 @@ const SideMenu = ({ show, handleClose }) => {
   };
 
   const handleCategoryClick = (category) => {
-    navigate('/products', { state: { category } });
+    // Convert display name to lowercase for URL
+    const categorySlug = category.toLowerCase();
+    navigate(`/category/${categorySlug}`);
     handleClose();
   };
 

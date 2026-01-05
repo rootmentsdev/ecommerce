@@ -62,16 +62,16 @@ const imageSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Image category is required'],
     enum: {
-      values: ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'], // Include all old values for migration
-      message: 'Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional, product, hero, banner, gallery, testimonial, about'
+      values: ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'lehangas', 'blazers', 'western', 'ethnic', 'accessories', 'jewellery', 'product', 'hero', 'banner', 'gallery', 'testimonial', 'about'], // Include all old values for migration
+      message: 'Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional, lehangas, blazers, western, ethnic, accessories, jewellery, product, hero, banner, gallery, testimonial, about'
     },
     default: 'rent'
   },
   categories: [{
     type: String,
     enum: {
-      values: ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional'],
-      message: 'Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional'
+      values: ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'lehangas', 'blazers', 'western', 'ethnic', 'accessories', 'jewellery'],
+      message: 'Category must be one of: buy, rent, featured, trending, topCategories, suits, kurtas, bandhgalas, formal, traditional, lehangas, blazers, western, ethnic, accessories, jewellery'
     }
   }],
   tags: [{
@@ -348,7 +348,7 @@ imageSchema.pre('save', function(next) {
   } else {
     // Ensure all categories in the array are valid
     this.categories = this.categories.filter(cat => 
-      ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional'].includes(cat)
+      ['buy', 'rent', 'featured', 'trending', 'topCategories', 'suits', 'kurtas', 'bandhgalas', 'formal', 'traditional', 'lehangas', 'blazers', 'western', 'ethnic', 'accessories', 'jewellery'].includes(cat)
     );
     
     // Ensure primary category is included in categories array
