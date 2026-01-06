@@ -40,7 +40,7 @@ const RentProducts = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
-    priceRange: [0, 10000],
+    priceRange: [0, 100000],
     sortBy: 'none'
   });
 

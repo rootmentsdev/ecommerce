@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button, Image, Badge, Breadcrumb, Dropdown, Spinner, Alert, Offcanvas } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Image, Badge, Breadcrumb, Dropdown, Spinner, Alert, Offcanvas, Modal } from 'react-bootstrap';
 import { X, Funnel } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -8,21 +8,114 @@ import API_CONFIG from '../config/api';
 
 const AllProductsPage = () => {
   const navigate = useNavigate();
-  const [showFilters, setShowFilters] = useState(false);
+  const [showDesktopFilters, setShowDesktopFilters] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedOccasions, setSelectedOccasions] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedAvailability, setSelectedAvailability] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 15000]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [sortBy, setSortBy] = useState('Recommended');
   
   // API state
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Cart state
+  const [cartItems, setCartItems] = useState([]);
+  
+  // Buy/Rent selection modal state
+  const [showTypeModal, setShowTypeModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedType, setSelectedType] = useState('rent');
 
-  const handleToggleFilters = () => setShowFilters(!showFilters);
+  const handleToggleDesktopFilters = () => setShowDesktopFilters(!showDesktopFilters);
+  const handleToggleMobileFilters = () => setShowMobileFilters(!showMobileFilters);
+  
+  // Show type selection modal when clicking Add to Cart
+  const handleAddToCartClick = (e, product) => {
+    e.stopPropagation();
+    setSelectedProduct(product);
+    setSelectedType('rent'); // Default to rent
+    setShowTypeModal(true);
+  };
+  
+  // Confirm add to cart with selected type
+  const handleConfirmAddToCart = () => {
+    if (!selectedProduct) return;
+    
+    const existingItemIndex = cartItems.findIndex(item => item.id === selectedProduct.id);
+    
+    if (existingItemIndex >= 0) {
+      const newCartItems = [...cartItems];
+      newCartItems[existingItemIndex] = {
+        ...newCartItems[existingItemIndex],
+        quantity: (newCartItems[existingItemIndex].quantity || 1) + 1,
+        selectedType: selectedType
+      };
+      setCartItems(newCartItems);
+      localStorage.setItem('cart', JSON.stringify(newCartItems));
+    } else {
+      const productWithQuantity = { ...selectedProduct, quantity: 1, selectedType: selectedType };
+      const newCartItems = [...cartItems, productWithQuantity];
+      setCartItems(newCartItems);
+      localStorage.setItem('cart', JSON.stringify(newCartItems));
+    }
+    
+    window.dispatchEvent(new Event('cartUpdated'));
+    setShowTypeModal(false);
+    setSelectedProduct(null);
+  };
+  
+  // Add to cart function (legacy - kept for compatibility)
+  const handleAddToCart = (e, product) => {
+    e.stopPropagation(); // Prevent navigation to product details
+    
+    // Check if product is already in cart
+    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+    
+    if (existingItemIndex >= 0) {
+      // If item exists, increase quantity
+      const newCartItems = [...cartItems];
+      newCartItems[existingItemIndex] = {
+        ...newCartItems[existingItemIndex],
+        quantity: (newCartItems[existingItemIndex].quantity || 1) + 1
+      };
+      setCartItems(newCartItems);
+      localStorage.setItem('cart', JSON.stringify(newCartItems));
+    } else {
+      // If item doesn't exist, add with quantity 1
+      const productWithQuantity = { ...product, quantity: 1 };
+      const newCartItems = [...cartItems, productWithQuantity];
+      setCartItems(newCartItems);
+      localStorage.setItem('cart', JSON.stringify(newCartItems));
+    }
+    
+    // Dispatch event to update header cart count
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
+  
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartItems(savedCart);
+    
+    // Listen for cart updates
+    const handleCartUpdate = () => {
+      const updatedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCartItems(updatedCart);
+    };
+    
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    window.addEventListener('storage', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('storage', handleCartUpdate);
+    };
+  }, []);
 
   // Fetch products from backend
   useEffect(() => {
@@ -31,6 +124,7 @@ const AllProductsPage = () => {
         setLoading(true);
         setError(null);
         
+        console.log('🔍 AllProductsPage - Fetching from:', `${API_CONFIG.BASE_URL}/images/public?category=all&limit=100`);
         const response = await fetch(`${API_CONFIG.BASE_URL}/images/public?category=all&limit=100`);
         
         if (!response.ok) {
@@ -48,7 +142,8 @@ const AllProductsPage = () => {
             id: item._id,
             image: item.imageUrl,
             name: item.title,
-            category: item.description || item.category,
+            description: item.description || '', // Keep for ProductDetails page
+            category: item.category,
             productCategory: item.category,
             categories: item.categories || [item.category], // Include categories array
             rentPrice: item.rentalPrice || 0,
@@ -56,13 +151,14 @@ const AllProductsPage = () => {
             originalPrice: item.actualPrice || item.price || 0,
             badge: item.type === 'new' ? 'New' : null,
             occasion: item.occasions || item.style || 'General',
-            sizes: item.sizes ? (typeof item.sizes === 'string' ? item.sizes.split(',') : item.sizes) : ['S', 'M', 'L', 'XL'],
+            sizes: item.sizes ? (typeof item.sizes === 'string' ? item.sizes.split(',').map(s => s.trim()) : item.sizes) : ['S', 'M', 'L', 'XL'],
             availability: [],
             rating: 4.5,
             reviews: Math.floor(Math.random() * 1000) + 100,
-            fabric: item.fabric,
-            color: item.color,
-            style: item.style,
+            fabric: item.fabric || '',
+            color: item.color || '',
+            style: item.style || '',
+            inclusions: item.inclusions || '',
             inStock: item.inStock !== false
           }));
           
@@ -74,11 +170,14 @@ const AllProductsPage = () => {
           });
           
           setAllProducts(transformedProducts);
-          console.log('✅ Fetched products:', transformedProducts.length);
-          console.log('🔍 First 3 products:', transformedProducts.slice(0, 3));
+          console.log('✅ AllProductsPage - Fetched products:', transformedProducts.length);
+          console.log('🔍 AllProductsPage - First 3 products:', transformedProducts.slice(0, 3));
+          console.log('🔍 AllProductsPage - All product categories:', transformedProducts.map(p => ({ name: p.name, category: p.category, categories: p.categories })));
+        } else {
+          console.error('🔍 AllProductsPage - Invalid API response structure:', data);
         }
       } catch (err) {
-        console.error('Error fetching products:', err);
+        console.error('🔍 AllProductsPage - Error fetching products:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -111,12 +210,6 @@ const AllProductsPage = () => {
     'kurtas',
     'bandhgalas',
     'formal',
-    'traditional',
-    'lehangas',
-    'blazers',
-    'western',
-    'ethnic',
-    'accessories',
     'jewellery'
   ];
 
@@ -182,15 +275,25 @@ const AllProductsPage = () => {
     }
   });
 
+  console.log('🔍 AllProductsPage - Rendering state:', {
+    allProductsCount: allProducts.length,
+    filteredProductsCount: filteredProducts.length,
+    sortedProductsCount: sortedProducts.length,
+    selectedCategories,
+    loading,
+    error
+  });
+
   const handleClearFilters = () => {
     setSelectedCategories([]);
     setSelectedOccasions([]);
     setSelectedSizes([]);
     setSelectedAvailability([]);
-    setPriceRange([2300, 8400]);
+    setPriceRange([0, 100000]);
   };
 
   const handleCategoryChange = (category) => {
+    console.log('🔍 Category clicked:', category); // Debug log
     setSelectedCategories(prev => {
       const newCategories = prev.includes(category) 
         ? prev.filter(c => c !== category) 
@@ -229,7 +332,8 @@ const AllProductsPage = () => {
   };
 
   const handleApplyFilters = () => {
-    setShowFilters(false);
+    setShowDesktopFilters(false);
+    setShowMobileFilters(false);
   };
 
   const handleResetFilters = () => {
@@ -238,7 +342,7 @@ const AllProductsPage = () => {
     setSelectedSizes([]);
     setSelectedAvailability([]);
     setSelectedColors([]);
-    setPriceRange([0, 15000]);
+    setPriceRange([0, 100000]);
   };
 
   return (
@@ -263,7 +367,7 @@ const AllProductsPage = () => {
             <Button 
               variant="dark" 
               className="rounded-0 d-flex align-items-center gap-2"
-              onClick={handleToggleFilters}
+              onClick={handleToggleMobileFilters}
               style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
             >
               <Funnel size={16} />
@@ -295,7 +399,7 @@ const AllProductsPage = () => {
               <Button 
                 variant="dark" 
                 className="rounded-0 px-4 py-2"
-                onClick={handleToggleFilters}
+                onClick={handleToggleDesktopFilters}
                 style={{ fontWeight: 600, fontSize: '0.9rem' }}
               >
                 FILTER +
@@ -326,159 +430,362 @@ const AllProductsPage = () => {
           </div>
 
           {/* Dropdown Filter Panel - Desktop Only */}
-          {showFilters && (
-            <div className="border rounded-0 mb-4 p-4 bg-white d-none d-lg-block" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-              <Row>
-                {/* Categories Column */}
-                <Col md={3} sm={6} xs={12} className="mb-4">
-                  <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>Category</h6>
-                  <div className="d-flex flex-column" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                    <Button 
-                      variant="link" 
-                      className="text-start text-decoration-none text-secondary p-1"
-                      onClick={handleResetFilters}
-                      style={{ fontSize: '0.85rem' }}
-                    >
-                      Reset
-                    </Button>
-                    {categories.map((cat) => (
-                      <Form.Check
-                        key={cat}
-                        type="checkbox"
-                        id={`cat-${cat}`}
-                        label={getCategoryLabel(cat)}
-                        checked={selectedCategories.includes(cat)}
-                        onChange={() => handleCategoryChange(cat)}
-                        className="mb-2"
-                        style={{ fontSize: '0.85rem' }}
-                      />
-                    ))}
-                  </div>
-                </Col>
-
-                {/* Price Column */}
-                <Col md={3} sm={6} xs={12} className="mb-4">
-                  <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>Price</h6>
-                  <Button 
-                    variant="link" 
-                    className="text-start text-decoration-none text-secondary p-1 mb-2"
-                    onClick={() => setPriceRange([0, 15000])}
-                    style={{ fontSize: '0.85rem' }}
-                  >
-                    Reset
-                  </Button>
-                  <div className="mb-3">
-                    <Form.Range
-                      min={0}
-                      max={15000}
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    />
-                    <div className="d-flex justify-content-between text-muted" style={{ fontSize: '0.75rem' }}>
-                      <span>₹{priceRange[0]}</span>
-                      <span>₹{priceRange[1]}</span>
+          {showDesktopFilters && (
+            <>
+              {/* Filter Panel */}
+              <div 
+                className="mb-4 p-4 bg-white d-none d-lg-block" 
+                style={{ 
+                  border: '1px solid #dee2e6',
+                  borderRadius: '0',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  position: 'static',
+                  zIndex: 'auto'
+                }}
+              >
+                <div className="row">
+                  {/* Categories Column */}
+                  <div className="col-md-3 col-sm-6 col-12 mb-4">
+                    <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem', color: '#000' }}>Category</h6>
+                    <div className="d-flex flex-column" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleResetFilters();
+                        }}
+                        style={{ 
+                          fontSize: '0.85rem', 
+                          border: 'none', 
+                          background: 'none',
+                          color: '#6c757d',
+                          textAlign: 'left',
+                          padding: '4px 0',
+                          cursor: 'pointer',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        Reset
+                      </button>
+                      {categories.map((cat) => (
+                        <div key={cat} className="mb-2" style={{ display: 'flex', alignItems: 'center' }}>
+                          <input
+                            type="checkbox"
+                            id={`desktop-cat-${cat}`}
+                            checked={selectedCategories.includes(cat)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleCategoryChange(cat);
+                            }}
+                            style={{ 
+                              marginRight: '8px',
+                              cursor: 'pointer',
+                              width: '16px',
+                              height: '16px'
+                            }}
+                          />
+                          <label 
+                            htmlFor={`desktop-cat-${cat}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleCategoryChange(cat);
+                            }}
+                            style={{ 
+                              fontSize: '0.85rem', 
+                              cursor: 'pointer', 
+                              color: '#000',
+                              margin: 0,
+                              userSelect: 'none'
+                            }}
+                          >
+                            {getCategoryLabel(cat)}
+                          </label>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </Col>
 
-                {/* Occasions Column */}
-                <Col md={2} sm={6} xs={12} className="mb-4">
-                  <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>Occasions</h6>
-                  <Button 
-                    variant="link" 
-                    className="text-start text-decoration-none text-secondary p-1"
-                    onClick={() => setSelectedOccasions([])}
-                    style={{ fontSize: '0.85rem' }}
-                  >
-                    Reset
-                  </Button>
-                  {occasions.map((occasion) => (
-                    <Form.Check
-                      key={occasion}
-                      type="checkbox"
-                      id={`occasion-${occasion}`}
-                      label={occasion}
-                      checked={selectedOccasions.includes(occasion)}
-                      onChange={() => handleOccasionChange(occasion)}
-                      className="mb-2"
-                      style={{ fontSize: '0.85rem' }}
-                    />
-                  ))}
-                </Col>
+                  {/* Price Column */}
+                  <div className="col-md-3 col-sm-6 col-12 mb-4">
+                    <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem', color: '#000' }}>Price</h6>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setPriceRange([0, 100000]);
+                      }}
+                      style={{ 
+                        fontSize: '0.85rem', 
+                        border: 'none', 
+                        background: 'none',
+                        color: '#6c757d',
+                        textAlign: 'left',
+                        padding: '4px 0',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        marginBottom: '8px'
+                      }}
+                    >
+                      Reset
+                    </button>
+                    <div className="mb-3">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100000}
+                        value={priceRange[1]}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setPriceRange([priceRange[0], parseInt(e.target.value)]);
+                        }}
+                        style={{ 
+                          width: '100%',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <div className="d-flex justify-content-between text-muted" style={{ fontSize: '0.75rem' }}>
+                        <span>₹{priceRange[0]}</span>
+                        <span>₹{priceRange[1]}</span>
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Availability Column */}
-                <Col md={2} sm={6} xs={12} className="mb-4">
-                  <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>Availability</h6>
-                  <Button 
-                    variant="link" 
-                    className="text-start text-decoration-none text-secondary p-1"
-                    onClick={() => setSelectedAvailability([])}
-                    style={{ fontSize: '0.85rem' }}
-                  >
-                    Reset
-                  </Button>
-                  {availability.map((avail) => (
-                    <Form.Check
-                      key={avail}
-                      type="checkbox"
-                      id={`avail-${avail}`}
-                      label={avail}
-                      checked={selectedAvailability.includes(avail)}
-                      onChange={() => handleAvailabilityChange(avail)}
-                      className="mb-2"
-                      style={{ fontSize: '0.85rem' }}
-                    />
-                  ))}
-                </Col>
-
-                {/* Sizes Column */}
-                <Col md={2} sm={6} xs={12} className="mb-4">
-                  <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>Size</h6>
-                  <Button 
-                    variant="link" 
-                    className="text-start text-decoration-none text-secondary p-1 mb-2"
-                    onClick={() => setSelectedSizes([])}
-                    style={{ fontSize: '0.85rem' }}
-                  >
-                    Reset
-                  </Button>
-                  <div className="d-flex flex-wrap gap-2">
-                    {sizes.map((size) => (
-                      <Button
-                        key={size}
-                        variant={selectedSizes.includes(size) ? 'dark' : 'outline-secondary'}
-                        size="sm"
-                        className="rounded-0"
-                        onClick={() => handleSizeChange(size)}
-                        style={{ minWidth: '40px', fontSize: '0.75rem' }}
-                      >
-                        {size}
-                      </Button>
+                  {/* Occasions Column */}
+                  <div className="col-md-2 col-sm-6 col-12 mb-4">
+                    <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem', color: '#000' }}>Occasions</h6>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedOccasions([]);
+                      }}
+                      style={{ 
+                        fontSize: '0.85rem', 
+                        border: 'none', 
+                        background: 'none',
+                        color: '#6c757d',
+                        textAlign: 'left',
+                        padding: '4px 0',
+                        cursor: 'pointer',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      Reset
+                    </button>
+                    {occasions.map((occasion) => (
+                      <div key={occasion} className="mb-2" style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type="checkbox"
+                          id={`desktop-occasion-${occasion}`}
+                          checked={selectedOccasions.includes(occasion)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleOccasionChange(occasion);
+                          }}
+                          style={{ 
+                            marginRight: '8px',
+                            cursor: 'pointer',
+                            width: '16px',
+                            height: '16px'
+                          }}
+                        />
+                        <label 
+                          htmlFor={`desktop-occasion-${occasion}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleOccasionChange(occasion);
+                          }}
+                          style={{ 
+                            fontSize: '0.85rem', 
+                            cursor: 'pointer', 
+                            color: '#000',
+                            margin: 0,
+                            userSelect: 'none'
+                          }}
+                        >
+                          {occasion}
+                        </label>
+                      </div>
                     ))}
                   </div>
-                </Col>
-              </Row>
 
-              {/* Apply and Clear Buttons */}
-              <Row className="mt-3">
-                <Col className="d-flex gap-2">
-                  <Button 
-                    variant="dark" 
-                    className="rounded-0 px-4"
-                    onClick={handleApplyFilters}
-                  >
-                    APPLY
-                  </Button>
-                  <Button 
-                    variant="outline-secondary" 
-                    className="rounded-0 px-4"
-                    onClick={handleResetFilters}
-                  >
-                    Clear
-                  </Button>
-                </Col>
-              </Row>
-            </div>
+                  {/* Availability Column */}
+                  <div className="col-md-2 col-sm-6 col-12 mb-4">
+                    <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem', color: '#000' }}>Availability</h6>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedAvailability([]);
+                      }}
+                      style={{ 
+                        fontSize: '0.85rem', 
+                        border: 'none', 
+                        background: 'none',
+                        color: '#6c757d',
+                        textAlign: 'left',
+                        padding: '4px 0',
+                        cursor: 'pointer',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      Reset
+                    </button>
+                    {availability.map((avail) => (
+                      <div key={avail} className="mb-2" style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type="checkbox"
+                          id={`desktop-avail-${avail}`}
+                          checked={selectedAvailability.includes(avail)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleAvailabilityChange(avail);
+                          }}
+                          style={{ 
+                            marginRight: '8px',
+                            cursor: 'pointer',
+                            width: '16px',
+                            height: '16px'
+                          }}
+                        />
+                        <label 
+                          htmlFor={`desktop-avail-${avail}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAvailabilityChange(avail);
+                          }}
+                          style={{ 
+                            fontSize: '0.85rem', 
+                            cursor: 'pointer', 
+                            color: '#000',
+                            margin: 0,
+                            userSelect: 'none'
+                          }}
+                        >
+                          {avail}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Sizes Column */}
+                  <div className="col-md-2 col-sm-6 col-12 mb-4">
+                    <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem', color: '#000' }}>Size</h6>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedSizes([]);
+                      }}
+                      style={{ 
+                        fontSize: '0.85rem', 
+                        border: 'none', 
+                        background: 'none',
+                        color: '#6c757d',
+                        textAlign: 'left',
+                        padding: '4px 0',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        marginBottom: '8px'
+                      }}
+                    >
+                      Reset
+                    </button>
+                    <div className="d-flex flex-wrap gap-2">
+                      {sizes.map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSizeChange(size);
+                          }}
+                          style={{ 
+                            minWidth: '40px', 
+                            fontSize: '0.75rem',
+                            cursor: 'pointer',
+                            padding: '6px 12px',
+                            border: selectedSizes.includes(size) ? '1px solid #212529' : '1px solid #6c757d',
+                            backgroundColor: selectedSizes.includes(size) ? '#212529' : '#fff',
+                            color: selectedSizes.includes(size) ? '#fff' : '#6c757d',
+                            borderRadius: '0'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!selectedSizes.includes(size)) {
+                              e.target.style.backgroundColor = '#6c757d';
+                              e.target.style.color = '#fff';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!selectedSizes.includes(size)) {
+                              e.target.style.backgroundColor = '#fff';
+                              e.target.style.color = '#6c757d';
+                            }
+                          }}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Apply and Clear Buttons */}
+                <div className="row mt-3">
+                  <div className="col d-flex gap-2">
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleApplyFilters();
+                      }}
+                      style={{ 
+                        cursor: 'pointer',
+                        padding: '8px 16px',
+                        backgroundColor: '#212529',
+                        color: '#fff',
+                        border: '1px solid #212529',
+                        borderRadius: '0',
+                        fontSize: '0.9rem',
+                        fontWeight: '500'
+                      }}
+                    >
+                      APPLY
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleResetFilters();
+                      }}
+                      style={{ 
+                        cursor: 'pointer',
+                        padding: '8px 16px',
+                        backgroundColor: '#fff',
+                        color: '#6c757d',
+                        border: '1px solid #6c757d',
+                        borderRadius: '0',
+                        fontSize: '0.9rem',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
           {/* Loading State */}
           {loading && (
@@ -602,15 +909,17 @@ const AllProductsPage = () => {
                     
                     {/* Add to Cart Button */}
                     <Button 
-                      variant="dark" 
+                      variant="dark"
                       className="w-100 rounded-0 fw-bold mt-auto text-uppercase" 
                       style={{ 
                         fontSize: '0.65rem',
                         padding: '0.45rem',
                         letterSpacing: '0.3px',
                         backgroundColor: '#000',
+                        color: '#fff',
                         border: 'none'
                       }}
+                      onClick={(e) => handleAddToCartClick(e, product)}
                     >
                       ADD TO CART
                     </Button>
@@ -661,7 +970,7 @@ const AllProductsPage = () => {
       </Container>
 
       {/* Mobile Filter Offcanvas */}
-      <Offcanvas show={showFilters} onHide={() => setShowFilters(false)} placement="end" className="d-lg-none">
+      <Offcanvas show={showMobileFilters} onHide={() => setShowMobileFilters(false)} placement="end" className="d-lg-none">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title className="fw-bold">Filters</Offcanvas.Title>
         </Offcanvas.Header>
@@ -695,7 +1004,7 @@ const AllProductsPage = () => {
             <h6 className="fw-bold mb-3">Price</h6>
             <Form.Range
               min={0}
-              max={15000}
+              max={100000}
               value={priceRange[1]}
               onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
             />
@@ -767,6 +1076,127 @@ const AllProductsPage = () => {
         </Offcanvas.Body>
       </Offcanvas>
 
+      {/* Buy/Rent Selection Modal */}
+      <Modal show={showTypeModal} onHide={() => setShowTypeModal(false)} centered>
+        <Modal.Header closeButton style={{ border: 'none', paddingBottom: 0 }}>
+          <Modal.Title style={{ fontWeight: 700, fontSize: '1.25rem' }}>Select Option</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: '24px' }}>
+          {selectedProduct && (
+            <>
+              {/* Product Preview */}
+              <div className="d-flex gap-3 mb-4 pb-3" style={{ borderBottom: '1px solid #eee' }}>
+                <Image 
+                  src={selectedProduct.image} 
+                  alt={selectedProduct.name}
+                  style={{ width: '80px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                />
+                <div>
+                  <p className="text-muted mb-1" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                    {selectedProduct.category}
+                  </p>
+                  <h6 className="fw-bold mb-2" style={{ fontSize: '0.95rem' }}>{selectedProduct.name}</h6>
+                </div>
+              </div>
+              
+              {/* Buy/Rent Options */}
+              <p className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>How would you like to get this?</p>
+              <div className="d-flex flex-column gap-3">
+                {/* Buy Option */}
+                <div 
+                  className={`p-3 d-flex justify-content-between align-items-center`}
+                  style={{ 
+                    border: selectedType === 'buy' ? '2px solid #000' : '2px solid #e0e0e0',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    backgroundColor: selectedType === 'buy' ? '#fafafa' : '#fff',
+                    transition: 'all 0.2s'
+                  }}
+                  onClick={() => setSelectedType('buy')}
+                >
+                  <div className="d-flex align-items-center gap-3">
+                    <div 
+                      style={{ 
+                        width: '22px', 
+                        height: '22px', 
+                        borderRadius: '50%', 
+                        border: selectedType === 'buy' ? '2px solid #000' : '2px solid #ccc',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      {selectedType === 'buy' && (
+                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#000' }}></div>
+                      )}
+                    </div>
+                    <div>
+                      <span className="fw-bold" style={{ fontSize: '0.95rem' }}>Buy</span>
+                      <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>Own it forever</p>
+                    </div>
+                  </div>
+                  <span className="fw-bold" style={{ fontSize: '1.1rem' }}>₹{selectedProduct.buyPrice?.toLocaleString()}</span>
+                </div>
+                
+                {/* Rent Option */}
+                <div 
+                  className={`p-3 d-flex justify-content-between align-items-center`}
+                  style={{ 
+                    border: selectedType === 'rent' ? '2px solid #FF8C00' : '2px solid #e0e0e0',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    backgroundColor: selectedType === 'rent' ? '#fff8f0' : '#fff',
+                    transition: 'all 0.2s'
+                  }}
+                  onClick={() => setSelectedType('rent')}
+                >
+                  <div className="d-flex align-items-center gap-3">
+                    <div 
+                      style={{ 
+                        width: '22px', 
+                        height: '22px', 
+                        borderRadius: '50%', 
+                        border: selectedType === 'rent' ? '2px solid #FF8C00' : '2px solid #ccc',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      {selectedType === 'rent' && (
+                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FF8C00' }}></div>
+                      )}
+                    </div>
+                    <div>
+                      <span className="fw-bold" style={{ fontSize: '0.95rem', color: '#FF8C00' }}>Rent</span>
+                      <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>Use it for a few days</p>
+                    </div>
+                  </div>
+                  <div className="text-end">
+                    <span className="fw-bold" style={{ fontSize: '1.1rem', color: '#FF8C00' }}>₹{selectedProduct.rentPrice?.toLocaleString()}</span>
+                    <span className="text-muted" style={{ fontSize: '0.75rem' }}>/day</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer style={{ border: 'none', padding: '0 24px 24px' }}>
+          <Button 
+            variant="dark" 
+            className="w-100 fw-bold"
+            style={{ 
+              height: '50px', 
+              borderRadius: '10px',
+              fontSize: '0.9rem',
+              letterSpacing: '0.5px'
+            }}
+            onClick={handleConfirmAddToCart}
+          >
+            ADD TO CART
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <Footer />
 
       <style>{`
@@ -790,6 +1220,19 @@ const AllProductsPage = () => {
         
         .cursor-pointer {
           cursor: pointer;
+        }
+        
+        /* Simple filter styles */
+        .form-check-input {
+          cursor: pointer !important;
+        }
+        
+        .form-check-label {
+          cursor: pointer !important;
+        }
+        
+        .form-range {
+          cursor: pointer !important;
         }
         
         /* Pagination Styles */

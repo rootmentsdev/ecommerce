@@ -3,7 +3,7 @@ import { Offcanvas, Form, Button, Row, Col } from 'react-bootstrap';
 import { X } from 'react-bootstrap-icons';
 import { APP_CONFIG } from '../../constants';
 
-const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = null, maxPrice = 10000 }) => {
+const FilterSidebar = ({ show, handleClose, onApplyFilters, initialFilters = null, maxPrice = 100000 }) => {
   // Filter state following clean code principles
   const [filters, setFilters] = useState(initialFilters || {
     priceRange: [1000, maxPrice],

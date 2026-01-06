@@ -1011,6 +1011,7 @@ const AdminDashboard = () => {
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>DATE</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>TYPE</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>PRODUCT NAME</th>
+                          <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>SIZE</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>FULL NAME</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>MOBILE</th>
                           <th style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: '600', color: '#6c757d' }}>DISTRICT</th>
@@ -1068,6 +1069,19 @@ const AdminDashboard = () => {
                                     </div>
                                   </div>
                                 </div>
+                              </td>
+                              <td>
+                                <Badge 
+                                  bg="secondary" 
+                                  style={{ 
+                                    fontSize: '12px', 
+                                    fontWeight: '600',
+                                    padding: '6px 12px',
+                                    borderRadius: '6px'
+                                  }}
+                                >
+                                  {enquiry.selectedSize || 'N/A'}
+                                </Badge>
                               </td>
                               <td>
                                 <div>

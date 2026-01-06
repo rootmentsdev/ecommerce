@@ -20,16 +20,23 @@ const EnquireNow = () => {
   const product = location.state?.product || {};
   const selectedSize = location.state?.selectedSize || '';
   const selectedQuantity = location.state?.selectedQuantity || 1;
-  const enquiryType = location.state?.enquiryType || 'rent'; // 'rent' or 'buy'
+  const enquiryType = location.state?.enquiryType || 'rent'; // 'rent', 'buy', or 'mixed'
+  const cartItems = location.state?.cartItems || [];
+  const fromCart = location.state?.fromCart || false;
   
   // Debug: Log the product object and additional data
   console.log('🔍 EnquireNow - Product object:', product);
   console.log('🔍 EnquireNow - Selected size:', selectedSize);
   console.log('🔍 EnquireNow - Selected quantity:', selectedQuantity);
   console.log('🔍 EnquireNow - Enquiry type:', enquiryType);
+  console.log('🔍 EnquireNow - Cart items:', cartItems);
+  console.log('🔍 EnquireNow - From cart:', fromCart);
+  
+  // Determine if we need to show rent fields (for rent or mixed enquiries)
+  const showRentFields = enquiryType === 'rent' || enquiryType === 'mixed';
   
   // Validate that we have the necessary product data
-  if (!product || !product.id) {
+  if (!fromCart && (!product || !product.id)) {
     console.warn('⚠️ EnquireNow - Missing product data:', product);
   }
   
@@ -215,14 +222,28 @@ const EnquireNow = () => {
         selectedQuantity: formData.selectedQuantity || 1
       };
       
-      // Add productId if it exists (relaxed validation for admin-created products)
-      if (product.id && product.id.trim() !== '') {
-        enquiryData.productId = product.id;
-      }
-      
-      // Add productName if product has a name
-      if (product.name && product.name.trim() !== '') {
-        enquiryData.productName = product.name;
+      // If coming from cart, add cart items info
+      if (fromCart && cartItems.length > 0) {
+        enquiryData.cartItems = cartItems.map(item => ({
+          productId: item.id,
+          productName: item.name,
+          selectedType: item.selectedType || 'buy',
+          quantity: item.quantity || 1,
+          price: item.selectedType === 'rent' ? item.rentPrice : item.buyPrice
+        }));
+        // Use first item's info for backward compatibility
+        enquiryData.productId = cartItems[0].id;
+        enquiryData.productName = cartItems.map(item => item.name).join(', ');
+      } else {
+        // Add productId if it exists (relaxed validation for admin-created products)
+        if (product.id && product.id.trim() !== '') {
+          enquiryData.productId = product.id;
+        }
+        
+        // Add productName if product has a name
+        if (product.name && product.name.trim() !== '') {
+          enquiryData.productName = product.name;
+        }
       }
       
       // Debug: Log the data being sent
@@ -239,6 +260,12 @@ const EnquireNow = () => {
           text: 'Enquiry submitted successfully! We will contact you soon.'
         });
         
+        // Clear cart if coming from cart
+        if (fromCart) {
+          localStorage.setItem('cart', JSON.stringify([]));
+          window.dispatchEvent(new Event('cartUpdated'));
+        }
+        
         // Reset form after successful submission
         setTimeout(() => {
           navigate('/');
@@ -253,7 +280,7 @@ const EnquireNow = () => {
       console.error('❌ EnquireNow - Error details:', {
         message: error.message,
         product: product,
-        enquiryData: enquiryData
+        formData: formData
       });
       
       setSubmitMessage({
@@ -288,7 +315,7 @@ const EnquireNow = () => {
         <Col xs={12}>
           <div className="text-center mb-4">
             <h1 
-              className="h3 fw-bold mb-0"
+              className="h3 fw-bold mb-2"
               style={{
                 fontFamily: APP_CONFIG.FONTS.PRIMARY,
                 fontWeight: '700',
@@ -296,9 +323,51 @@ const EnquireNow = () => {
                 color: '#000'
               }}
             >
-              Enquire Now
+              {enquiryType === 'buy' ? 'Buy Enquiry' : enquiryType === 'mixed' ? 'Enquire Now' : 'Rent Enquiry'}
             </h1>
+            {enquiryType === 'mixed' && (
+              <p className="text-muted" style={{ fontSize: '0.9rem' }}>
+                Your cart contains both rent and buy items
+              </p>
+            )}
           </div>
+
+          {/* Cart Items Summary - Show when coming from cart */}
+          {fromCart && cartItems.length > 0 && (
+            <div className="mb-4 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '12px' }}>
+              <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>Items in your enquiry:</h6>
+              {cartItems.map((item, index) => (
+                <div key={item.id || index} className="d-flex align-items-center gap-3 mb-2 pb-2" style={{ borderBottom: index < cartItems.length - 1 ? '1px solid #e9ecef' : 'none' }}>
+                  <img 
+                    src={item.image} 
+                    alt={item.name}
+                    style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }}
+                  />
+                  <div className="flex-grow-1">
+                    <p className="mb-0 fw-medium" style={{ fontSize: '0.85rem' }}>{item.name}</p>
+                    <div className="d-flex align-items-center gap-2">
+                      <span 
+                        className="px-2 py-1 rounded" 
+                        style={{ 
+                          fontSize: '0.65rem', 
+                          backgroundColor: item.selectedType === 'rent' ? '#FFF3E0' : '#E8E8E8', 
+                          color: item.selectedType === 'rent' ? '#FF8C00' : '#333',
+                          fontWeight: 600
+                        }}
+                      >
+                        {item.selectedType === 'rent' ? 'RENT' : 'BUY'}
+                      </span>
+                      <span className="text-muted" style={{ fontSize: '0.75rem' }}>Qty: {item.quantity || 1}</span>
+                      <span className="fw-bold" style={{ fontSize: '0.85rem', color: item.selectedType === 'rent' ? '#FF8C00' : '#000' }}>
+                        ₹{((item.selectedType === 'rent' ? item.rentPrice : item.buyPrice) * (item.quantity || 1)).toLocaleString()}
+                        {item.selectedType === 'rent' && <span className="text-muted" style={{ fontSize: '0.7rem' }}>/day</span>}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           <Form onSubmit={handleSubmit}>
             {/* Full Name */}
@@ -423,7 +492,7 @@ const EnquireNow = () => {
 
              {/* Preferred Booking Date and City - Only show booking date for rent enquiries */}
              <Row className="mb-4 g-3">
-               {enquiryType === 'rent' && (
+               {showRentFields && (
                  <Col xs={6}>
                    <Form.Label 
                      className="fw-medium mb-2"
@@ -456,7 +525,7 @@ const EnquireNow = () => {
                    )}
                  </Col>
                )}
-              <Col xs={enquiryType === 'rent' ? 6 : 12}>
+              <Col xs={showRentFields ? 6 : 12}>
                 <Form.Label 
                   className="fw-medium mb-2"
                   style={{
@@ -495,7 +564,7 @@ const EnquireNow = () => {
             </Row>
 
             {/* Pickup and Return Dates - Only show for rent enquiries */}
-            {enquiryType === 'rent' && (
+            {showRentFields && (
               <Row className="mb-4 g-3">
                 <Col xs={6}>
                   <Form.Label 
@@ -561,6 +630,47 @@ const EnquireNow = () => {
               </Row>
             )}
 
+            {/* Selected Size - Only show when not from cart */}
+            {!fromCart && (
+              <div className="mb-4">
+                <Form.Label 
+                  className="fw-medium mb-2"
+                  style={{
+                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
+                    fontSize: '14px',
+                    color: '#000'
+                  }}
+                >
+                  Selected Size
+                </Form.Label>
+                <div className="d-flex gap-2 flex-wrap">
+                  {(product.sizes || ['S', 'M', 'L', 'XL', 'XXL']).map((size) => (
+                    <Button
+                      key={size}
+                      type="button"
+                      variant={formData.selectedSize === size ? 'dark' : 'outline-dark'}
+                      onClick={() => setFormData(prev => ({ ...prev, selectedSize: size }))}
+                      style={{
+                        minWidth: '50px',
+                        height: '50px',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        fontFamily: APP_CONFIG.FONTS.SECONDARY
+                      }}
+                    >
+                      {size}
+                    </Button>
+                  ))}
+                </div>
+                {errors.selectedSize && (
+                  <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                    {errors.selectedSize}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Special Notes */}
             <div className="mb-4">
               <Form.Label 
@@ -624,7 +734,7 @@ const EnquireNow = () => {
                   type="submit"
                   variant="dark"
                   className="w-100"
-                  disabled={isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (enquiryType === 'rent' && (!formData.preferredBookingDate || !formData.pickupDate))}
+                  disabled={isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (showRentFields && (!formData.preferredBookingDate || !formData.pickupDate))}
                   style={{
                     borderRadius: '8px',
                     fontFamily: APP_CONFIG.FONTS.SECONDARY,
@@ -633,7 +743,7 @@ const EnquireNow = () => {
                     padding: '12px',
                     backgroundColor: '#000',
                     border: 'none',
-                    opacity: (isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (enquiryType === 'rent' && (!formData.preferredBookingDate || !formData.pickupDate))) ? 0.6 : 1
+                    opacity: (isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (showRentFields && (!formData.preferredBookingDate || !formData.pickupDate))) ? 0.6 : 1
                   }}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit'}

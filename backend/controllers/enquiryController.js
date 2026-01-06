@@ -36,13 +36,14 @@ class EnquiryController {
         city,
         specialNotes,
         productId,
-        productName
+        productName,
+        cartItems
       } = req.body;
 
-      // Additional validation for rent enquiries
+      // Additional validation for rent enquiries (rent or mixed types need dates)
       const finalEnquiryType = enquiryType || 'rent';
       
-      if (finalEnquiryType === 'rent' && !preferredBookingDate) {
+      if ((finalEnquiryType === 'rent' || finalEnquiryType === 'mixed') && !preferredBookingDate) {
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
@@ -64,7 +65,8 @@ class EnquiryController {
         city: city.trim(),
         specialNotes: specialNotes ? specialNotes.trim() : null,
         productId: productId || null,
-        productName: productName ? productName.trim() : null
+        productName: productName ? productName.trim() : null,
+        cartItems: cartItems || []
       });
 
       await enquiry.save();

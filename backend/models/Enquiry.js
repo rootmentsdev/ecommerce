@@ -25,7 +25,7 @@ const enquirySchema = new mongoose.Schema({
   // Enquiry Type
   enquiryType: {
     type: String,
-    enum: ['rent', 'buy'],
+    enum: ['rent', 'buy', 'mixed'],
     default: 'rent'
   },
 
@@ -93,6 +93,19 @@ const enquirySchema = new mongoose.Schema({
     trim: true,
     maxlength: [200, 'Product name cannot exceed 200 characters']
   },
+  
+  // Cart Items (for multi-product enquiries)
+  cartItems: [{
+    productId: String,
+    productName: String,
+    selectedType: {
+      type: String,
+      enum: ['rent', 'buy']
+    },
+    quantity: Number,
+    price: Number,
+    selectedSize: String
+  }],
 
   // Enquiry Status
   status: {

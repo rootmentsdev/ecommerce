@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Image, Card, Pagination, Badge, Spinner } from 'react-bootstrap';
+import { Container, Button, Image, Badge, Spinner, Breadcrumb } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Heart, HeartFill } from 'react-bootstrap-icons';
 import Header from '../components/Header';
 import SideMenu from '../components/SideMenu';
 import Footer from '../components/Footer';
-import { PRODUCTS_DATA } from '../data/products';
 import FavoritesService from '../services/favoritesService';
 import API_CONFIG from '../config/api';
 
@@ -14,10 +13,6 @@ const Favorites = () => {
   const [showSideMenu, setShowSideMenu] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // State for pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 8;
 
   // Load favorites from localStorage and admin images
   useEffect(() => {
@@ -25,45 +20,84 @@ const Favorites = () => {
       try {
         setLoading(true);
         
-        // Get favorites using centralized service
         const savedFavorites = FavoritesService.getStaticFavorites();
         const adminImageFavorites = FavoritesService.getAdminFavorites();
-        
-        console.log('🔍 Debug - Saved favorites:', savedFavorites);
-        console.log('🔍 Debug - Admin image favorites:', adminImageFavorites);
-        
-        // Get static products that are favorited
-        const staticFavorites = savedFavorites.map(id => PRODUCTS_DATA.find(p => p.id === id)).filter(Boolean);
-        
-        console.log('🔍 Debug - Static favorites found:', staticFavorites);
         
         // Get admin images that are favorited
         let adminFavorites = [];
         if (adminImageFavorites.length > 0) {
           try {
-            // Fetch ALL admin images (not just specific categories)
-            console.log('🔍 Fetching admin images from:', `${API_CONFIG.BASE_URL}/images/public?limit=1000`);
             const response = await fetch(`${API_CONFIG.BASE_URL}/images/public?limit=1000`);
             const data = await response.json();
             
-            console.log('🔍 API Response:', data);
-            
             if (data.success && data.data && data.data.images) {
-              // Filter by favorites
-              adminFavorites = data.data.images.filter(img => adminImageFavorites.includes(img._id));
-              console.log('🔍 Debug - Admin favorites found:', adminFavorites);
-              console.log('🔍 Debug - Matching IDs:', adminFavorites.map(img => img._id));
-            } else {
-              console.log('🔍 No images in response or response format unexpected');
+              adminFavorites = data.data.images
+                .filter(img => adminImageFavorites.includes(img._id))
+                .map(item => ({
+                  id: item._id,
+                  image: item.imageUrl,
+                  name: item.title,
+                  description: item.description || '',
+                  category: item.description || item.category,
+                  productCategory: item.category,
+                  rentPrice: item.rentalPrice || 0,
+                  buyPrice: item.price || 0,
+                  originalPrice: item.actualPrice || item.price || 0,
+                  rating: 4.5,
+                  reviews: Math.floor(Math.random() * 1000) + 100,
+                  fabric: item.fabric || '',
+                  color: item.color || '',
+                  style: item.style || '',
+                  inclusions: item.inclusions || '',
+                  sizes: item.sizes ? (typeof item.sizes === 'string' ? item.sizes.split(',').map(s => s.trim()) : item.sizes) : ['S', 'M', 'L', 'XL'],
+                }));
             }
           } catch (error) {
             console.error('Error fetching admin images for favorites:', error);
           }
         }
+
+        // Also check for products saved by id (from product details page)
+        let productFavorites = [];
+        if (savedFavorites.length > 0) {
+          try {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/images/public?limit=1000`);
+            const data = await response.json();
+            
+            if (data.success && data.data && data.data.images) {
+              productFavorites = data.data.images
+                .filter(img => savedFavorites.includes(img._id))
+                .map(item => ({
+                  id: item._id,
+                  image: item.imageUrl,
+                  name: item.title,
+                  description: item.description || '',
+                  category: item.description || item.category,
+                  productCategory: item.category,
+                  rentPrice: item.rentalPrice || 0,
+                  buyPrice: item.price || 0,
+                  originalPrice: item.actualPrice || item.price || 0,
+                  rating: 4.5,
+                  reviews: Math.floor(Math.random() * 1000) + 100,
+                  fabric: item.fabric || '',
+                  color: item.color || '',
+                  style: item.style || '',
+                  inclusions: item.inclusions || '',
+                  sizes: item.sizes ? (typeof item.sizes === 'string' ? item.sizes.split(',').map(s => s.trim()) : item.sizes) : ['S', 'M', 'L', 'XL'],
+                }));
+            }
+          } catch (error) {
+            console.error('Error fetching products for favorites:', error);
+          }
+        }
         
-        // Combine both types of favorites
-        setFavorites([...staticFavorites, ...adminFavorites]);
-        console.log('🔍 Debug - Final favorites set:', [...staticFavorites, ...adminFavorites]);
+        // Combine and deduplicate
+        const allFavorites = [...adminFavorites, ...productFavorites];
+        const uniqueFavorites = allFavorites.filter((item, index, self) => 
+          index === self.findIndex(t => t.id === item.id)
+        );
+        
+        setFavorites(uniqueFavorites);
       } catch (error) {
         console.error('Error loading favorites:', error);
         setFavorites([]);
@@ -75,332 +109,236 @@ const Favorites = () => {
     loadFavorites();
   }, []);
 
-  // Handle removing from favorites
-  const handleRemoveFavorite = (item) => {
-    console.log('🗑️ Removing favorite:', item);
-    
-    // Use centralized favorites service
-    FavoritesService.removeFromFavorites(item);
-    
-    // Update local state
-    setFavorites(prev => {
-      const updated = prev.filter(fav => 
-        (item.id && fav.id !== item.id) || (item._id && fav._id !== item._id)
-      );
-      console.log('💖 Updated favorites list:', updated.length, 'items');
-      return updated;
-    });
-    
-    // Force dispatch the event to ensure header updates
-    FavoritesService.dispatchFavoritesUpdated();
+  const handleRemoveFavorite = (e, product) => {
+    e.stopPropagation();
+    FavoritesService.removeFromFavorites({ id: product.id });
+    FavoritesService.removeFromFavorites({ _id: product.id });
+    setFavorites(prev => prev.filter(fav => fav.id !== product.id));
   };
 
-  // Handle product click
   const handleProductClick = (product) => {
     navigate('/product-details', { state: { product } });
   };
 
-  // Handle menu toggle
-  const handleMenuToggle = () => {
-    setShowSideMenu(!showSideMenu);
-  };
-
   return (
-    <>
-      <style>{`
-        .pagination-dark .page-link {
-          background-color: #000;
-          border-color: #000;
-          color: #fff;
-        }
-        .pagination-dark .page-link:hover {
-          background-color: #333;
-          border-color: #333;
-          color: #fff;
-        }
-        .pagination-dark .page-item.active .page-link {
-          background-color: #000;
-          border-color: #000;
-          color: #fff;
-        }
-        .pagination-dark .page-item.disabled .page-link {
-          background-color: #666;
-          border-color: #666;
-          color: #999;
-        }
-      `}</style>
-      <div className="min-vh-100" style={{ backgroundColor: '#f8f9fa' }}>
-        <Header onMenuClick={handleMenuToggle} />
-        <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
+    <div className="d-flex flex-column min-vh-100">
+      <Header onMenuClick={() => setShowSideMenu(true)} />
       
-      <Container className="py-4">
-        {/* Page Header */}
-        <div className="text-center mb-5">
-          <h1 
-            style={{
-              fontFamily: 'Poppins',
-              fontWeight: 700,
-              fontSize: '2.5rem',
-              color: '#000',
-              marginBottom: '1rem'
-            }}
-          >
-            My Favorites
-          </h1>
-          <p 
-            style={{
-              fontFamily: 'Poppins',
-              fontWeight: 400,
-              fontSize: '1.1rem',
-              color: '#666',
-              maxWidth: '600px',
-              margin: '0 auto 1rem auto'
-            }}
-          >
-            Your saved items and favorite products
-          </p>
-          {favorites.length > 0 && (
-            <Badge bg="secondary" style={{ fontSize: '0.9rem', fontFamily: 'Poppins' }}>
+      <Container fluid className="flex-grow-1 bg-white py-4">
+        <div style={{ 
+          maxWidth: '1440px', 
+          paddingLeft: '100px', 
+          paddingRight: '100px',
+          margin: '0 auto'
+        }} className="responsive-container">
+          {/* Breadcrumb */}
+          <Breadcrumb className="mb-3 d-none d-lg-block">
+            <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+            <Breadcrumb.Item active>My Favorites</Breadcrumb.Item>
+          </Breadcrumb>
+
+          {/* Header */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h4 className="fw-bold mb-0">My Favorites</h4>
+            <div className="text-muted" style={{ fontSize: '0.95rem' }}>
               {favorites.length} {favorites.length === 1 ? 'item' : 'items'}
-            </Badge>
-          )}
-        </div>
-
-        {/* Favorites Grid - Same UI as Product Listing */}
-        {loading ? (
-          <div className="text-center py-5">
-            <Spinner animation="border" variant="primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-            <p className="mt-3 text-muted">Loading your favorites...</p>
+            </div>
           </div>
-        ) : favorites.length > 0 ? (
-          <div>
-            {/* Pagination logic */}
-            {(() => {
-              const totalPages = Math.ceil(favorites.length / ITEMS_PER_PAGE);
-              const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-              const endIndex = startIndex + ITEMS_PER_PAGE;
-              const paginatedFavorites = favorites.slice(startIndex, endIndex);
 
-              return (
-                <>
-                  {/* Product Count Badge */}
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <Badge bg="dark" className="fs-6 fw-normal px-3 py-2">
-                      Showing {startIndex + 1}-{Math.min(endIndex, favorites.length)} of {favorites.length} favorites
-                    </Badge>
-                    {totalPages > 1 && <span className="text-muted">Page {currentPage} of {totalPages}</span>}
-                  </div>
-            
-            {/* Product Grid - Same as Product Listing Page */}
-              <Row className="g-2 g-md-3">
-                {paginatedFavorites.map((item, index) => {
-                  const isAdminImage = item._id;
-                  const imageSrc = isAdminImage ? item.imageUrl : item.image;
-                  const title = isAdminImage ? item.title : item.name;
-                  const price = isAdminImage ? (item.price || item.rentalPrice) : item.price;
-                  
-                  return (
-                    <Col key={isAdminImage ? item._id : item.id} xs={6} sm={6} md={4} lg={3}>
-                      <Card 
-                        className="border-0 shadow-sm h-100"
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-5">
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+              <p className="mt-3 text-muted">Loading your favorites...</p>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && favorites.length === 0 && (
+            <div className="text-center py-5">
+              <Heart size={64} className="text-muted mb-3" />
+              <h5 className="text-muted mb-3">No favorites yet</h5>
+              <p className="text-muted mb-4">Start adding items to your favorites by clicking the heart icon</p>
+              <Button variant="dark" onClick={() => navigate('/products')}>
+                Browse Products
+              </Button>
+            </div>
+          )}
+
+          {/* Products Grid - Same as AllProductsPage */}
+          {!loading && favorites.length > 0 && (
+            <div className="products-grid">
+              {favorites.map((product) => (
+                <div 
+                  key={product.id}
+                  className="cursor-pointer d-flex flex-column product-card" 
+                  onClick={() => handleProductClick(product)}
+                >
+                  {/* Product Image */}
+                  <div className="position-relative product-image-container" style={{ height: '200px', overflow: 'hidden' }}>
+                    <Image 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-100 h-100" 
+                      style={{ objectFit: 'cover', display: 'block' }} 
+                    />
+                    {/* Discount Badge */}
+                    {product.originalPrice > product.buyPrice && (
+                      <Badge 
+                        className="position-absolute bottom-0 start-0 m-2 px-2 py-1 fw-bold" 
                         style={{ 
-                          borderRadius: '12px',
-                          overflow: 'hidden',
-                          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                          cursor: 'pointer'
-                        }}
-                        onClick={() => {
-                          if (isAdminImage) {
-                            // Convert admin image to product format
-                            const product = {
-                              id: item._id,
-                              name: item.title,
-                              image: item.imageUrl,
-                              price: item.price || item.rentalPrice || 0,
-                              rentalPrice: item.rentalPrice || item.price || 0,
-                              actualPrice: item.actualPrice || 0,
-                              securityDeposit: item.securityDeposit || 0,
-                              description: item.description || '',
-                              category: item.category || 'product'
-                            };
-                            handleProductClick(product);
-                          } else {
-                            handleProductClick(item);
-                          }
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                          fontSize: '0.6rem',
+                          backgroundColor: 'rgba(0,0,0,0.7)',
+                          color: '#fff',
+                          border: 'none'
                         }}
                       >
-                        <div className="position-relative">
-                          <Card.Img
-                            variant="top"
-                            src={imageSrc}
-                            alt={title}
-                            loading="lazy"
-                            style={{
-                              height: window.innerWidth <= 768 ? '220px' : '240px',
-                              objectFit: 'cover',
-                              width: '100%'
-                            }}
-                          />
-                          
-                          {/* Love Button - Same as Product Listing */}
-                          <Button 
-                            variant="danger"
-                            size="sm"
-                            className="position-absolute top-0 end-0 m-2 rounded-circle p-0"
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              opacity: 0.9
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveFavorite(item);
-                            }}
-                          >
-                            <HeartFill size={16} />
-                          </Button>
-                        </div>
-                        
-                        <Card.Body className="p-2">
-                          <Card.Title className="mb-1" style={{
-                            fontFamily: 'Poppins',
-                            fontWeight: 600,
-                            fontSize: window.innerWidth <= 768 ? '12px' : '14px',
-                            color: '#000',
-                            lineHeight: '1.3',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            {title}
-                          </Card.Title>
-                          <Card.Text className="mb-0 fw-bold" style={{
-                            fontFamily: 'Poppins',
-                            fontWeight: 700,
-                            fontSize: window.innerWidth <= 768 ? '14px' : '16px',
-                            color: '#000'
-                          }}>
-                            ₹{price}
-                          </Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  );
-                })}
-              </Row>
-
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="d-flex justify-content-center mt-4">
-                  <Pagination className="pagination-dark">
-                    <Pagination.First 
-                      onClick={() => setCurrentPage(1)} 
-                      disabled={currentPage === 1}
-                    />
-                    <Pagination.Prev 
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
-                      disabled={currentPage === 1}
-                    />
+                        {Math.round(((product.originalPrice - product.buyPrice) / product.originalPrice) * 100)}% OFF
+                      </Badge>
+                    )}
+                    {/* Favorite Button */}
+                    <Button
+                      variant="light"
+                      className="position-absolute top-0 end-0 m-2 rounded-circle p-0 d-flex align-items-center justify-content-center"
+                      style={{ width: '32px', height: '32px', backgroundColor: 'white' }}
+                      onClick={(e) => handleRemoveFavorite(e, product)}
+                    >
+                      <HeartFill size={16} color="#e53935" />
+                    </Button>
+                  </div>
+                  
+                  {/* Product Info */}
+                  <div className="d-flex flex-column flex-grow-1 p-2" style={{ height: '173px' }}>
+                    {/* Category */}
+                    <p className="text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem', letterSpacing: '0.3px', fontWeight: 500 }}>
+                      {product.category}
+                    </p>
                     
-                    {[...Array(totalPages)].map((_, idx) => {
-                      const pageNum = idx + 1;
-                      if (
-                        pageNum === 1 || 
-                        pageNum === totalPages || 
-                        (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-                      ) {
-                        return (
-                          <Pagination.Item
-                            key={pageNum}
-                            active={pageNum === currentPage}
-                            onClick={() => setCurrentPage(pageNum)}
-                          >
-                            {pageNum}
-                          </Pagination.Item>
-                        );
-                      } else if (
-                        pageNum === currentPage - 2 || 
-                        pageNum === currentPage + 2
-                      ) {
-                        return <Pagination.Ellipsis key={pageNum} disabled />;
-                      }
-                      return null;
-                    })}
+                    {/* Product Name */}
+                    <h6 className="mb-1 fw-bold" style={{ 
+                      fontSize: '0.75rem', 
+                      lineHeight: '1.2',
+                      color: '#000',
+                      height: '1.8rem',
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
+                      {product.name}
+                    </h6>
                     
-                    <Pagination.Next 
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
-                      disabled={currentPage === totalPages}
-                    />
-                    <Pagination.Last 
-                      onClick={() => setCurrentPage(totalPages)} 
-                      disabled={currentPage === totalPages}
-                    />
-                  </Pagination>
+                    {/* Rating & Reviews */}
+                    <div className="d-flex align-items-center gap-1 mb-1" style={{ fontSize: '0.6rem' }}>
+                      <span className="text-warning fw-bold" style={{ fontSize: '0.7rem' }}>★</span>
+                      <span className="fw-bold" style={{ color: '#000' }}>{product.rating}</span>
+                      <span className="text-muted">|</span>
+                      <span className="text-primary" style={{ fontSize: '0.6rem' }}>
+                        ({product.reviews > 1000 ? `${(product.reviews / 1000).toFixed(1)}K` : product.reviews})
+                      </span>
+                    </div>
+                    
+                    {/* Pricing */}
+                    <div className="mb-2">
+                      <div className="d-flex align-items-baseline gap-1 mb-1">
+                        <span style={{ fontSize: '0.6rem', color: '#666' }}>Buy:</span>
+                        <span className="fw-bold" style={{ fontSize: '0.85rem', color: '#000' }}>
+                          ₹{product.buyPrice.toLocaleString()}
+                        </span>
+                        {product.originalPrice > product.buyPrice && (
+                          <span className="text-muted text-decoration-line-through" style={{ fontSize: '0.65rem' }}>
+                            ₹{product.originalPrice.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="d-flex align-items-baseline gap-1">
+                        <span style={{ fontSize: '0.6rem', color: '#666' }}>Rent:</span>
+                        <span className="fw-bold" style={{ fontSize: '0.85rem', color: '#FFA726' }}>
+                          ₹{product.rentPrice.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* View Details Button */}
+                    <Button 
+                      variant="dark"
+                      className="w-100 rounded-0 fw-bold mt-auto text-uppercase" 
+                      style={{ 
+                        fontSize: '0.65rem',
+                        padding: '0.45rem',
+                        letterSpacing: '0.3px',
+                        backgroundColor: '#000',
+                        color: '#fff',
+                        border: 'none'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleProductClick(product);
+                      }}
+                    >
+                      VIEW DETAILS
+                    </Button>
+                  </div>
                 </div>
-              )}
-            </>
-            );
-          })()}
-          </div>
-        ) : (
-          <div className="text-center py-5">
-            <Heart 
-              size={64} 
-              color="#ccc" 
-              style={{ marginBottom: '1rem' }}
-            />
-            <h3 
-              style={{
-                fontFamily: 'Poppins',
-                fontWeight: 700,
-                fontSize: '1.5rem',
-                color: '#666',
-                marginBottom: '1rem'
-              }}
-            >
-              No favorites yet
-            </h3>
-            <p 
-              style={{
-                fontFamily: 'Poppins',
-                fontWeight: 400,
-                fontSize: '1rem',
-                color: '#999',
-                marginBottom: '2rem'
-              }}
-            >
-              Start adding items to your favorites by clicking the heart icon
-            </p>
-            <Button 
-              variant="dark" 
-              size="lg"
-              onClick={() => navigate('/')}
-              style={{
-                fontFamily: 'Poppins',
-                fontWeight: 600,
-                borderRadius: '20px',
-                padding: '0.75rem 2rem'
-              }}
-            >
-              Browse Products
-            </Button>
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </Container>
-      
+
       <Footer />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
+
+      <style>{`
+        .products-grid {
+          display: grid;
+          gap: 19px;
+          grid-template-columns: repeat(auto-fill, minmax(265.5px, 1fr));
+        }
+        
+        .product-card {
+          background: #fff;
+          border: 1px solid #eee;
+          cursor: pointer;
+        }
+        
+        .responsive-container {
+          padding-left: 100px;
+          padding-right: 100px;
+        }
+        
+        @media (max-width: 991px) {
+          .responsive-container {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+          
+          .product-image-container {
+            height: 180px !important;
+          }
+        }
+        
+        @media (max-width: 576px) {
+          .responsive-container {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+          }
+          
+          .product-image-container {
+            height: 160px !important;
+          }
+        }
+      `}</style>
     </div>
-    </>
   );
 };
 
