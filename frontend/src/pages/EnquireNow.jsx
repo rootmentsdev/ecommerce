@@ -310,12 +310,13 @@ const EnquireNow = () => {
 
   // Render methods
   const renderForm = () => (
-    <Container className="py-4">
+    <Container fluid className="py-5" style={{ maxWidth: '800px' }}>
       <Row className="justify-content-center">
-        <Col xs={12}>
-          <div className="text-center mb-4">
+        <Col xs={12} lg={10}>
+          {/* Header Section */}
+          <div className="text-center mb-5">
             <h1 
-              className="h3 fw-bold mb-2"
+              className="display-5 fw-bold mb-3"
               style={{
                 fontFamily: APP_CONFIG.FONTS.PRIMARY,
                 fontWeight: '700',
@@ -326,66 +327,65 @@ const EnquireNow = () => {
               {enquiryType === 'buy' ? 'Buy Enquiry' : enquiryType === 'mixed' ? 'Enquire Now' : 'Rent Enquiry'}
             </h1>
             {enquiryType === 'mixed' && (
-              <p className="text-muted" style={{ fontSize: '0.9rem' }}>
+              <p className="text-muted fs-6">
                 Your cart contains both rent and buy items
               </p>
             )}
+            <p className="text-muted mt-2">
+              Fill in your details and we'll get back to you soon
+            </p>
           </div>
 
           {/* Cart Items Summary - Show when coming from cart */}
           {fromCart && cartItems.length > 0 && (
-            <div className="mb-4 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '12px' }}>
-              <h6 className="fw-bold mb-3" style={{ fontSize: '0.9rem' }}>Items in your enquiry:</h6>
-              {cartItems.map((item, index) => (
-                <div key={item.id || index} className="d-flex align-items-center gap-3 mb-2 pb-2" style={{ borderBottom: index < cartItems.length - 1 ? '1px solid #e9ecef' : 'none' }}>
-                  <img 
-                    src={item.image} 
-                    alt={item.name}
-                    style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }}
-                  />
-                  <div className="flex-grow-1">
-                    <p className="mb-0 fw-medium" style={{ fontSize: '0.85rem' }}>{item.name}</p>
-                    <div className="d-flex align-items-center gap-2">
-                      <span 
-                        className="px-2 py-1 rounded" 
-                        style={{ 
-                          fontSize: '0.65rem', 
-                          backgroundColor: item.selectedType === 'rent' ? '#FFF3E0' : '#E8E8E8', 
-                          color: item.selectedType === 'rent' ? '#FF8C00' : '#333',
-                          fontWeight: 600
-                        }}
-                      >
-                        {item.selectedType === 'rent' ? 'RENT' : 'BUY'}
-                      </span>
-                      <span className="text-muted" style={{ fontSize: '0.75rem' }}>Qty: {item.quantity || 1}</span>
-                      <span className="fw-bold" style={{ fontSize: '0.85rem', color: item.selectedType === 'rent' ? '#FF8C00' : '#000' }}>
-                        ₹{((item.selectedType === 'rent' ? item.rentPrice : item.buyPrice) * (item.quantity || 1)).toLocaleString()}
-                        {item.selectedType === 'rent' && <span className="text-muted" style={{ fontSize: '0.7rem' }}>/day</span>}
-                      </span>
+            <div className="mb-5 p-4 border rounded-3 shadow-sm">
+              <h5 className="fw-bold mb-4">Items in your enquiry</h5>
+              <div className="d-flex flex-column gap-3">
+                {cartItems.map((item, index) => (
+                  <div key={item.id || index} className="d-flex align-items-center gap-3 pb-3" style={{ borderBottom: index < cartItems.length - 1 ? '1px solid #e9ecef' : 'none' }}>
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="rounded"
+                      style={{ width: '70px', height: '70px', objectFit: 'cover' }}
+                    />
+                    <div className="flex-grow-1">
+                      <h6 className="mb-1 fw-semibold">{item.name}</h6>
+                      <div className="d-flex align-items-center gap-2 flex-wrap">
+                        <span 
+                          className="badge px-2 py-1" 
+                          style={{ 
+                            fontSize: '0.7rem', 
+                            backgroundColor: item.selectedType === 'rent' ? '#FFF3E0' : '#E8E8E8', 
+                            color: item.selectedType === 'rent' ? '#FF8C00' : '#333',
+                            fontWeight: 600
+                          }}
+                        >
+                          {item.selectedType === 'rent' ? 'RENT' : 'BUY'}
+                        </span>
+                        <span className="text-muted small">Qty: {item.quantity || 1}</span>
+                        <span className="fw-bold" style={{ color: item.selectedType === 'rent' ? '#FF8C00' : '#000' }}>
+                          ₹{((item.selectedType === 'rent' ? item.rentPrice : item.buyPrice) * (item.quantity || 1)).toLocaleString()}
+                          {item.selectedType === 'rent' && <span className="text-muted small">/day</span>}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
 
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} className="bg-white p-4 p-lg-5 rounded-3 shadow-sm">
             {/* Full Name */}
             <div className="mb-4">
-              <Form.Label 
-                className="fw-medium mb-2"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  color: '#000'
-                }}
-              >
-                Full Name
+              <Form.Label className="fw-semibold mb-2">
+                Full Name <span className="text-danger">*</span>
               </Form.Label>
               <div className="position-relative">
                 <Envelope 
-                  size={16} 
-                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
+                  size={18} 
+                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"
                 />
                 <Form.Control
                   type="text"
@@ -393,39 +393,29 @@ const EnquireNow = () => {
                   value={formData.fullName}
                   onChange={handleInputChange}
                   placeholder="Enter your full name"
-                  className={`ps-5 ${errors.fullName ? 'is-invalid' : ''}`}
+                  className={`ps-5 py-3 ${errors.fullName ? 'is-invalid border-danger' : 'border-secondary'}`}
                   style={{
                     borderRadius: '8px',
-                    border: errors.fullName ? '1px solid #dc3545' : '1px solid #e9ecef',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    padding: '12px 16px'
+                    fontSize: '15px'
                   }}
                 />
               </div>
               {errors.fullName && (
-                <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                <Form.Text className="text-danger d-block mt-1">
                   {errors.fullName}
-                </div>
+                </Form.Text>
               )}
             </div>
 
             {/* Mobile Number */}
             <div className="mb-4">
-              <Form.Label 
-                className="fw-medium mb-2"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  color: '#000'
-                }}
-              >
-                Mobile Number
+              <Form.Label className="fw-semibold mb-2">
+                Mobile Number <span className="text-danger">*</span>
               </Form.Label>
               <div className="position-relative">
                 <Telephone 
-                  size={16} 
-                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
+                  size={18} 
+                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"
                 />
                 <Form.Control
                   type="tel"
@@ -433,39 +423,29 @@ const EnquireNow = () => {
                   value={formData.mobileNumber}
                   onChange={handleInputChange}
                   placeholder="Enter your phone number"
-                  className={`ps-5 ${errors.mobileNumber ? 'is-invalid' : ''}`}
+                  className={`ps-5 py-3 ${errors.mobileNumber ? 'is-invalid border-danger' : 'border-secondary'}`}
                   style={{
                     borderRadius: '8px',
-                    border: errors.mobileNumber ? '1px solid #dc3545' : '1px solid #e9ecef',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    padding: '12px 16px'
+                    fontSize: '15px'
                   }}
                 />
               </div>
               {errors.mobileNumber && (
-                <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                <Form.Text className="text-danger d-block mt-1">
                   {errors.mobileNumber}
-                </div>
+                </Form.Text>
               )}
             </div>
 
             {/* Email */}
             <div className="mb-4">
-              <Form.Label 
-                className="fw-medium mb-2"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  color: '#000'
-                }}
-              >
-                Email
+              <Form.Label className="fw-semibold mb-2">
+                Email <span className="text-danger">*</span>
               </Form.Label>
               <div className="position-relative">
                 <Envelope 
-                  size={16} 
-                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
+                  size={18} 
+                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"
                 />
                 <Form.Control
                   type="email"
@@ -473,36 +453,26 @@ const EnquireNow = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Enter your email address"
-                  className={`ps-5 ${errors.email ? 'is-invalid' : ''}`}
+                  className={`ps-5 py-3 ${errors.email ? 'is-invalid border-danger' : 'border-secondary'}`}
                   style={{
                     borderRadius: '8px',
-                    border: errors.email ? '1px solid #dc3545' : '1px solid #e9ecef',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    padding: '12px 16px'
+                    fontSize: '15px'
                   }}
                 />
               </div>
               {errors.email && (
-                <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                <Form.Text className="text-danger d-block mt-1">
                   {errors.email}
-                </div>
+                </Form.Text>
               )}
             </div>
 
              {/* Preferred Booking Date and City - Only show booking date for rent enquiries */}
              <Row className="mb-4 g-3">
                {showRentFields && (
-                 <Col xs={6}>
-                   <Form.Label 
-                     className="fw-medium mb-2"
-                     style={{
-                       fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                       fontSize: '14px',
-                       color: '#000'
-                     }}
-                   >
-                     Preferred Booking Date
+                 <Col xs={12} md={6}>
+                   <Form.Label className="fw-semibold mb-2">
+                     Preferred Booking Date <span className="text-danger">*</span>
                    </Form.Label>
                    <Form.Control
                      type="date"
@@ -510,55 +480,45 @@ const EnquireNow = () => {
                      value={formData.preferredBookingDate}
                      onChange={handleInputChange}
                      min={new Date().toISOString().split('T')[0]}
+                     className={`py-3 ${errors.preferredBookingDate ? 'is-invalid border-danger' : 'border-secondary'}`}
                      style={{
                        borderRadius: '8px',
-                       border: errors.preferredBookingDate ? '1px solid #dc3545' : '1px solid #e9ecef',
-                       fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                       fontSize: '14px',
-                       padding: '12px'
+                       fontSize: '15px'
                      }}
                    />
                    {errors.preferredBookingDate && (
-                     <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                     <Form.Text className="text-danger d-block mt-1">
                        {errors.preferredBookingDate}
-                     </div>
+                     </Form.Text>
                    )}
                  </Col>
                )}
-              <Col xs={showRentFields ? 6 : 12}>
-                <Form.Label 
-                  className="fw-medium mb-2"
-                  style={{
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    color: '#000'
-                  }}
-                >
-                  District
+              <Col xs={12} md={showRentFields ? 6 : 12}>
+                <Form.Label className="fw-semibold mb-2">
+                  District <span className="text-danger">*</span>
                 </Form.Label>
                 <Button
                   variant="outline-secondary"
-                  className="w-100 d-flex align-items-center justify-content-between p-3"
+                  className="w-100 d-flex align-items-center justify-content-between py-3"
                   onClick={() => setShowCityModal(true)}
                   style={{
                     borderRadius: '8px',
-                    border: errors.city ? '1px solid #dc3545' : '1px solid #e9ecef',
+                    border: errors.city ? '2px solid #dc3545' : '1px solid #6c757d',
                     backgroundColor: '#fff',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
+                    fontSize: '15px',
                     color: formData.city ? '#000' : '#6c757d'
                   }}
                 >
                   <div className="d-flex align-items-center">
-                    <GeoAlt size={16} className="text-muted me-2" />
+                    <GeoAlt size={18} className="text-secondary me-2" />
                     <span>{formData.city || 'Select District'}</span>
                   </div>
-                  <ChevronDown size={16} className="text-muted" />
+                  <ChevronDown size={16} className="text-secondary" />
                 </Button>
                 {errors.city && (
-                  <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                  <Form.Text className="text-danger d-block mt-1">
                     {errors.city}
-                  </div>
+                  </Form.Text>
                 )}
               </Col>
             </Row>
@@ -566,16 +526,9 @@ const EnquireNow = () => {
             {/* Pickup and Return Dates - Only show for rent enquiries */}
             {showRentFields && (
               <Row className="mb-4 g-3">
-                <Col xs={6}>
-                  <Form.Label 
-                    className="fw-medium mb-2"
-                    style={{
-                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                      fontSize: '14px',
-                      color: '#000'
-                    }}
-                  >
-                    Pickup Date
+                <Col xs={12} md={6}>
+                  <Form.Label className="fw-semibold mb-2">
+                    Pickup Date <span className="text-danger">*</span>
                   </Form.Label>
                   <Form.Control
                     type="date"
@@ -583,29 +536,20 @@ const EnquireNow = () => {
                     value={formData.pickupDate}
                     onChange={handlePickupDateChange}
                     min={new Date().toISOString().split('T')[0]}
+                    className={`py-3 ${errors.pickupDate ? 'is-invalid border-danger' : 'border-secondary'}`}
                     style={{
                       borderRadius: '8px',
-                      border: errors.pickupDate ? '1px solid #dc3545' : '1px solid #e9ecef',
-                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                      fontSize: '14px',
-                      padding: '12px'
+                      fontSize: '15px'
                     }}
                   />
                   {errors.pickupDate && (
-                    <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                    <Form.Text className="text-danger d-block mt-1">
                       {errors.pickupDate}
-                    </div>
+                    </Form.Text>
                   )}
                 </Col>
-                <Col xs={6}>
-                  <Form.Label 
-                    className="fw-medium mb-2"
-                    style={{
-                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                      fontSize: '14px',
-                      color: '#000'
-                    }}
-                  >
+                <Col xs={12} md={6}>
+                  <Form.Label className="fw-semibold mb-2">
                     Return Date
                   </Form.Label>
                   <Form.Control
@@ -613,19 +557,16 @@ const EnquireNow = () => {
                     name="returnDate"
                     value={formData.returnDate}
                     readOnly
+                    className="py-3 border-secondary bg-light"
                     style={{
                       borderRadius: '8px',
-                      border: '1px solid #e9ecef',
-                      fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                      fontSize: '14px',
-                      padding: '12px',
-                      backgroundColor: '#f8f9fa',
+                      fontSize: '15px',
                       color: '#6c757d'
                     }}
                   />
-                  <small className="text-muted" style={{ fontSize: '11px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                  <Form.Text className="text-muted d-block mt-1">
                     Automatically set to 5 days after pickup
-                  </small>
+                  </Form.Text>
                 </Col>
               </Row>
             )}
@@ -633,15 +574,8 @@ const EnquireNow = () => {
             {/* Selected Size - Only show when not from cart */}
             {!fromCart && (
               <div className="mb-4">
-                <Form.Label 
-                  className="fw-medium mb-2"
-                  style={{
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '14px',
-                    color: '#000'
-                  }}
-                >
-                  Selected Size
+                <Form.Label className="fw-semibold mb-3">
+                  Select Size
                 </Form.Label>
                 <div className="d-flex gap-2 flex-wrap">
                   {(product.sizes || ['S', 'M', 'L', 'XL', 'XXL']).map((size) => (
@@ -650,13 +584,12 @@ const EnquireNow = () => {
                       type="button"
                       variant={formData.selectedSize === size ? 'dark' : 'outline-dark'}
                       onClick={() => setFormData(prev => ({ ...prev, selectedSize: size }))}
+                      className="px-4 py-2"
                       style={{
-                        minWidth: '50px',
-                        height: '50px',
+                        minWidth: '60px',
                         borderRadius: '8px',
                         fontWeight: '600',
-                        fontSize: '14px',
-                        fontFamily: APP_CONFIG.FONTS.SECONDARY
+                        fontSize: '15px'
                       }}
                     >
                       {size}
@@ -664,102 +597,84 @@ const EnquireNow = () => {
                   ))}
                 </div>
                 {errors.selectedSize && (
-                  <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                  <Form.Text className="text-danger d-block mt-2">
                     {errors.selectedSize}
-                  </div>
+                  </Form.Text>
                 )}
               </div>
             )}
 
             {/* Special Notes */}
             <div className="mb-4">
-              <Form.Label 
-                className="fw-medium mb-2"
-                style={{
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  color: '#000'
-                }}
-              >
-                Special Notes
+              <Form.Label className="fw-semibold mb-2">
+                Special Notes <span className="text-muted fw-normal">(Optional)</span>
               </Form.Label>
               <Form.Control
                 as="textarea"
                 name="specialNotes"
                 value={formData.specialNotes}
                 onChange={handleInputChange}
-                placeholder="Type something..."
+                placeholder="Any special requirements or notes..."
                 rows={4}
-                className={errors.specialNotes ? 'is-invalid' : ''}
+                className={`py-3 ${errors.specialNotes ? 'is-invalid border-danger' : 'border-secondary'}`}
                 style={{
                   borderRadius: '8px',
-                  border: errors.specialNotes ? '1px solid #dc3545' : '1px solid #e9ecef',
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  padding: '12px 16px',
+                  fontSize: '15px',
                   resize: 'none'
                 }}
               />
               {errors.specialNotes && (
-                <div className="text-danger mt-1" style={{ fontSize: '12px', fontFamily: APP_CONFIG.FONTS.SECONDARY }}>
+                <Form.Text className="text-danger d-block mt-1">
                   {errors.specialNotes}
-                </div>
+                </Form.Text>
               )}
             </div>
 
             {/* Action Buttons */}
-            <Row className="g-3">
-              <Col xs={6}>
-                <Button
-                  type="button"
-                  variant="outline-secondary"
-                  className="w-100"
-                  onClick={handleCancel}
-                  style={{
-                    borderRadius: '8px',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    padding: '12px',
-                    border: '1px solid #000',
-                    color: '#000',
-                    backgroundColor: '#fff'
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Col>
-              <Col xs={6}>
-                <Button
-                  type="submit"
-                  variant="dark"
-                  className="w-100"
-                  disabled={isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (showRentFields && (!formData.preferredBookingDate || !formData.pickupDate))}
-                  style={{
-                    borderRadius: '8px',
-                    fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    padding: '12px',
-                    backgroundColor: '#000',
-                    border: 'none',
-                    opacity: (isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (showRentFields && (!formData.preferredBookingDate || !formData.pickupDate))) ? 0.6 : 1
-                  }}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
-                </Button>
-              </Col>
-            </Row>
+            <div className="d-grid gap-3 mt-5">
+              <Button
+                type="submit"
+                variant="dark"
+                size="lg"
+                disabled={isSubmitting || !formData.fullName || !formData.mobileNumber || !formData.email || !formData.city || (showRentFields && (!formData.preferredBookingDate || !formData.pickupDate))}
+                className="py-3 fw-semibold"
+                style={{
+                  borderRadius: '8px',
+                  fontSize: '16px'
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Enquiry'
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline-secondary"
+                size="lg"
+                onClick={handleCancel}
+                className="py-3 fw-semibold"
+                style={{
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  border: '2px solid #6c757d'
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
 
             {/* Success/Error Message */}
             {submitMessage.text && (
               <Alert 
                 variant={submitMessage.type} 
-                className="mt-3 mb-0"
+                className="mt-4 mb-0 rounded-3"
                 style={{
-                  borderRadius: '8px',
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px'
+                  fontSize: '15px'
                 }}
               >
                 {submitMessage.text}
@@ -784,30 +699,24 @@ const EnquireNow = () => {
       />
       
       {/* City Selection Modal */}
-      <Modal show={showCityModal} onHide={() => setShowCityModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title 
-            style={{
-              fontFamily: APP_CONFIG.FONTS.PRIMARY,
-              fontWeight: '600'
-            }}
-          >
+      <Modal show={showCityModal} onHide={() => setShowCityModal(false)} centered size="md">
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="fw-bold">
             Select District
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="pt-3">
           <div className="d-grid gap-2">
             {cities.map((city) => (
               <Button
                 key={city}
                 variant={formData.city === city ? 'dark' : 'outline-secondary'}
-                className="text-start"
+                className="text-start py-3"
                 onClick={() => handleCitySelect(city)}
                 style={{
                   borderRadius: '8px',
-                  fontFamily: APP_CONFIG.FONTS.SECONDARY,
-                  fontSize: '14px',
-                  padding: '12px 16px'
+                  fontSize: '15px',
+                  fontWeight: formData.city === city ? '600' : '400'
                 }}
               >
                 {city}
