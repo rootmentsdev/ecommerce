@@ -3,6 +3,7 @@ import { Navbar, Nav, Form, InputGroup, Container, Button, Dropdown, Offcanvas, 
 import { Heart, Bag, Person, Search, List, X, Plus, Dash } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import FavoritesService from '../services/favoritesService';
+import LogoImage from '../assets/Logo.png';
 
 const Header = ({ onMenuClick }) => {
   const navigate = useNavigate();
@@ -141,7 +142,9 @@ const Header = ({ onMenuClick }) => {
             <Button variant="link" className="p-0 text-dark" onClick={onMenuClick}>
               <List size={24} />
             </Button>
-            <Navbar.Brand href="/" className="fw-bold fs-5 mx-auto">Logo</Navbar.Brand>
+            <Navbar.Brand href="/" className="mx-auto">
+              <Image src={LogoImage} alt="Dappr Squad Logo" style={{ height: '40px', width: 'auto' }} />
+            </Navbar.Brand>
             <div className="d-flex gap-3">
               <Button variant="link" className="p-0 text-dark">
                 <Search size={20} />
@@ -164,7 +167,9 @@ const Header = ({ onMenuClick }) => {
           {/* Desktop Layout */}
           <div className="d-none d-lg-flex w-100 align-items-center">
             {/* Logo */}
-            <Navbar.Brand href="/" className="fw-bold fs-4 me-5">Logo</Navbar.Brand>
+            <Navbar.Brand href="/" className="me-5">
+              <Image src={LogoImage} alt="Dappr Squad Logo" style={{ height: '50px', width: 'auto' }} />
+            </Navbar.Brand>
 
             {/* Navigation Links */}
             <Nav className="me-auto">

@@ -388,58 +388,47 @@ const HomePageContent = () => {
           </div>
         </Container>
 
-        {/* Tablet - 768px to 1023px */}
-        <Container fluid className="d-none d-md-block d-lg-none bg-white py-5">
-          <div className="mx-auto" style={{ paddingLeft: '40px', paddingRight: '40px' }}>
+        {/* Tablet - 768px to 1023px - Same as Mobile with horizontal scroll */}
+        <Container fluid className="d-none d-md-block d-lg-none bg-white py-4">
+          <Container className="px-2">
             <div className="mb-4">
-              <h2 className="fw-bold text-uppercase mb-2" style={{ fontSize: '2rem', letterSpacing: '1px' }}>
+              <h3 className="fw-bold text-uppercase mb-2" style={{ fontSize: '1.5rem', letterSpacing: '0.5px' }}>
                 Trending This Season
-              </h2>
-              <div style={{ width: '60px', height: '3px', backgroundColor: '#000', marginTop: '10px' }}></div>
+              </h3>
+              <div style={{ width: '50px', height: '3px', backgroundColor: '#000', marginTop: '8px' }}></div>
             </div>
-            <Row className="g-3">
+            <div className="d-flex gap-3 overflow-auto pb-3">
               {trendingProducts.map((product) => (
-                <Col key={product.id} md={6}>
-                  <div className="cursor-pointer h-100 d-flex flex-column" onClick={() => handleProductClick(product)}>
-                    <div className="position-relative bg-light" style={{ aspectRatio: '1/1' }}>
-                      <Image src={product.image} alt={product.title} className="w-100 h-100" style={{ objectFit: 'cover' }} />
-                      <span className={`position-absolute top-0 start-0 m-2 badge ${product.badge === 'NEW' ? 'bg-success' : 'bg-warning'} text-white`}>
-                        {product.badge}
-                      </span>
-                      <span className="position-absolute bottom-0 start-0 m-2 badge bg-secondary">{product.discount}</span>
-                    </div>
-                    <div className="py-3 d-flex flex-column flex-grow-1">
-                      <p className="text-muted small mb-1">{product.category}</p>
-                      <h6 className="fw-bold mb-2" style={{ minHeight: '48px' }}>{product.title}</h6>
-                      <div className="d-flex align-items-center gap-2 mb-2">
-                        <span className="text-warning">★</span>
-                        <span className="fw-bold small">{product.rating}</span>
-                        <span className="text-muted">|</span>
-                        <span className="text-primary small">({product.reviews} Reviews)</span>
-                      </div>
-                      <div className="mb-3">
-                        <div className="d-flex align-items-center gap-2 mb-1">
-                          <span className="text-muted small">Buy:</span>
-                          <span className="fw-bold">₹{product.buyPrice}</span>
-                          <span className="text-muted text-decoration-line-through small">₹{product.originalPrice}</span>
-                        </div>
-                        <div className="d-flex align-items-center gap-2">
-                          <span className="text-muted small">Rent:</span>
-                          <span className="fw-bold text-warning">₹{product.rentPrice}</span>
-                        </div>
-                      </div>
-                      <Button variant="dark" className="w-100 rounded-0 fw-bold mt-auto" size="sm">ADD TO CART</Button>
-                    </div>
+                <div key={product.id} style={{ minWidth: '280px' }} onClick={() => handleProductClick(product)}>
+                  <div className="position-relative bg-light" style={{ aspectRatio: '1/1' }}>
+                    <Image src={product.image} alt={product.title} className="w-100 h-100" style={{ objectFit: 'cover' }} />
+                    <span className={`position-absolute top-0 start-0 m-2 badge ${product.badge === 'NEW' ? 'bg-success' : 'bg-warning'}`}>
+                      {product.badge}
+                    </span>
+                    <span className="position-absolute bottom-0 start-0 m-2 badge bg-secondary">{product.discount}</span>
                   </div>
-                </Col>
+                  <div className="py-3">
+                    <p className="text-muted small mb-1">{product.category}</p>
+                    <h6 className="fw-bold mb-2">{product.title}</h6>
+                    <div className="d-flex align-items-center gap-2 mb-2">
+                      <span className="text-warning">★</span>
+                      <span className="fw-bold small">{product.rating}</span>
+                      <span className="text-muted">|</span>
+                      <span className="text-primary small">({product.reviews})</span>
+                    </div>
+                    <div className="mb-2">
+                      <div className="small mb-1">Buy: <span className="fw-bold">₹{product.buyPrice}</span></div>
+                      <div className="small">Rent: <span className="fw-bold text-warning">₹{product.rentPrice}</span></div>
+                    </div>
+                    <Button variant="dark" size="sm" className="w-100 rounded-0">ADD TO CART</Button>
+                  </div>
+                </div>
               ))}
-            </Row>
-            <div className="text-center mt-4">
-              <Button variant="outline-dark" className="rounded-0 px-5" onClick={() => navigate('/products')}>
-                VIEW ALL
-              </Button>
             </div>
-          </div>
+            <Button variant="outline-dark" className="w-100 rounded-0 mt-3" size="sm" onClick={() => navigate('/products')}>
+              VIEW ALL
+            </Button>
+          </Container>
         </Container>
 
         {/* Mobile - below 768px */}

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { Image } from 'react-bootstrap';
+import FooterLogo from '../assets/Footer.png';
 
 const Footer = () => {
   const quickLinks = [
@@ -35,26 +37,17 @@ const Footer = () => {
         }}>
           {/* Brand Column */}
           <div style={{ flex: '0 0 280px', maxWidth: '300px' }}>
-            <h3 style={{ 
-              fontFamily: 'Bricolage Grotesque, sans-serif', 
-              fontWeight: 400, 
-              fontSize: '28px', 
-              color: '#fff', 
-              marginBottom: '4px',
-              letterSpacing: '-0.5px'
-            }}>
-              dappr
-            </h3>
-            <p style={{ 
-              fontFamily: 'Bricolage Grotesque, sans-serif', 
-              fontWeight: 600, 
-              fontSize: '14px', 
-              color: '#fff', 
-              marginBottom: '20px',
-              letterSpacing: '2px'
-            }}>
-              SQUAD
-            </p>
+            <Link to="/" style={{ textDecoration: 'none', display: 'inline-block', marginBottom: '20px' }}>
+              <Image 
+                src={FooterLogo} 
+                alt="Dappr Squad Logo" 
+                style={{ 
+                  height: '100px', 
+                  width: 'auto',
+                  maxWidth: '300px'
+                }} 
+              />
+            </Link>
             <p style={{ 
               fontFamily: 'Bricolage Grotesque, sans-serif', 
               fontSize: '13px', 

@@ -27,6 +27,8 @@ import RentProducts from './pages/RentProducts';
 import CityLandingPage from './pages/CityLandingPage';
 import AllProductsPage from './pages/AllProductsPage';
 import CartPage from './pages/CartPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import RentalTerms from './pages/RentalTerms';
 import './App.css';
 import './fonts.css';
 
@@ -115,6 +117,16 @@ function App() {
               <Route path="/about" element={
                 <PageTransition>
                   <AboutUs />
+                </PageTransition>
+              } />
+              <Route path="/privacy" element={
+                <PageTransition>
+                  <PrivacyPolicy />
+                </PageTransition>
+              } />
+              <Route path="/rental-terms" element={
+                <PageTransition>
+                  <RentalTerms />
                 </PageTransition>
               } />
               <Route path="/favorites" element={
