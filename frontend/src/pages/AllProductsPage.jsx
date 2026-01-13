@@ -58,21 +58,27 @@ const AllProductsPage = () => {
     // Read from localStorage directly to get the most current cart state
     const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
     const productId = selectedProduct.id || selectedProduct._id;
+    
+    // Check if the same product with the same selectedType already exists
     const existingItemIndex = currentCart.findIndex(item => {
       const itemId = item.id || item._id;
-      return itemId === productId;
+      const itemType = item.selectedType || 'buy';
+      const newType = selectedType || 'buy';
+      return itemId === productId && itemType === newType;
     });
     
     if (existingItemIndex >= 0) {
+      // If same product with same type exists, increase quantity (keep original selectedType)
       const newCartItems = [...currentCart];
       newCartItems[existingItemIndex] = {
         ...newCartItems[existingItemIndex],
-        quantity: (newCartItems[existingItemIndex].quantity || 1) + 1,
-        selectedType: selectedType
+        quantity: (newCartItems[existingItemIndex].quantity || 1) + 1
+        // Don't update selectedType - keep the original one
       };
       setCartItems(newCartItems);
       localStorage.setItem('cart', JSON.stringify(newCartItems));
     } else {
+      // If product doesn't exist or exists with different selectedType, add as new item
       const productWithQuantity = { ...selectedProduct, quantity: 1, selectedType: selectedType };
       const newCartItems = [...currentCart, productWithQuantity];
       setCartItems(newCartItems);

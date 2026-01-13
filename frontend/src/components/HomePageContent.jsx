@@ -140,7 +140,87 @@ const HomePageContent = () => {
     const categorySlug = category.category.toLowerCase();
     navigate(`/category/${categorySlug}`);
   };
-  const handleProductClick = (product) => navigate('/product-details', { state: { product } });
+  const handleProductClick = (product) => {
+    // Convert price strings to numbers and prepare product data
+    const parsePrice = (priceStr) => {
+      if (typeof priceStr === 'number') return priceStr;
+      if (typeof priceStr === 'string') {
+        return parseInt(priceStr.replace(/,/g, '')) || 0;
+      }
+      return 0;
+    };
+
+    const productData = {
+      id: product.id,
+      name: product.title || product.name,
+      image: product.image,
+      category: product.category,
+      buyPrice: parsePrice(product.buyPrice),
+      rentPrice: parsePrice(product.rentPrice),
+      originalPrice: parsePrice(product.originalPrice),
+      rating: product.rating,
+      reviews: product.reviews,
+      badge: product.badge,
+      discount: product.discount
+    };
+
+    navigate('/product-details', { state: { product: productData } });
+  };
+
+  // Add to cart handler for trending products
+  const handleAddToCart = (e, product, type = 'buy') => {
+    e.stopPropagation();
+    
+    // Convert price strings to numbers (remove commas and convert)
+    const parsePrice = (priceStr) => {
+      if (typeof priceStr === 'number') return priceStr;
+      if (typeof priceStr === 'string') {
+        return parseInt(priceStr.replace(/,/g, '')) || 0;
+      }
+      return 0;
+    };
+
+    // Prepare product data with proper price fields
+    const productData = {
+      id: product.id,
+      name: product.title,
+      image: product.image,
+      category: product.category,
+      buyPrice: parsePrice(product.buyPrice),
+      rentPrice: parsePrice(product.rentPrice),
+      originalPrice: parsePrice(product.originalPrice),
+      selectedType: type
+    };
+
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const productId = productData.id;
+    
+    // Check if the same product with the same selectedType already exists
+    const existingItemIndex = currentCart.findIndex(item => {
+      const itemId = item.id || item._id;
+      const itemType = item.selectedType || 'buy';
+      const newType = type || 'buy';
+      return itemId === productId && itemType === newType;
+    });
+    
+    if (existingItemIndex >= 0) {
+      // If same product with same type exists, increase quantity
+      const newCartItems = [...currentCart];
+      newCartItems[existingItemIndex] = {
+        ...newCartItems[existingItemIndex],
+        quantity: (newCartItems[existingItemIndex].quantity || 1) + 1
+      };
+      localStorage.setItem('cart', JSON.stringify(newCartItems));
+    } else {
+      // If product doesn't exist or exists with different selectedType, add as new item
+      const productWithQuantity = { ...productData, quantity: 1, selectedType: type };
+      const newCartItems = [...currentCart, productWithQuantity];
+      localStorage.setItem('cart', JSON.stringify(newCartItems));
+    }
+    
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
 
   // Newsletter handler
   const handleNewsletterSubmit = async (e) => {
@@ -374,7 +454,13 @@ const HomePageContent = () => {
                           <span className="fw-bold text-warning">₹{product.rentPrice}</span>
                         </div>
                       </div>
-                      <Button variant="dark" className="w-100 rounded-0 fw-bold mt-auto">ADD TO CART</Button>
+                      <Button 
+                        variant="dark" 
+                        className="w-100 rounded-0 fw-bold mt-auto"
+                        onClick={(e) => handleAddToCart(e, product, 'buy')}
+                      >
+                        ADD TO CART
+                      </Button>
                     </div>
                   </div>
                 </Col>
@@ -399,8 +485,8 @@ const HomePageContent = () => {
             </div>
             <div className="d-flex gap-3 overflow-auto pb-3">
               {trendingProducts.map((product) => (
-                <div key={product.id} style={{ minWidth: '280px' }} onClick={() => handleProductClick(product)}>
-                  <div className="position-relative bg-light" style={{ aspectRatio: '1/1' }}>
+                <div key={product.id} style={{ minWidth: '280px' }}>
+                  <div className="position-relative bg-light" style={{ aspectRatio: '1/1', cursor: 'pointer' }} onClick={() => handleProductClick(product)}>
                     <Image src={product.image} alt={product.title} className="w-100 h-100" style={{ objectFit: 'cover' }} />
                     <span className={`position-absolute top-0 start-0 m-2 badge ${product.badge === 'NEW' ? 'bg-success' : 'bg-warning'}`}>
                       {product.badge}
@@ -409,7 +495,7 @@ const HomePageContent = () => {
                   </div>
                   <div className="py-3">
                     <p className="text-muted small mb-1">{product.category}</p>
-                    <h6 className="fw-bold mb-2">{product.title}</h6>
+                    <h6 className="fw-bold mb-2" onClick={() => handleProductClick(product)} style={{ cursor: 'pointer' }}>{product.title}</h6>
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <span className="text-warning">★</span>
                       <span className="fw-bold small">{product.rating}</span>
@@ -420,7 +506,14 @@ const HomePageContent = () => {
                       <div className="small mb-1">Buy: <span className="fw-bold">₹{product.buyPrice}</span></div>
                       <div className="small">Rent: <span className="fw-bold text-warning">₹{product.rentPrice}</span></div>
                     </div>
-                    <Button variant="dark" size="sm" className="w-100 rounded-0">ADD TO CART</Button>
+                    <Button 
+                      variant="dark" 
+                      size="sm" 
+                      className="w-100 rounded-0"
+                      onClick={(e) => handleAddToCart(e, product, 'buy')}
+                    >
+                      ADD TO CART
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -442,8 +535,8 @@ const HomePageContent = () => {
             </div>
             <div className="d-flex gap-3 overflow-auto pb-3">
               {trendingProducts.map((product) => (
-                <div key={product.id} style={{ minWidth: '280px' }} onClick={() => handleProductClick(product)}>
-                  <div className="position-relative bg-light" style={{ aspectRatio: '1/1' }}>
+                <div key={product.id} style={{ minWidth: '280px' }}>
+                  <div className="position-relative bg-light" style={{ aspectRatio: '1/1', cursor: 'pointer' }} onClick={() => handleProductClick(product)}>
                     <Image src={product.image} alt={product.title} className="w-100 h-100" style={{ objectFit: 'cover' }} />
                     <span className={`position-absolute top-0 start-0 m-2 badge ${product.badge === 'NEW' ? 'bg-success' : 'bg-warning'}`}>
                       {product.badge}
@@ -452,7 +545,7 @@ const HomePageContent = () => {
                   </div>
                   <div className="py-3">
                     <p className="text-muted small mb-1">{product.category}</p>
-                    <h6 className="fw-bold mb-2">{product.title}</h6>
+                    <h6 className="fw-bold mb-2" onClick={() => handleProductClick(product)} style={{ cursor: 'pointer' }}>{product.title}</h6>
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <span className="text-warning">★</span>
                       <span className="fw-bold small">{product.rating}</span>
@@ -463,7 +556,14 @@ const HomePageContent = () => {
                       <div className="small mb-1">Buy: <span className="fw-bold">₹{product.buyPrice}</span></div>
                       <div className="small">Rent: <span className="fw-bold text-warning">₹{product.rentPrice}</span></div>
                     </div>
-                    <Button variant="dark" size="sm" className="w-100 rounded-0">ADD TO CART</Button>
+                    <Button 
+                      variant="dark" 
+                      size="sm" 
+                      className="w-100 rounded-0"
+                      onClick={(e) => handleAddToCart(e, product, 'buy')}
+                    >
+                      ADD TO CART
+                    </Button>
                   </div>
                 </div>
               ))}

@@ -39,13 +39,24 @@ const ProductDetails = () => {
 
   const enquiryType = location.state?.enquiryType || 'rent';
 
+  // Helper function to parse price (handles strings with commas)
+  const parsePrice = (price) => {
+    if (typeof price === 'number') return price;
+    if (typeof price === 'string') {
+      // Remove commas and convert to number
+      const cleaned = price.replace(/,/g, '').trim();
+      return parseInt(cleaned) || 0;
+    }
+    return 0;
+  };
+
   const product = {
-    id: productData.id || '507f1f77bcf86cd799439021',
-    name: productData.name || 'Premium Black Tuxedo - Italian Fit',
-    buyPrice: productData.buyPrice || productData.price || 8000,
-    rentPrice: productData.rentPrice || productData.rentalPrice || 1200,
-    originalPrice: productData.originalPrice || productData.actualPrice || 13000,
-    securityDeposit: productData.securityDeposit || 5000,
+    id: productData.id || productData._id || '507f1f77bcf86cd799439021',
+    name: productData.name || productData.title || 'Premium Black Tuxedo - Italian Fit',
+    buyPrice: parsePrice(productData.buyPrice || productData.price || 8000),
+    rentPrice: parsePrice(productData.rentPrice || productData.rentalPrice || 1200),
+    originalPrice: parsePrice(productData.originalPrice || productData.actualPrice || 13000),
+    securityDeposit: parsePrice(productData.securityDeposit || 5000),
     image: productData.image || demo1,
     category: productData.category || 'Premium Suits',
     occasion: productData.occasion || 'Formal',
@@ -122,18 +133,43 @@ const ProductDetails = () => {
     // Read from localStorage directly to get the most current cart state
     const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
     const productId = product.id || product._id;
+    
+    // Check if the same product with the same selectedType already exists
     const existingItemIndex = currentCart.findIndex(item => {
       const itemId = item.id || item._id;
-      return itemId === productId;
+      const itemType = item.selectedType || 'buy';
+      const newType = selectedType || 'buy';
+      return itemId === productId && itemType === newType;
     });
+    
     let newCartItems;
     
     if (existingItemIndex >= 0) {
+      // If same product with same type exists, increase quantity (keep original selectedType)
       newCartItems = [...currentCart];
       newCartItems[existingItemIndex].quantity = (newCartItems[existingItemIndex].quantity || 1) + 1;
+      // Don't update selectedType - keep the original one
     } else {
-      newCartItems = [...currentCart, { ...product, quantity: 1, selectedSize, selectedType }];
+      // If product doesn't exist or exists with different selectedType, add as new item
+      // Ensure all price fields are numbers
+      const cartProduct = {
+        ...product,
+        quantity: 1,
+        selectedSize,
+        selectedType,
+        buyPrice: typeof product.buyPrice === 'number' ? product.buyPrice : parsePrice(product.buyPrice),
+        rentPrice: typeof product.rentPrice === 'number' ? product.rentPrice : parsePrice(product.rentPrice),
+        originalPrice: typeof product.originalPrice === 'number' ? product.originalPrice : parsePrice(product.originalPrice)
+      };
+      newCartItems = [...currentCart, cartProduct];
     }
+    
+    console.log('🔍 ProductDetails - Adding to cart:', {
+      product: product,
+      selectedType: selectedType,
+      buyPrice: product.buyPrice,
+      rentPrice: product.rentPrice
+    });
     
     setCartItems(newCartItems);
     localStorage.setItem('cart', JSON.stringify(newCartItems));

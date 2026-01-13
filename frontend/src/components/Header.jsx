@@ -198,29 +198,39 @@ const Header = ({ onMenuClick }) => {
     setShowCart(true);
   };
 
-  const handleRemoveFromCart = (productId) => {
+  const handleRemoveFromCart = (productId, selectedType) => {
     // Read from localStorage directly to get the most current cart state
     const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
     const updatedCart = currentCart.filter(item => {
       const itemId = item.id || item._id;
-      return itemId !== productId;
+      const itemType = item.selectedType || 'buy';
+      const targetType = selectedType || 'buy';
+      // Remove only if both ID and selectedType match
+      return !(itemId === productId && itemType === targetType);
     });
     setCartItems(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     window.dispatchEvent(new Event('cartUpdated'));
   };
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = (productId, newQuantity, selectedType) => {
     if (newQuantity <= 0) {
-      handleRemoveFromCart(productId);
+      handleRemoveFromCart(productId, selectedType);
       return;
     }
     
-    const updatedCart = cartItems.map(item => 
-      item.id === productId 
-        ? { ...item, quantity: newQuantity }
-        : item
-    );
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const updatedCart = currentCart.map(item => {
+      const itemId = item.id || item._id;
+      const itemType = item.selectedType || 'buy';
+      const targetType = selectedType || 'buy';
+      // Update only if both ID and selectedType match
+      if (itemId === productId && itemType === targetType) {
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    });
     
     setCartItems(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
@@ -585,14 +595,25 @@ const Header = ({ onMenuClick }) => {
               {/* Cart Items */}
               <div className="flex-grow-1" style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                 {cartItems.map((item) => (
-                  <div key={item.id} className="d-flex align-items-center p-3 border-bottom">
+                  <div key={`${item.id}-${item.selectedType || 'buy'}`} className="d-flex align-items-center p-3 border-bottom">
                     <Image 
                       src={item.image} 
                       alt={item.name}
-                      style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                      style={{ width: '60px', height: '60px', objectFit: 'cover', cursor: 'pointer' }}
                       className="me-3"
+                      onClick={() => {
+                        setShowCart(false);
+                        navigate('/product-details', { state: { product: item } });
+                      }}
                     />
-                    <div className="flex-grow-1">
+                    <div 
+                      className="flex-grow-1"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        setShowCart(false);
+                        navigate('/product-details', { state: { product: item } });
+                      }}
+                    >
                       <h6 className="mb-1" style={{ fontSize: '0.85rem' }}>{item.name}</h6>
                       <p className="text-muted mb-1" style={{ fontSize: '0.75rem' }}>{item.category}</p>
                       <div className="d-flex align-items-center justify-content-between">
@@ -641,7 +662,7 @@ const Header = ({ onMenuClick }) => {
                             variant="link" 
                             className="p-1 text-dark border-0"
                             style={{ minWidth: '30px', fontSize: '0.8rem' }}
-                            onClick={() => handleQuantityChange(item.id, (item.quantity || 1) - 1)}
+                            onClick={() => handleQuantityChange(item.id, (item.quantity || 1) - 1, item.selectedType)}
                           >
                             <Dash size={14} />
                           </Button>
@@ -652,7 +673,7 @@ const Header = ({ onMenuClick }) => {
                             variant="link" 
                             className="p-1 text-dark border-0"
                             style={{ minWidth: '30px', fontSize: '0.8rem' }}
-                            onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1)}
+                            onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1, item.selectedType)}
                           >
                             <Plus size={14} />
                           </Button>
@@ -662,7 +683,7 @@ const Header = ({ onMenuClick }) => {
                     <Button 
                       variant="link" 
                       className="p-1 text-muted ms-2"
-                      onClick={() => handleRemoveFromCart(item.id)}
+                      onClick={() => handleRemoveFromCart(item.id, item.selectedType)}
                     >
                       <X size={16} />
                     </Button>

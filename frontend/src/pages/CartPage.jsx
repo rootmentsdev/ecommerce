@@ -17,28 +17,33 @@ const CartPage = () => {
     const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCartItems(savedCart);
     
-    // Initialize quantities
+    // Initialize quantities with unique keys (productId + selectedType)
     const initialQuantities = {};
     savedCart.forEach(item => {
-      initialQuantities[item.id] = 1;
+      const uniqueKey = `${item.id || item._id}_${item.selectedType || 'buy'}`;
+      initialQuantities[uniqueKey] = item.quantity || 1;
     });
     setQuantities(initialQuantities);
   }, []);
 
   // Remove item from cart
-  const handleRemoveItem = (productId) => {
+  const handleRemoveItem = (productId, selectedType) => {
     // Read from localStorage directly to get the most current cart state
     const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
     const updatedCart = currentCart.filter(item => {
       const itemId = item.id || item._id;
-      return itemId !== productId;
+      const itemType = item.selectedType || 'buy';
+      const targetType = selectedType || 'buy';
+      // Remove only if both ID and selectedType match
+      return !(itemId === productId && itemType === targetType);
     });
     setCartItems(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     
-    // Remove quantity
+    // Remove quantity using unique key (productId + selectedType)
+    const uniqueKey = `${productId}_${selectedType || 'buy'}`;
     const updatedQuantities = { ...quantities };
-    delete updatedQuantities[productId];
+    delete updatedQuantities[uniqueKey];
     setQuantities(updatedQuantities);
     
     // Dispatch event to update header cart count
@@ -56,8 +61,10 @@ const CartPage = () => {
   // Calculate totals
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
-      const quantity = quantities[item.id] || 1;
-      return total + (item.buyPrice * quantity);
+      const uniqueKey = `${item.id || item._id}_${item.selectedType || 'buy'}`;
+      const quantity = quantities[uniqueKey] || item.quantity || 1;
+      const price = item.selectedType === 'rent' ? item.rentPrice : item.buyPrice;
+      return total + (price * quantity);
     }, 0);
   };
 
@@ -96,8 +103,10 @@ const CartPage = () => {
             <Row>
               {/* Cart Items */}
               <Col lg={8} className="mb-4">
-                {cartItems.map((item) => (
-                  <Card key={item.id} className="mb-3 rounded-0 border shadow-sm">
+                {cartItems.map((item) => {
+                  const uniqueKey = `${item.id || item._id}_${item.selectedType || 'buy'}`;
+                  return (
+                  <Card key={uniqueKey} className="mb-3 rounded-0 border shadow-sm">
                     <Card.Body className="p-3">
                       <Row>
                         {/* Product Image */}
@@ -142,7 +151,7 @@ const CartPage = () => {
                               <Button
                                 variant="link"
                                 className="text-danger p-0"
-                                onClick={() => handleRemoveItem(item.id)}
+                                onClick={() => handleRemoveItem(item.id, item.selectedType)}
                                 style={{ height: 'fit-content' }}
                               >
                                 <Trash size={20} />
@@ -158,20 +167,20 @@ const CartPage = () => {
                                   variant="outline-dark"
                                   size="sm"
                                   className="rounded-0"
-                                  onClick={() => handleQuantityChange(item.id, -1)}
-                                  disabled={quantities[item.id] <= 1}
+                                  onClick={() => handleQuantityChange(item.id, -1, item.selectedType)}
+                                  disabled={(quantities[uniqueKey] || item.quantity || 1) <= 1}
                                   style={{ width: '32px', height: '32px', padding: '0' }}
                                 >
                                   <Dash />
                                 </Button>
                                 <span className="fw-bold mx-2" style={{ minWidth: '30px', textAlign: 'center', fontSize: '1rem' }}>
-                                  {quantities[item.id] || 1}
+                                  {quantities[uniqueKey] || item.quantity || 1}
                                 </span>
                                 <Button
                                   variant="outline-dark"
                                   size="sm"
                                   className="rounded-0"
-                                  onClick={() => handleQuantityChange(item.id, 1)}
+                                  onClick={() => handleQuantityChange(item.id, 1, item.selectedType)}
                                   style={{ width: '32px', height: '32px', padding: '0' }}
                                 >
                                   <Plus />
@@ -181,10 +190,10 @@ const CartPage = () => {
                               {/* Price */}
                               <div className="text-end">
                                 <p className="mb-0 fw-bold" style={{ fontSize: '1.3rem' }}>
-                                  ₹{(item.buyPrice * (quantities[item.id] || 1)).toLocaleString()}
+                                  ₹{((item.selectedType === 'rent' ? item.rentPrice : item.buyPrice) * (quantities[uniqueKey] || item.quantity || 1)).toLocaleString()}
                                 </p>
                                 <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
-                                  ₹{item.buyPrice.toLocaleString()} each
+                                  ₹{(item.selectedType === 'rent' ? item.rentPrice : item.buyPrice).toLocaleString()} each
                                 </p>
                               </div>
                             </div>
@@ -193,7 +202,8 @@ const CartPage = () => {
                       </Row>
                     </Card.Body>
                   </Card>
-                ))}
+                  );
+                })}
               </Col>
 
               {/* Order Summary */}
