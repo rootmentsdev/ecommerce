@@ -3,10 +3,12 @@ import { Container, Row, Col, Button, Image, Card, Badge } from 'react-bootstrap
 import { Trash, Plus, Dash } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import SideMenu from '../components/SideMenu';
 import Footer from '../components/Footer';
 
 const CartPage = () => {
   const navigate = useNavigate();
+  const [showSideMenu, setShowSideMenu] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [quantities, setQuantities] = useState({});
 
@@ -25,7 +27,12 @@ const CartPage = () => {
 
   // Remove item from cart
   const handleRemoveItem = (productId) => {
-    const updatedCart = cartItems.filter(item => item.id !== productId);
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const updatedCart = currentCart.filter(item => {
+      const itemId = item.id || item._id;
+      return itemId !== productId;
+    });
     setCartItems(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     
@@ -33,6 +40,9 @@ const CartPage = () => {
     const updatedQuantities = { ...quantities };
     delete updatedQuantities[productId];
     setQuantities(updatedQuantities);
+    
+    // Dispatch event to update header cart count
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   // Update quantity
@@ -57,7 +67,8 @@ const CartPage = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Header />
+      <Header onMenuClick={() => setShowSideMenu(true)} />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <Container fluid className="flex-grow-1 bg-light py-4">
         <div style={{ 

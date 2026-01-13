@@ -1,13 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Image, Badge, Breadcrumb, Dropdown, Spinner, Alert, Offcanvas, Modal } from 'react-bootstrap';
 import { X, Funnel } from 'react-bootstrap-icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
+import SideMenu from '../components/SideMenu';
 import Footer from '../components/Footer';
 import API_CONFIG from '../config/api';
 
 const AllProductsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [showSideMenu, setShowSideMenu] = useState(false);
+  
+  // Get search query from URL params or location state
+  const urlParams = new URLSearchParams(location.search);
+  const searchFromUrl = urlParams.get('search') || '';
+  const searchFromState = location.state?.search || '';
+  const [searchQuery, setSearchQuery] = useState(searchFromUrl || searchFromState || '');
   const [showDesktopFilters, setShowDesktopFilters] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -46,10 +55,16 @@ const AllProductsPage = () => {
   const handleConfirmAddToCart = () => {
     if (!selectedProduct) return;
     
-    const existingItemIndex = cartItems.findIndex(item => item.id === selectedProduct.id);
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const productId = selectedProduct.id || selectedProduct._id;
+    const existingItemIndex = currentCart.findIndex(item => {
+      const itemId = item.id || item._id;
+      return itemId === productId;
+    });
     
     if (existingItemIndex >= 0) {
-      const newCartItems = [...cartItems];
+      const newCartItems = [...currentCart];
       newCartItems[existingItemIndex] = {
         ...newCartItems[existingItemIndex],
         quantity: (newCartItems[existingItemIndex].quantity || 1) + 1,
@@ -59,7 +74,7 @@ const AllProductsPage = () => {
       localStorage.setItem('cart', JSON.stringify(newCartItems));
     } else {
       const productWithQuantity = { ...selectedProduct, quantity: 1, selectedType: selectedType };
-      const newCartItems = [...cartItems, productWithQuantity];
+      const newCartItems = [...currentCart, productWithQuantity];
       setCartItems(newCartItems);
       localStorage.setItem('cart', JSON.stringify(newCartItems));
     }
@@ -73,12 +88,17 @@ const AllProductsPage = () => {
   const handleAddToCart = (e, product) => {
     e.stopPropagation(); // Prevent navigation to product details
     
-    // Check if product is already in cart
-    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const productId = product.id || product._id;
+    const existingItemIndex = currentCart.findIndex(item => {
+      const itemId = item.id || item._id;
+      return itemId === productId;
+    });
     
     if (existingItemIndex >= 0) {
       // If item exists, increase quantity
-      const newCartItems = [...cartItems];
+      const newCartItems = [...currentCart];
       newCartItems[existingItemIndex] = {
         ...newCartItems[existingItemIndex],
         quantity: (newCartItems[existingItemIndex].quantity || 1) + 1
@@ -88,7 +108,7 @@ const AllProductsPage = () => {
     } else {
       // If item doesn't exist, add with quantity 1
       const productWithQuantity = { ...product, quantity: 1 };
-      const newCartItems = [...cartItems, productWithQuantity];
+      const newCartItems = [...currentCart, productWithQuantity];
       setCartItems(newCartItems);
       localStorage.setItem('cart', JSON.stringify(newCartItems));
     }
@@ -97,6 +117,29 @@ const AllProductsPage = () => {
     window.dispatchEvent(new Event('cartUpdated'));
   };
   
+  // Get search query from URL params or location state when component mounts or location changes
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchFromUrl = urlParams.get('search');
+    const searchFromState = location.state?.search;
+    
+    console.log('🔍 AllProductsPage - Search query update:', {
+      searchFromUrl,
+      searchFromState,
+      locationSearch: location.search,
+      currentSearchQuery: searchQuery
+    });
+    
+    if (searchFromUrl) {
+      setSearchQuery(searchFromUrl);
+    } else if (searchFromState) {
+      setSearchQuery(searchFromState);
+    } else {
+      // Clear search if no query in URL or state
+      setSearchQuery('');
+    }
+  }, [location.search, location.state]);
+
   // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -218,8 +261,22 @@ const AllProductsPage = () => {
   const availability = ['Rental', 'Purchase'];
   const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Gold', 'Silver'];
 
-  // Filter products based on selected filters
+  // Filter products based on selected filters and search query
   const filteredProducts = allProducts.filter(product => {
+    // Search filter - check product name, category, and description
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      const matchesSearch = 
+        product.name?.toLowerCase().includes(query) ||
+        product.category?.toLowerCase().includes(query) ||
+        product.description?.toLowerCase().includes(query) ||
+        (product.categories && product.categories.some(cat => cat.toLowerCase().includes(query)));
+      
+      if (!matchesSearch) {
+        return false;
+      }
+    }
+
     // Category filter - check both primary category and categories array
     if (selectedCategories.length > 0) {
       const productCategories = product.categories || [product.productCategory];
@@ -279,9 +336,11 @@ const AllProductsPage = () => {
     allProductsCount: allProducts.length,
     filteredProductsCount: filteredProducts.length,
     sortedProductsCount: sortedProducts.length,
+    searchQuery: searchQuery,
     selectedCategories,
     loading,
-    error
+    error,
+    locationSearch: location.search
   });
 
   const handleClearFilters = () => {
@@ -347,7 +406,8 @@ const AllProductsPage = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Header />
+      <Header onMenuClick={() => setShowSideMenu(true)} />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <Container fluid className="flex-grow-1 bg-white py-4">
         <div style={{ 
@@ -361,6 +421,30 @@ const AllProductsPage = () => {
             <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
             <Breadcrumb.Item active>All Products</Breadcrumb.Item>
           </Breadcrumb>
+
+          {/* Search Results Indicator */}
+          {searchQuery.trim() && (
+            <div className="mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div className="d-flex align-items-center gap-2">
+                <span className="text-muted">Search results for:</span>
+                <span className="fw-bold">"{searchQuery}"</span>
+                <Badge bg="secondary" className="ms-2">
+                  {filteredProducts.length} {filteredProducts.length === 1 ? 'result' : 'results'}
+                </Badge>
+              </div>
+              <Button
+                variant="link"
+                className="p-0 text-muted text-decoration-none"
+                onClick={() => {
+                  setSearchQuery('');
+                  navigate('/products');
+                }}
+                style={{ fontSize: '0.9rem' }}
+              >
+                Clear search
+              </Button>
+            </div>
+          )}
 
           {/* Mobile Filter & Sort Bar */}
           <div className="d-lg-none d-flex justify-content-between align-items-center mb-3 py-2">

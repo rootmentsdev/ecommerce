@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Navbar, Nav, Form, InputGroup, Container, Button, Dropdown, Offcanvas, Image } from 'react-bootstrap';
+import { useState, useEffect, useRef } from 'react';
+import { Navbar, Nav, Form, InputGroup, Container, Button, Dropdown, Offcanvas, Image, ListGroup } from 'react-bootstrap';
 import { Heart, Bag, Person, Search, List, X, Plus, Dash } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import FavoritesService from '../services/favoritesService';
 import LogoImage from '../assets/Logo.png';
+import API_CONFIG from '../config/api';
 
 const Header = ({ onMenuClick }) => {
   const navigate = useNavigate();
@@ -12,14 +13,153 @@ const Header = ({ onMenuClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCart, setShowCart] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+  const [allProducts, setAllProducts] = useState([]);
+  const searchRef = useRef(null);
+  const suggestionsRef = useRef(null);
+  const mobileSearchRef = useRef(null);
+  const mobileSuggestionsRef = useRef(null);
 
   const categories = [
-    'Suits',
-    'Kurtas',
-    'Bandhgalas',
-    'Formal',
-    'Jewellery'
+    { name: 'Suits', slug: 'suits' },
+    { name: 'Kurtas', slug: 'kurtas' },
+    { name: 'Bandhgalas', slug: 'bandhgalas' },
+    { name: 'Formal', slug: 'formal' },
+    { name: 'Jewellery', slug: 'jewellery' }
   ];
+
+  // Fetch all products for search
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/images/public?category=all&limit=200`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data.images) {
+            const products = data.data.images.map(item => ({
+              id: item._id,
+              name: item.title,
+              category: item.category,
+              image: item.imageUrl
+            }));
+            setAllProducts(products);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching products for search:', err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        searchRef.current && 
+        !searchRef.current.contains(event.target) &&
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+      }
+      
+      if (
+        mobileSearchRef.current && 
+        !mobileSearchRef.current.contains(event.target) &&
+        mobileSuggestionsRef.current &&
+        !mobileSuggestionsRef.current.contains(event.target)
+      ) {
+        // Don't close mobile search on outside click, only close suggestions
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Generate mobile search suggestions
+  useEffect(() => {
+    if (mobileSearchQuery.trim().length > 0) {
+      const query = mobileSearchQuery.toLowerCase().trim();
+      const suggestions = [];
+
+      // Search in categories
+      categories.forEach(cat => {
+        if (cat.name.toLowerCase().includes(query) || cat.slug.toLowerCase().includes(query)) {
+          suggestions.push({
+            type: 'category',
+            name: cat.name,
+            slug: cat.slug
+          });
+        }
+      });
+
+      // Search in products
+      allProducts.forEach(product => {
+        if (product.name.toLowerCase().includes(query)) {
+          suggestions.push({
+            type: 'product',
+            name: product.name,
+            category: product.category,
+            id: product.id,
+            image: product.image
+          });
+        }
+      });
+
+      // Limit to 8 suggestions
+      setSearchSuggestions(suggestions.slice(0, 8));
+      setShowSuggestions(suggestions.length > 0);
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [mobileSearchQuery, allProducts]);
+
+  // Generate search suggestions for desktop
+  useEffect(() => {
+    if (searchQuery.trim().length > 0 && !showMobileSearch) {
+      const query = searchQuery.toLowerCase().trim();
+      const suggestions = [];
+
+      // Search in categories
+      categories.forEach(cat => {
+        if (cat.name.toLowerCase().includes(query) || cat.slug.toLowerCase().includes(query)) {
+          suggestions.push({
+            type: 'category',
+            name: cat.name,
+            slug: cat.slug
+          });
+        }
+      });
+
+      // Search in products
+      allProducts.forEach(product => {
+        if (product.name.toLowerCase().includes(query)) {
+          suggestions.push({
+            type: 'product',
+            name: product.name,
+            category: product.category,
+            id: product.id,
+            image: product.image
+          });
+        }
+      });
+
+      // Limit to 8 suggestions
+      setSearchSuggestions(suggestions.slice(0, 8));
+      setShowSuggestions(suggestions.length > 0);
+    } else if (!showMobileSearch) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery, allProducts, showMobileSearch]);
 
   useEffect(() => {
     const updateFavoritesCount = () => {
@@ -59,7 +199,12 @@ const Header = ({ onMenuClick }) => {
   };
 
   const handleRemoveFromCart = (productId) => {
-    const updatedCart = cartItems.filter(item => item.id !== productId);
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const updatedCart = currentCart.filter(item => {
+      const itemId = item.id || item._id;
+      return itemId !== productId;
+    });
     setCartItems(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     window.dispatchEvent(new Event('cartUpdated'));
@@ -119,44 +264,113 @@ const Header = ({ onMenuClick }) => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate('/products', { state: { search: searchQuery } });
+      setShowSuggestions(false);
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
+
+  const handleMobileSearchSubmit = (e) => {
+    e.preventDefault();
+    const query = mobileSearchQuery.trim();
+    if (query) {
+      console.log('🔍 Mobile search submit:', query);
+      setShowMobileSearch(false);
+      setShowSuggestions(false);
+      const searchUrl = `/products?search=${encodeURIComponent(query)}`;
+      console.log('🔍 Navigating to:', searchUrl);
+      navigate(searchUrl);
+      setMobileSearchQuery('');
+    }
+  };
+
+  const handleMobileSuggestionClick = (suggestion) => {
+    console.log('🔍 Mobile suggestion clicked:', suggestion);
+    
+    // Close modal and clear state first
+    setShowSuggestions(false);
+    setShowMobileSearch(false);
+    setMobileSearchQuery('');
+    
+    // Use setTimeout to ensure modal closes before navigation
+    setTimeout(() => {
+      if (suggestion.type === 'category') {
+        const categoryUrl = `/category/${suggestion.slug}`;
+        console.log('🔍 Navigating to category:', categoryUrl);
+        navigate(categoryUrl);
+      } else if (suggestion.type === 'product') {
+        const productCategoryUrl = `/category/${suggestion.category}`;
+        console.log('🔍 Navigating to product category:', productCategoryUrl);
+        navigate(productCategoryUrl);
+      }
+    }, 100);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery('');
+    setShowSuggestions(false);
+    
+    if (suggestion.type === 'category') {
+      navigate(`/category/${suggestion.slug}`);
+    } else if (suggestion.type === 'product') {
+      // Navigate to category page with the product's category
+      navigate(`/category/${suggestion.category}`);
     }
   };
 
   const handleCategoryClick = (category) => {
-    // Convert display name to lowercase for URL
-    const categorySlug = category.toLowerCase();
+    // Handle both object and string format
+    const categorySlug = typeof category === 'object' ? category.slug : category.toLowerCase();
     navigate(`/category/${categorySlug}`);
   };
 
   return (
     <>
-      {/* Top Black Bar */}
-      <div className="bg-dark" style={{ height: '2px' }}></div>
-
       {/* Main Header */}
-      <Navbar bg="white" className="border-bottom py-3 sticky-top">
+      <Navbar bg="white" expand="lg" className="border-bottom sticky-top" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Container fluid style={{ maxWidth: '1440px', paddingLeft: '100px', paddingRight: '100px' }}>
           {/* Mobile Layout */}
-          <div className="d-flex d-lg-none w-100 align-items-center justify-content-between">
-            <Button variant="link" className="p-0 text-dark" onClick={onMenuClick}>
-              <List size={24} />
+          <div className="d-flex d-lg-none w-100 align-items-center justify-content-between py-2">
+            <Button 
+              variant="link" 
+              className="p-0 text-dark" 
+              onClick={onMenuClick} 
+              style={{ minWidth: '40px', zIndex: 1032, pointerEvents: 'auto', position: 'relative' }}
+            >
+              <List size={26} />
             </Button>
             <Navbar.Brand href="/" className="mx-auto">
-              <Image src={LogoImage} alt="Dappr Squad Logo" style={{ height: '40px', width: 'auto' }} />
+              <Image src={LogoImage} alt="Dappr Squad Logo" style={{ height: '42px', width: 'auto' }} />
             </Navbar.Brand>
-            <div className="d-flex gap-3">
-              <Button variant="link" className="p-0 text-dark">
-                <Search size={20} />
+            <div className="d-flex gap-3 align-items-center">
+              <Button 
+                variant="link" 
+                className="p-0 text-dark position-relative" 
+                onClick={() => setShowMobileSearch(true)}
+                style={{ minWidth: '40px', zIndex: 1032, pointerEvents: 'auto', position: 'relative' }}
+              >
+                <Search size={22} />
               </Button>
               <Button 
                 variant="link" 
                 className="p-0 text-dark position-relative"
                 onClick={handleCartClick}
+                style={{ minWidth: '40px', zIndex: 1032, pointerEvents: 'auto', position: 'relative' }}
               >
-                <Bag size={20} />
+                <Bag size={22} />
                 {cartCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.6rem' }}>
+                  <span 
+                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                    style={{ 
+                      fontSize: '0.65rem', 
+                      padding: '2px 5px',
+                      transition: 'none',
+                      animation: 'none',
+                      WebkitTransition: 'none',
+                      MozTransition: 'none',
+                      OTransition: 'none'
+                    }}
+                  >
                     {cartCount}
                   </span>
                 )}
@@ -165,78 +379,183 @@ const Header = ({ onMenuClick }) => {
           </div>
 
           {/* Desktop Layout */}
-          <div className="d-none d-lg-flex w-100 align-items-center">
+          <div className="d-none d-lg-flex w-100 align-items-center py-3" style={{ flexWrap: 'nowrap' }}>
             {/* Logo */}
-            <Navbar.Brand href="/" className="me-5">
-              <Image src={LogoImage} alt="Dappr Squad Logo" style={{ height: '50px', width: 'auto' }} />
+            <Navbar.Brand href="/" className="me-4" style={{ minWidth: '140px', flexShrink: 0 }}>
+              <Image src={LogoImage} alt="Dappr Squad Logo" style={{ height: '55px', width: 'auto' }} />
             </Navbar.Brand>
 
             {/* Navigation Links */}
-            <Nav className="me-auto">
-              <Nav.Link href="/" className="text-secondary px-3">Home</Nav.Link>
+            <Nav className="me-auto align-items-center flex-nowrap">
+              <Nav.Link 
+                href="/" 
+                className="text-dark px-4 fw-medium"
+                style={{ fontSize: '0.9rem', letterSpacing: '0.2px', whiteSpace: 'nowrap' }}
+              >
+                Home
+              </Nav.Link>
               <Dropdown>
-                <Dropdown.Toggle variant="link" className="text-secondary text-decoration-none px-3">
+                <Dropdown.Toggle 
+                  variant="link" 
+                  className="text-dark text-decoration-none px-4 fw-medium d-flex align-items-center"
+                  style={{ fontSize: '0.9rem', letterSpacing: '0.2px', border: 'none', whiteSpace: 'nowrap' }}
+                >
                   Categories
+                  <span className="ms-1" style={{ fontSize: '0.65rem' }}>▼</span>
                 </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => navigate('/products')}>
+                <Dropdown.Menu className="mt-2 border-0 shadow-lg" style={{ borderRadius: '8px', padding: '8px 0', minWidth: '200px' }}>
+                  <Dropdown.Item 
+                    onClick={() => navigate('/products')}
+                    className="px-4 py-2"
+                    style={{ fontSize: '0.9rem' }}
+                  >
                     All Products
                   </Dropdown.Item>
-                  <Dropdown.Divider />
+                  <Dropdown.Divider className="my-2" />
                   {categories.map((cat) => (
-                    <Dropdown.Item key={cat} onClick={() => handleCategoryClick(cat)}>
-                      {cat}
+                    <Dropdown.Item 
+                      key={cat.slug} 
+                      onClick={() => handleCategoryClick(cat)}
+                      className="px-4 py-2"
+                      style={{ fontSize: '0.9rem' }}
+                    >
+                      {cat.name}
                     </Dropdown.Item>
                   ))}
                 </Dropdown.Menu>
               </Dropdown>
-              <Nav.Link href="/how-it-works" className="text-secondary px-3">How It Works</Nav.Link>
-              <Nav.Link href="/new-arrivals" className="text-secondary px-3">New Arrivals</Nav.Link>
+              <Nav.Link 
+                href="/how-it-works" 
+                className="text-dark px-4 fw-medium"
+                style={{ fontSize: '0.9rem', letterSpacing: '0.2px', whiteSpace: 'nowrap' }}
+              >
+                How It Works
+              </Nav.Link>
+              <Nav.Link 
+                href="/new-arrivals" 
+                className="text-dark px-4 fw-medium"
+                style={{ fontSize: '0.9rem', letterSpacing: '0.2px', whiteSpace: 'nowrap' }}
+              >
+                New Arrivals
+              </Nav.Link>
             </Nav>
 
             {/* Search Bar */}
-            <Form onSubmit={handleSearchSubmit} className="me-4" style={{ width: '350px' }}>
-              <InputGroup>
-                <InputGroup.Text className="bg-light border-end-0">
-                  <Search size={16} className="text-muted" />
-                </InputGroup.Text>
-                <Form.Control
-                  type="text"
-                  placeholder="Search for products..."
-                  className="bg-light border-start-0"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </InputGroup>
-            </Form>
+            <div className="me-4 position-relative" ref={searchRef} style={{ width: '280px', flexShrink: 0 }}>
+              <Form onSubmit={handleSearchSubmit}>
+                <InputGroup className="border rounded-pill" style={{ backgroundColor: '#f8f9fa' }}>
+                  <InputGroup.Text className="bg-transparent border-0 ps-3">
+                    <Search size={18} className="text-muted" />
+                  </InputGroup.Text>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search products..."
+                    className="bg-transparent border-0 pe-3"
+                    style={{ fontSize: '0.9rem' }}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => searchQuery.trim().length > 0 && setShowSuggestions(true)}
+                  />
+                </InputGroup>
+              </Form>
+              
+              {/* Search Suggestions Dropdown */}
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <div 
+                  ref={suggestionsRef}
+                  className="position-absolute w-100 mt-1 bg-white border rounded shadow-lg"
+                  style={{ 
+                    zIndex: 1050, 
+                    maxHeight: '400px', 
+                    overflowY: 'auto',
+                    top: '100%',
+                    left: 0
+                  }}
+                >
+                  <ListGroup variant="flush">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <ListGroup.Item
+                        key={index}
+                        action
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="px-3 py-2 d-flex align-items-center"
+                        style={{ cursor: 'pointer', border: 'none' }}
+                      >
+                        {suggestion.type === 'category' ? (
+                          <>
+                            <Search size={16} className="text-muted me-2" />
+                            <div className="flex-grow-1">
+                              <div className="fw-medium">{suggestion.name}</div>
+                              <small className="text-muted">Category</small>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {suggestion.image && (
+                              <Image 
+                                src={suggestion.image} 
+                                alt={suggestion.name}
+                                style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                                className="me-2 rounded"
+                              />
+                            )}
+                            <div className="flex-grow-1">
+                              <div className="fw-medium">{suggestion.name}</div>
+                              <small className="text-muted">{suggestion.category}</small>
+                            </div>
+                          </>
+                        )}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </div>
+              )}
+            </div>
 
             {/* Right Icons */}
-            <div className="d-flex gap-3 align-items-center">
+            <div className="d-flex gap-4 align-items-center flex-shrink-0">
               <Button 
                 variant="link" 
-                className="p-0 text-secondary position-relative" 
+                className="p-0 text-dark position-relative d-flex align-items-center justify-content-center" 
                 onClick={() => navigate('/favorites')}
+                style={{ width: '40px', height: '40px' }}
               >
-                <Heart size={22} />
+                <Heart size={24} />
                 {favoritesCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem' }}>
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.7rem', padding: '3px 6px' }}>
                     {favoritesCount}
                   </span>
                 )}
               </Button>
               <Button 
                 variant="link" 
-                className="p-0 text-secondary position-relative"
+                className="p-0 text-dark position-relative d-flex align-items-center justify-content-center"
                 onClick={handleCartClick}
+                style={{ width: '40px', height: '40px' }}
               >
-                <Bag size={22} />
+                <Bag size={24} />
                 {cartCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem' }}>
+                  <span 
+                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                    style={{ 
+                      fontSize: '0.7rem', 
+                      padding: '3px 6px',
+                      transition: 'none',
+                      animation: 'none',
+                      WebkitTransition: 'none',
+                      MozTransition: 'none',
+                      OTransition: 'none'
+                    }}
+                  >
                     {cartCount}
                   </span>
                 )}
               </Button>
-              <Button variant="light" className="rounded p-2">
+              <Button 
+                variant="outline-dark" 
+                className="rounded-circle d-flex align-items-center justify-content-center border-2"
+                style={{ width: '40px', height: '40px', padding: 0 }}
+              >
                 <Person size={20} />
               </Button>
             </div>
@@ -375,40 +694,230 @@ const Header = ({ onMenuClick }) => {
         </Offcanvas.Body>
       </Offcanvas>
 
+      {/* Mobile Search Modal */}
+      <Offcanvas 
+        show={showMobileSearch} 
+        onHide={() => {
+          setShowMobileSearch(false);
+          setShowSuggestions(false);
+          setMobileSearchQuery('');
+        }}
+        backdrop={true}
+        backdropClassName="mobile-search-backdrop"
+        placement="top"
+        className="mobile-search-offcanvas"
+      >
+        <Offcanvas.Header className="border-bottom pb-3">
+          <div className="w-100 position-relative" ref={mobileSearchRef}>
+            <Form onSubmit={handleMobileSearchSubmit}>
+              <InputGroup className="border rounded-pill" style={{ backgroundColor: '#f8f9fa' }}>
+                <InputGroup.Text className="bg-transparent border-0 ps-3">
+                  <Search size={18} className="text-muted" />
+                </InputGroup.Text>
+                <Form.Control
+                  type="text"
+                  placeholder="Search products..."
+                  className="bg-transparent border-0 pe-3"
+                  style={{ fontSize: '0.95rem' }}
+                  value={mobileSearchQuery}
+                  onChange={(e) => {
+                    setMobileSearchQuery(e.target.value);
+                    if (e.target.value.trim().length > 0) {
+                      setShowSuggestions(true);
+                    } else {
+                      setShowSuggestions(false);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (mobileSearchQuery.trim().length > 0) {
+                      setShowSuggestions(true);
+                    }
+                  }}
+                  autoFocus
+                />
+                {mobileSearchQuery.trim() && (
+                  <Button
+                    type="submit"
+                    variant="link"
+                    className="bg-transparent border-0 pe-2"
+                    style={{ color: '#000' }}
+                  >
+                    <Search size={18} />
+                  </Button>
+                )}
+                <Button
+                  variant="link"
+                  className="bg-transparent border-0 pe-2"
+                  onClick={() => {
+                    setShowMobileSearch(false);
+                    setShowSuggestions(false);
+                    setMobileSearchQuery('');
+                  }}
+                >
+                  <X size={20} className="text-muted" />
+                </Button>
+              </InputGroup>
+            </Form>
+            
+            {/* Mobile Search Suggestions Dropdown */}
+            {showSuggestions && searchSuggestions.length > 0 && (
+              <div 
+                ref={mobileSuggestionsRef}
+                className="position-absolute w-100 mt-2 bg-white border rounded shadow-lg"
+                style={{ 
+                  zIndex: 1050, 
+                  maxHeight: '400px', 
+                  overflowY: 'auto',
+                  top: '100%',
+                  left: 0
+                }}
+              >
+                <ListGroup variant="flush">
+                  {searchSuggestions.map((suggestion, index) => (
+                    <ListGroup.Item
+                      key={index}
+                      action
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🔍 ListGroup.Item clicked:', suggestion);
+                        handleMobileSuggestionClick(suggestion);
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      className="px-3 py-2 d-flex align-items-center"
+                      style={{ 
+                        cursor: 'pointer', 
+                        border: 'none', 
+                        touchAction: 'manipulation',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none'
+                      }}
+                    >
+                      {suggestion.type === 'category' ? (
+                        <>
+                          <Search size={16} className="text-muted me-2" />
+                          <div className="flex-grow-1">
+                            <div className="fw-medium">{suggestion.name}</div>
+                            <small className="text-muted">Category</small>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {suggestion.image && (
+                            <Image 
+                              src={suggestion.image} 
+                              alt={suggestion.name}
+                              style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                              className="me-2 rounded"
+                            />
+                          )}
+                          <div className="flex-grow-1">
+                            <div className="fw-medium">{suggestion.name}</div>
+                            <small className="text-muted">{suggestion.category}</small>
+                          </div>
+                        </>
+                      )}
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </div>
+            )}
+          </div>
+        </Offcanvas.Header>
+      </Offcanvas>
+
       {/* Responsive Styles */}
       <style>
         {`
-          .navbar {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          /* Navigation Links - Prevent Wrapping */
+          .nav-link {
+            white-space: nowrap !important;
+            flex-shrink: 0;
           }
 
-          .nav-link {
-            font-size: 0.9rem;
+          /* Navigation Links Hover Effect */
+          .nav-link:hover {
+            color: #000 !important;
+            opacity: 0.8;
+          }
+
+          /* Nav Container - Prevent Wrapping */
+          .navbar-nav {
+            flex-wrap: nowrap !important;
+            white-space: nowrap;
+          }
+
+          /* Dropdown Toggle - No Animation */
+          .dropdown-toggle {
+            text-decoration: none !important;
+            border: none !important;
+            white-space: nowrap !important;
+            flex-shrink: 0;
           }
 
           .dropdown-toggle::after {
-            margin-left: 0.5rem;
+            display: none !important;
           }
 
+          .dropdown-toggle:hover {
+            color: #000 !important;
+            opacity: 0.8;
+          }
+
+          /* Dropdown Menu - No Animation, Better Styling */
+          .dropdown-menu {
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+            border-radius: 8px !important;
+            margin-top: 8px !important;
+            padding: 8px 0 !important;
+          }
+
+          .dropdown-item {
+            transition: none !important;
+          }
+
+          .dropdown-item:hover {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+          }
+
+          .dropdown-item:active {
+            background-color: #e9ecef !important;
+            color: #000 !important;
+          }
+
+          /* Search Bar Styling */
+          .form-control:focus {
+            box-shadow: none !important;
+            border-color: transparent !important;
+            background-color: #f8f9fa !important;
+          }
+
+          .input-group:focus-within {
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1) !important;
+            background-color: #fff !important;
+          }
+
+          /* Button Links */
           .btn-link {
-            text-decoration: none;
-            border: none;
+            text-decoration: none !important;
+            border: none !important;
           }
 
-          /* Remove ALL focus/active states, animations, and transitions */
+          .btn-link:hover {
+            opacity: 0.7;
+          }
+
+          /* Remove all focus outlines and animations */
           *:focus,
           *:active,
           *:focus-visible {
             outline: none !important;
             box-shadow: none !important;
-          }
-
-          .btn,
-          .btn-link,
-          .dropdown-toggle,
-          .nav-link,
-          button {
-            transition: none !important;
           }
 
           .btn:focus,
@@ -417,7 +926,6 @@ const Header = ({ onMenuClick }) => {
           .btn-link:active,
           .dropdown-toggle:focus,
           .dropdown-toggle:active,
-          .dropdown-toggle.show,
           .nav-link:focus,
           .nav-link:active {
             box-shadow: none !important;
@@ -425,60 +933,179 @@ const Header = ({ onMenuClick }) => {
             border: none !important;
           }
 
-          .btn:focus-visible,
-          .btn-link:focus-visible,
-          .dropdown-toggle:focus-visible {
-            box-shadow: none !important;
-            outline: none !important;
+          .btn,
+          .btn-link,
+          .dropdown-toggle,
+          .nav-link,
+          button,
+          .dropdown-item {
+            transition: none !important;
           }
 
-          .form-control:focus {
-            box-shadow: none;
-            border-color: #dee2e6;
+          /* Cart Badge - No Animation - Override All */
+          .badge,
+          .badge *,
+          span.badge,
+          .navbar .badge,
+          .navbar .position-relative .badge {
+            transition: none !important;
+            animation: none !important;
+            -webkit-transition: none !important;
+            -moz-transition: none !important;
+            -o-transition: none !important;
+            -webkit-animation: none !important;
+            -moz-animation: none !important;
+            -o-animation: none !important;
+            transform: none !important;
+            opacity: 1 !important;
           }
 
-          .input-group-text {
-            border-right: none;
+          /* Cart Icon Button - No Animation */
+          .navbar .btn-link.position-relative,
+          .navbar .btn.position-relative,
+          .navbar button.position-relative {
+            transition: none !important;
+            animation: none !important;
+            -webkit-transition: none !important;
+            -moz-transition: none !important;
+            -o-transition: none !important;
+            transform: none !important;
           }
 
-          .form-control {
-            border-left: none;
+          /* Cart Icon - No Animation */
+          .navbar .btn-link svg,
+          .navbar .btn svg {
+            transition: none !important;
+            animation: none !important;
+            -webkit-transition: none !important;
+            -moz-transition: none !important;
+            -o-transition: none !important;
           }
 
-          .form-control:focus + .input-group-text,
-          .input-group-text + .form-control:focus {
-            border-color: #dee2e6;
-          }
-
-          /* Dropdown - No Animation */
-          .dropdown-menu {
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 4px;
-          }
-
-          .dropdown-toggle::after {
-            border: none;
-            content: '';
-          }
-
-          /* Cart Sidebar - Force right side placement */
-          .cart-offcanvas.offcanvas-end {
+          /* Cart Sidebar - No Animation */
+          .cart-offcanvas,
+          .cart-offcanvas.offcanvas-end,
+          .cart-offcanvas.offcanvas-end.show,
+          .cart-offcanvas.offcanvas-end.showing {
             width: 400px !important;
             right: 0 !important;
             left: auto !important;
             top: 0 !important;
             bottom: 0 !important;
-            transform: translateX(100%) !important;
-            transition: transform 0.3s ease-in-out !important;
+            transition: none !important;
+            -webkit-transition: none !important;
+            -moz-transition: none !important;
+            -o-transition: none !important;
+            animation: none !important;
+            -webkit-animation: none !important;
+            -moz-animation: none !important;
+            -o-animation: none !important;
           }
           
-          .cart-offcanvas.offcanvas-end.show {
+          .cart-offcanvas.offcanvas-end {
+            transform: translateX(100%) !important;
+          }
+          
+          .cart-offcanvas.offcanvas-end.show,
+          .cart-offcanvas.offcanvas-end.showing {
             transform: translateX(0) !important;
           }
           
           .cart-offcanvas .offcanvas-backdrop {
             z-index: 1040 !important;
+            transition: none !important;
+            -webkit-transition: none !important;
+            -moz-transition: none !important;
+            -o-transition: none !important;
+          }
+
+          /* Mobile Search Offcanvas */
+          .mobile-search-offcanvas.offcanvas-top {
+            height: auto !important;
+            max-height: 80vh !important;
+            border-bottom: 1px solid #e5e5e5;
+            z-index: 1055 !important;
+          }
+
+          .mobile-search-offcanvas .offcanvas-header {
+            padding: 1rem;
+          }
+
+          .mobile-search-offcanvas .offcanvas-body {
+            padding: 0;
+          }
+
+          .mobile-search-backdrop {
+            z-index: 1054 !important;
+          }
+
+          /* Ensure suggestions are clickable */
+          .mobile-search-offcanvas .list-group-item {
+            pointer-events: auto !important;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+          }
+
+          /* Badge Styling - No Animation */
+          .badge,
+          .badge.rounded-pill,
+          .badge.bg-danger,
+          .navbar .badge,
+          .navbar .position-relative .badge,
+          .navbar button .badge,
+          .navbar .btn-link .badge {
+            font-weight: 600;
+            transition: none !important;
+            animation: none !important;
+            -webkit-transition: none !important;
+            -moz-transition: none !important;
+            -o-transition: none !important;
+            -webkit-animation: none !important;
+            -moz-animation: none !important;
+            -o-animation: none !important;
+            transform: none !important;
+            will-change: auto !important;
+          }
+
+          /* Prevent Bootstrap badge animations */
+          .badge:before,
+          .badge:after {
+            animation: none !important;
+            transition: none !important;
+          }
+
+          /* Search Suggestions */
+          .list-group-item:hover {
+            background-color: #f8f9fa !important;
+          }
+
+          .list-group-item:active {
+            background-color: #e9ecef !important;
+          }
+
+          /* Mobile Header Buttons - Ensure Clickability */
+          @media (max-width: 991px) {
+            .navbar {
+              z-index: 1030 !important;
+            }
+
+            .navbar .btn-link,
+            .navbar .btn {
+              position: relative !important;
+              z-index: 1031 !important;
+              pointer-events: auto !important;
+              touch-action: manipulation !important;
+              -webkit-tap-highlight-color: transparent;
+            }
+
+            .navbar-brand {
+              position: relative;
+              z-index: 1030;
+            }
+
+            .navbar .container-fluid {
+              position: relative;
+              z-index: 1030;
+            }
           }
 
           /* Tablet Responsive */
@@ -487,12 +1114,20 @@ const Header = ({ onMenuClick }) => {
               padding-left: 60px !important;
               padding-right: 60px !important;
             }
+            
+            .navbar form {
+              width: 320px !important;
+            }
           }
 
           @media (max-width: 992px) {
             .navbar .container-fluid {
               padding-left: 40px !important;
               padding-right: 40px !important;
+            }
+            
+            .navbar form {
+              width: 280px !important;
             }
           }
 

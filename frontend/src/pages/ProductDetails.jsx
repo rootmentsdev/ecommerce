@@ -119,14 +119,20 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
-    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const productId = product.id || product._id;
+    const existingItemIndex = currentCart.findIndex(item => {
+      const itemId = item.id || item._id;
+      return itemId === productId;
+    });
     let newCartItems;
     
     if (existingItemIndex >= 0) {
-      newCartItems = [...cartItems];
+      newCartItems = [...currentCart];
       newCartItems[existingItemIndex].quantity = (newCartItems[existingItemIndex].quantity || 1) + 1;
     } else {
-      newCartItems = [...cartItems, { ...product, quantity: 1, selectedSize, selectedType }];
+      newCartItems = [...currentCart, { ...product, quantity: 1, selectedSize, selectedType }];
     }
     
     setCartItems(newCartItems);

@@ -176,6 +176,39 @@ const SideMenu = ({ show, handleClose }) => {
         {isCategories && (
           <Collapse in={showCategories}>
             <div>
+              {/* All Products - First Item */}
+              <ListGroup.Item
+                action
+                onClick={() => {
+                  navigate('/products');
+                  handleClose();
+                }}
+                className="border-0 py-2 ps-5 pe-3"
+                style={{
+                  fontSize: '0.95rem',
+                  cursor: 'pointer',
+                  backgroundColor: '#f8f9fa',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#e9ecef';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8f9fa';
+                }}
+              >
+                <span 
+                  className="text-dark"
+                  style={{ 
+                    fontFamily: APP_CONFIG.FONTS.PRIMARY,
+                    fontWeight: '400'
+                  }}
+                >
+                  All Products
+                </span>
+              </ListGroup.Item>
+              
+              {/* Category Items */}
               {CATEGORIES.map((category, catIndex) => (
                 <ListGroup.Item
                   key={catIndex}

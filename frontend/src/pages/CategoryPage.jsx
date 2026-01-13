@@ -3,12 +3,14 @@ import { Container, Button, Image, Badge, Breadcrumb, Dropdown, Spinner, Alert, 
 import { Funnel } from 'react-bootstrap-icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
+import SideMenu from '../components/SideMenu';
 import Footer from '../components/Footer';
 import API_CONFIG from '../config/api';
 
 const CategoryPage = () => {
   const navigate = useNavigate();
   const { category } = useParams();
+  const [showSideMenu, setShowSideMenu] = useState(false);
   const [showDesktopFilters, setShowDesktopFilters] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedOccasions, setSelectedOccasions] = useState([]);
@@ -31,10 +33,17 @@ const CategoryPage = () => {
   // Add to cart function
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
-    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+    
+    // Read from localStorage directly to get the most current cart state
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const productId = product.id || product._id;
+    const existingItemIndex = currentCart.findIndex(item => {
+      const itemId = item.id || item._id;
+      return itemId === productId;
+    });
     
     if (existingItemIndex >= 0) {
-      const newCartItems = [...cartItems];
+      const newCartItems = [...currentCart];
       newCartItems[existingItemIndex] = {
         ...newCartItems[existingItemIndex],
         quantity: (newCartItems[existingItemIndex].quantity || 1) + 1
@@ -43,7 +52,7 @@ const CategoryPage = () => {
       localStorage.setItem('cart', JSON.stringify(newCartItems));
     } else {
       const productWithQuantity = { ...product, quantity: 1 };
-      const newCartItems = [...cartItems, productWithQuantity];
+      const newCartItems = [...currentCart, productWithQuantity];
       setCartItems(newCartItems);
       localStorage.setItem('cart', JSON.stringify(newCartItems));
     }
@@ -186,7 +195,8 @@ const CategoryPage = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Header />
+      <Header onMenuClick={() => setShowSideMenu(true)} />
+      <SideMenu show={showSideMenu} handleClose={() => setShowSideMenu(false)} />
       
       <Container fluid className="flex-grow-1 bg-white py-4">
         <div style={{ maxWidth: '1440px', paddingLeft: '100px', paddingRight: '100px', margin: '0 auto' }} className="responsive-container">
